@@ -102,11 +102,5 @@ ns.hi_bc             	=  5 5 5
 
 #*******************************************************************************
 
-# Continue from checkpoint 
-amr.restart 			= /local/data/public/ksk38/RestSteadyCessation/Re1_Bn10_N256/chk00450
-
-#*******************************************************************************
-
 # Which derived variables to write to plot files
 amr.plot_vars   	      =  x_velocity y_velocity z_velocity
-amr.derive_plot_vars   	=  stress viscosity
