@@ -549,9 +549,14 @@ NavierStokesBase::Initialize_specific ()
     pp.query("variable_vel_visc",variable_vel_visc);
     pp.query("variable_scal_diff",variable_scal_diff);
     //
+<<<<<<< HEAD
     // Viscosity parameters for Herschel-Bulkley model
     //
     pp.query("flow_index",flow_index);
+=======
+    // Viscosity parameters for Bingham model
+    //
+>>>>>>> started implementing functionality for Bingham rheology
     pp.query("yield_stress",yield_stress);
     pp.query("reg_param",reg_param);
 
