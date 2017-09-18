@@ -478,7 +478,6 @@ c      uytop(i,j) = (four*U(i,j+1)-three*U(i,j)-U(i,j-1))/(three*dy)
 c      vybot(i,j) = (V(i,j+1)+three*V(i,j)-four*V(i,j-1))/(three*dy)
 c      vytop(i,j) = (four*V(i,j+1)-three*V(i,j)-V(i,j-1))/(three*dy)
 
-
       dx = delta(1)
       dy = delta(2)
 
