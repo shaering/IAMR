@@ -2,7 +2,83 @@
 #ifndef _NAVIERSTOKES_F_H_
 #define _NAVIERSTOKES_F_H_
 
-#ifndef BL_LANG_FORT
+#ifdef BL_LANG_FORT
+#    define FORT_FILCC       filcc
+#    define FORT_GRADP       gradp
+#    define FORT_PUTDOWN     putdown
+#    define FORT_INCRMULT    incrmult
+#    define FORT_MAXVAL      maxval
+#    define FORT_SUMMASS     summass
+#    define FORT_SUMMASS_CYL summass_cyl
+#    define FORT_CEN2EDG     cen2edg
+#    define FORT_EDGE_INTERP edge_interp
+#    define FORT_PC_CF_EDGE_INTERP pc_edge_interp
+#    define FORT_BINGHAM 	 bingham
+#if (BL_SPACEDIM == 3)
+#    define FORT_SUMTURB     sumturb
+#ifdef SUMJET
+#    define FORT_SUMJET      sumjet
+#endif
+#endif
+#else
+#  if defined(BL_FORT_USE_UPPERCASE)
+#    define FORT_FILCC       FILCC
+#    define FORT_GRADP       GRADP
+#    define FORT_PUTDOWN     PUTDOWN
+#    define FORT_INCRMULT    INCRMULT
+#    define FORT_MAXVAL      MAXVAL
+#    define FORT_SUMMASS     SUMMASS
+#    define FORT_SUMMASS_CYL SUMMASS_CYL
+#    define FORT_CEN2EDG     CEN2EDG
+#    define FORT_EDGE_INTERP EDGE_INTERP
+#    define FORT_PC_CF_EDGE_INTERP PC_EDGE_INTERP
+#    define FORT_HOEXTRAPTOCC HOEXTRAPTOCC
+#    define FORT_BINGHAM 	 BINGHAM
+#if (BL_SPACEDIM == 3)
+#    define FORT_SUMTURB     SUMTURB
+#ifdef SUMJET
+#    define FORT_SUMJET      SUMJET
+#endif
+#endif
+#  elif defined(BL_FORT_USE_LOWERCASE)
+#    define FORT_FILCC       filcc
+#    define FORT_GRADP       gradp
+#    define FORT_PUTDOWN     putdown
+#    define FORT_INCRMULT    incrmult
+#    define FORT_MAXVAL      maxval
+#    define FORT_SUMMASS     summass
+#    define FORT_SUMMASS_CYL summass_cyl
+#    define FORT_CEN2EDG     cen2edg
+#    define FORT_EDGE_INTERP edge_interp
+#    define FORT_PC_CF_EDGE_INTERP pc_edge_interp
+#    define FORT_HOEXTRAPTOCC hoextraptocc
+#    define FORT_BINGHAM 	 bingham
+#if (BL_SPACEDIM == 3)
+#    define FORT_SUMTURB     sumturb
+#ifdef SUMJET
+#    define FORT_SUMJET      sumjet
+#endif
+#endif
+#  elif defined(BL_FORT_USE_UNDERSCORE)
+#    define FORT_FILCC       filcc_
+#    define FORT_GRADP       gradp_
+#    define FORT_PUTDOWN     putdown_
+#    define FORT_INCRMULT    incrmult_
+#    define FORT_MAXVAL      maxval_
+#    define FORT_SUMMASS     summass_
+#    define FORT_SUMMASS_CYL summass_cyl_
+#    define FORT_CEN2EDG     cen2edg_
+#    define FORT_EDGE_INTERP edge_interp_
+#    define FORT_PC_CF_EDGE_INTERP pc_edge_interp_
+#    define FORT_HOEXTRAPTOCC hoextraptocc_
+#    define FORT_BINGHAM 	 bingham_
+#if (BL_SPACEDIM == 3)
+#    define FORT_SUMTURB     sumturb_
+#ifdef SUMJET
+#    define FORT_SUMJET      sumjet_
+#endif
+#endif
+#  endif
 
 #include <AMReX_ArrayLim.H>
 #include <AMReX_filcc_f.H>
@@ -105,6 +181,12 @@ extern "C" {
                                 amrex::Real*       fine, ARLIM_P(flo), ARLIM_P(fhi));
 
 
+
+	void FORT_BINGHAM(amrex::Real* visc, ARLIM_P(visc_lo), ARLIM_P(visc_hi),
+					  const amrex::Real* vel, ARLIM_P(vel_lo), ARLIM_P(vel_hi),
+					  const int* lo, const int* hi, const int* domain_lo, const int* domain_hi,
+					  const amrex::Real* delta, const int* bcrec,
+					  const Real* mu, const Real* tau, const Real* eps);
 
 #ifdef __cplusplus
 }
