@@ -2137,6 +2137,9 @@ NavierStokes::calcViscosity (const Real time,
             {
                 // 
                 // Compute apparent viscosity for regularised Herschel-Bulkley fluid
+                // Ensure visc_cc is initialised
+                //
+                visc_cc->setVal(visc_coef[Xvel], 0, 1, nGrow);
                 //
 				calcHerschelBulkley(*visc_cc,time);
 				//
