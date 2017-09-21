@@ -492,6 +492,8 @@ c      vytop(i,j) = (four*V(i,j+1)-three*V(i,j)-V(i,j-1))/(three*dy)
          end do
       end do
 
+      if (0.eq.1) then
+
       fixlft = ( (lo(1) .eq. domlo(1)) .and. 
      &           ( (ULOX .eq. EXT_DIR .or. ULOX .eq. HOEXTRAP .or. ULOX.eq.FOEXTRAP) .or. 
      &             (VLOX .eq. EXT_DIR .or. VLOX .eq. HOEXTRAP .or. ULOX.eq.FOEXTRAP) ) )
