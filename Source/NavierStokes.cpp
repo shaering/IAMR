@@ -764,16 +764,6 @@ NavierStokes:: calcBingham  (MultiFab& visc)
 
     const int *domlo   = geom.Domain().loVect();
     const int *domhi   = geom.Domain().hiVect();
-	if (true)
-	{
-	  std::cout << "dom x lo,hi: " << domlo[0] << "," << domhi[0] << std::endl; 
-	  std::cout << "dom y lo,hi: " << domlo[1] << "," << domhi[1] << std::endl; 
-	}
-	if (vel.nGrow() != visc.nGrow())
-	{
-	  std::cout << "vel.nGrow() = " << vel.nGrow() << std::endl; 
-	  std::cout << "visc.nGrow() = " << visc.nGrow() << std::endl; 
-	}
     const Real* dx     = geom.CellSize();
     const int *bc      = phys_bc.vect();
 
@@ -2148,13 +2138,18 @@ NavierStokes::calcViscosity (const Real time,
                 // Ensure visc_cc is initialised
                 //
                 visc_cc->setVal(visc_coef[Xvel]+0.5*yield_stress/reg_param, 0, 1, nGrow);
- 
                 //
                 // Compute apparent viscosity for regularised Bingham fluid
                 //
+<<<<<<< HEAD
 				calcBingham(*visc_cc);
 				//
 				// Need to figure out how to fill the ghost cells for visc_cc!
+=======
+				calcBingham(*visc_cc,time);
+				//
+				// Fill the ghost cells for visc_cc
+>>>>>>> cleaned up code
 				//
 				visc_cc->FillBoundary(geom.periodicity());
             }
