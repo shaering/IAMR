@@ -601,9 +601,63 @@ NavierStokesBase::Initialize_specific ()
     //
     if (do_temp)
     {
-	    Temp = ++scalId;
-	    pp.get("temp_cond_coef",visc_coef[Temp]);
-    }    
+	Temp = ++scalId;
+	pp.get("temp_cond_coef",visc_coef[Temp]);
+    }
+    
+    pp.query("divu_relax_factor",divu_relax_factor);
+    pp.query("S_in_vel_diffusion",S_in_vel_diffusion);
+    pp.query("be_cn_theta",be_cn_theta);
+    if (be_cn_theta > 1.0 || be_cn_theta < .5)
+        amrex::Abort("NavierStokesBase::Initialize(): Must have be_cn_theta <= 1.0 && >= .5");
+    //
+    // Set parameters dealing with how grids are treated at outflow boundaries.
+    //
+    pp.query("do_refine_outflow",do_refine_outflow);
+    pp.query("do_derefine_outflow",do_derefine_outflow);
+    if (do_derefine_outflow) do_refine_outflow = 0;
+
+    pp.query("Nbuf_outflow",Nbuf_outflow);
+    BL_ASSERT(Nbuf_outflow >= 0);
+    BL_ASSERT(!(Nbuf_outflow <= 0 && do_derefine_outflow == 1));
+
+    //
+    // Check whether we are doing running statistics.
+    //
+    pp.query("do_running_statistics",do_running_statistics);
+
+    // If dx,dy,dz,Rcyl<0 (default) the volWgtSum is computed over the entire domain
+    pp.query("volWgtSum_sub_origin_x",volWgtSum_sub_origin_x);
+    pp.query("volWgtSum_sub_origin_y",volWgtSum_sub_origin_y);
+    pp.query("volWgtSum_sub_origin_z",volWgtSum_sub_origin_z);
+    pp.query("volWgtSum_sub_Rcyl",volWgtSum_sub_Rcyl);
+    pp.query("volWgtSum_sub_dx",volWgtSum_sub_dx);
+    pp.query("volWgtSum_sub_dy",volWgtSum_sub_dy);
+    pp.query("volWgtSum_sub_dz",volWgtSum_sub_dz);
+
+    //
+    // Are we going to do velocity or momentum update?
+    //
+    pp.query("do_mom_diff",do_mom_diff);
+    pp.query("predict_mom_together",predict_mom_together);
+
+    if (do_mom_diff == 0 && predict_mom_together == 1)
+    {
+      amrex::Print() << "MAKES NO SENSE TO HAVE DO_MOM_DIFF=0 AND PREDICT_MOM_TOGETHER=1\n";
+      exit(0);
+    }
+
+    pp.query("harm_avg_cen2edge", def_harm_avg_cen2edge);
+
+#ifdef PARTICLES
+    read_particle_params ();
+#endif
+
+    FORT_SET_PARAMS(vel_visc_coef, yield_stress, reg_param);
+
+    amrex::ExecOnFinalize(NavierStokesBase::Finalize);
+
+    initialized = true;
 }
 
 
