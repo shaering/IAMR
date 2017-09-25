@@ -1317,6 +1317,7 @@ NavierStokesBase::estTimeStep ()
     const int   n_grow        = 0;
     Real        estdt         = 1.0e+20;
 
+    const Real  cur_time = state[State_Type].curTime();
     const Real  cur_pres_time = state[Press_Type].curTime();
     MultiFab&   U_new         = get_new_data(State_Type);
 
@@ -1325,6 +1326,11 @@ NavierStokesBase::estTimeStep ()
     MultiFab Gp(grids,dmap,BL_SPACEDIM,1);
     getGradP(Gp, cur_pres_time);
 
+	//
+	// Viscous forcing - necessary for viscoplastic flow. 
+	//
+	MultiFab visc_terms(grids,dmap,BL_SPACEDIM,1);
+	getViscTerms(visc_terms,Xvel,BL_SPACEDIM,cur_time);
     //FIXME? find a better solution for umax? gcc 5.4, OMP reduction does not take arrays
     Real umax_x=-1.e200,umax_y=-1.e200,umax_z=-1.e200;
 #ifdef _OPENMP
@@ -1333,14 +1339,9 @@ NavierStokesBase::estTimeStep ()
 {
     FArrayBox tforces;
     Real gr_max[BL_SPACEDIM];
-
     for (MFIter Rho_mfi(rho_ctime,true); Rho_mfi.isValid(); ++Rho_mfi)
     {
         const Box& bx=Rho_mfi.tilebox();
-        //
-        // Get the velocity forcing.  For some reason no viscous forcing.
-        //
-
         const Real cur_time = state[State_Type].curTime();
         
         if (getForceVerbose)
@@ -1351,22 +1352,22 @@ NavierStokesBase::estTimeStep ()
         getForce(tforces,bx,n_grow,Xvel,BL_SPACEDIM,cur_time,U_new[Rho_mfi],U_new[Rho_mfi],Density);
 
         tforces.minus(Gp[Rho_mfi],0,0,BL_SPACEDIM);
+		if (yield_stress > 0.0)
+		{
+		  tforces.minus(visc_terms[Rho_mfi],0,0,BL_SPACEDIM);
+		}
         //
         // Estimate the maximum allowable timestep from the Godunov box.
         //
         Real dt = godunov->estdt(U_new[Rho_mfi],tforces,rho_ctime[Rho_mfi],bx,
                                  geom.CellSize(),cfl,gr_max);
 
-        // for (int k = 0; k < BL_SPACEDIM; k++)
-        // {
-	//     u_max[k] = std::max(u_max[k],gr_max[k]);
-	// }
         umax_x = std::max(umax_x,gr_max[0]);
         umax_y = std::max(umax_y,gr_max[1]);
 #if (BL_SPACEDIM == 3)
         umax_z = std::max(umax_z,gr_max[2]);
 #endif 
-        estdt = std::min(estdt,dt);
+		estdt = std::min(estdt,dt);
     }
 }
 
