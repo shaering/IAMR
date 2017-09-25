@@ -549,14 +549,9 @@ NavierStokesBase::Initialize_specific ()
     pp.query("variable_vel_visc",variable_vel_visc);
     pp.query("variable_scal_diff",variable_scal_diff);
     //
-<<<<<<< HEAD
     // Viscosity parameters for Herschel-Bulkley model
     //
     pp.query("flow_index",flow_index);
-=======
-    // Viscosity parameters for Bingham model
-    //
->>>>>>> started implementing functionality for Bingham rheology
     pp.query("yield_stress",yield_stress);
     pp.query("reg_param",reg_param);
 
@@ -1335,28 +1330,34 @@ NavierStokesBase::estTimeStep ()
 	//
 	MultiFab visc_terms(grids,dmap,BL_SPACEDIM,1);
 	getViscTerms(visc_terms,Xvel,BL_SPACEDIM,cur_time);
-    //FIXME? find a better solution for umax? gcc 5.4, OMP reduction does not take arrays
-    Real umax_x=-1.e200,umax_y=-1.e200,umax_z=-1.e200;
-#ifdef _OPENMP
-#pragma omp parallel if (!system::regtest_reduction) reduction(min:estdt) reduction(max:umax_x,umax_y,umax_z)
-#endif
-{
-    FArrayBox tforces;
-    Real gr_max[BL_SPACEDIM];
-    for (MFIter Rho_mfi(rho_ctime,true); Rho_mfi.isValid(); ++Rho_mfi)
-    {
-        const Box& bx=Rho_mfi.tilebox();
-        const Real cur_time = state[State_Type].curTime();
-        
-        if (getForceVerbose)
-        amrex::Print() << "---" << '\n' 
-        << "H - est Time Step:" << '\n' 
-        << "Calling getForce..." << '\n';
-        
-        getForce(tforces,bx,n_grow,Xvel,BL_SPACEDIM,cur_time,U_new[Rho_mfi],U_new[Rho_mfi],Density);
 
+    for (MFIter Rho_mfi(rho_ctime); Rho_mfi.isValid(); ++Rho_mfi)
+    {
+        const int i = Rho_mfi.index();
+        //
+        // Get the velocity forcing.  For some reason no viscous forcing.
+        //
+#ifdef BOUSSINESQ
+        // HACK HACK HACK 
+        // THIS CALL IS BROKEN 
+        // getForce(tforces,i,n_grow,Xvel,BL_SPACEDIM,cur_time,U_new[i]);
+        tforces.resize(amrex::grow(grids[i],n_grow),BL_SPACEDIM);
+        tforces.setVal(0.);
+#else
+#ifdef GENGETFORCE
+        getForce(tforces,i,n_grow,Xvel,BL_SPACEDIM,cur_time,rho_ctime[Rho_mfi]);
+#elif MOREGENGETFORCE
+	if (getForceVerbose)
+	  amrex::Print() << "---" << '\n' 
+			 << "H - est Time Step:" << '\n' 
+			 << "Calling getForce..." << '\n';
+        getForce(tforces,i,n_grow,Xvel,BL_SPACEDIM,cur_time,U_new[Rho_mfi],U_new[Rho_mfi],Density);
+#else
+        getForce(tforces,i,n_grow,Xvel,BL_SPACEDIM,rho_ctime[Rho_mfi]);
+#endif		 
+#endif		 
         tforces.minus(Gp[Rho_mfi],0,0,BL_SPACEDIM);
-		if (variable_vel_visc)
+		if (yield_stress > 0.0)
 		{
 		  tforces.minus(visc_terms[Rho_mfi],0,0,BL_SPACEDIM);
 		}
@@ -1366,11 +1367,10 @@ NavierStokesBase::estTimeStep ()
         Real dt = godunov->estdt(U_new[Rho_mfi],tforces,rho_ctime[Rho_mfi],bx,
                                  geom.CellSize(),cfl,gr_max);
 
-        umax_x = std::max(umax_x,gr_max[0]);
-        umax_y = std::max(umax_y,gr_max[1]);
-#if (BL_SPACEDIM == 3)
-        umax_z = std::max(umax_z,gr_max[2]);
-#endif 
+        for (int k = 0; k < BL_SPACEDIM; k++)
+        {
+		  u_max[k] = std::max(u_max[k],gr_max[k]);
+		}
 		estdt = std::min(estdt,dt);
     }
 }
@@ -1381,11 +1381,6 @@ NavierStokesBase::estTimeStep ()
     {
         const int IOProc = ParallelDescriptor::IOProcessorNumber();
 
-        u_max[0] = umax_x; 
-        u_max[1] = umax_y;
-#if (BL_SPACEDIM == 3)
-        u_max[2] = umax_z;
-#endif 
 	      ParallelDescriptor::ReduceRealMax(u_max, BL_SPACEDIM, IOProc);
 
 	      amrex::Print() << "estTimeStep :: \n" << "LEV = " << level << " UMAX = ";
