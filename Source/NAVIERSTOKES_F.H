@@ -21,6 +21,7 @@
 #    define FORT_SUMJET      sumjet
 #endif
 #endif
+#    define FORT_SET_PARAMS  setparams
 #else
 #  if defined(BL_FORT_USE_UPPERCASE)
 #    define FORT_FILCC       FILCC
@@ -42,6 +43,7 @@
 #    define FORT_SUMJET      SUMJET
 #endif
 #endif
+#    define FORT_SET_PARAMS  SETPARAMS
 #  elif defined(BL_FORT_USE_LOWERCASE)
 #    define FORT_FILCC       filcc
 #    define FORT_GRADP       gradp
@@ -62,6 +64,7 @@
 #    define FORT_SUMJET      sumjet
 #endif
 #endif
+#    define FORT_SET_PARAMS  setparams
 #  elif defined(BL_FORT_USE_UNDERSCORE)
 #    define FORT_FILCC       filcc_
 #    define FORT_GRADP       gradp_
@@ -82,6 +85,7 @@
 #    define FORT_SUMJET      sumjet_
 #endif
 #endif
+#    define FORT_SET_PARAMS  setparams_
 #  endif
 
 #include <AMReX_ArrayLim.H>
