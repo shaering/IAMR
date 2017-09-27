@@ -14,7 +14,6 @@
 #define XVEL 1
 #define YVEL 2
 
-
 module godunov_2d_module
 
   use amrex_fort_module, only : rt=>amrex_real
@@ -394,11 +393,15 @@ contains
 ! c     ----------------------------------------------------------
 ! c
       implicit none
+
+#include <NSCOMM_F.H>
+
       REAL_T    u, v
       REAL_T    small
       REAL_T    dt_start
       REAL_T    tforce1
       REAL_T    tforce2
+      REAL_T    yield
       integer   i, j
       integer lo(SDIM), hi(SDIM)
       REAL_T  dt,dx(SDIM),cfl,u_max(SDIM)
@@ -420,13 +423,15 @@ contains
       v       = zero
       tforce1 = zero
       tforce2 = zero
+      yield   = zero
 
       do j = lo(2), hi(2)
          do i = lo(1), hi(1)
-            u = max(u,abs(vel(i,j,1)))
-            v = max(v,abs(vel(i,j,2)))
-             tforce1 = max(tforce1,abs(tforces(i,j,1)/rho(i,j)))
-             tforce2 = max(tforce2,abs(tforces(i,j,2)/rho(i,j)))
+            u       = max(u,abs(vel(i,j,1)))
+            v       = max(v,abs(vel(i,j,2)))
+            tforce1 = max(tforce1,abs(tforces(i,j,1)/rho(i,j)))
+            tforce2 = max(tforce2,abs(tforces(i,j,2)/rho(i,j)))
+            yield   = max(yield, 1.0e3*(tau/sqrt(2.0)+mu)/rho(i,j))
          end do
       end do
 
@@ -445,6 +450,13 @@ contains
 
       if (tforce2 .gt. small) then
         dt  = min(dt,sqrt(two*dx(2)/tforce2))
+      end if
+
+      if (tau .gt. small) then
+        if (yield .gt. small) then
+          dt  = min(dt,dx(1)/yield)
+          dt  = min(dt,dx(2)/yield)
+        end if
       end if
 
       if (dt .eq. dt_start) dt = min(dx(1),dx(2))
@@ -480,9 +492,10 @@ contains
 
       do j = lo(2), hi(2)
          do i = lo(1), hi(1)
-            old_velmag = sqrt(old_vel(i,j,1)**2 + old_vel(i,j,2)**2)
-            new_velmag = sqrt(new_vel(i,j,1)**2 + new_vel(i,j,2)**2)
-            max_change = max(max_change, abs(new_velmag - old_velmag))
+            old_velmag = sqrt(old_vel(i,j,1)**2+old_vel(i,j,2)**2)
+            new_velmag = sqrt(new_vel(i,j,1)**2+new_vel(i,j,2)**2)
+            max_change = 
+     &          max(max_change,abs((new_velmag-old_velmag)/old_velmag))
          end do
       end do
 
