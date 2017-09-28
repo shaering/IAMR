@@ -38,8 +38,9 @@ NavierStokes::error_setup()
         err_list.add("mag_vort", 0, ErrorRec::Special,FORT_MVERROR);
 	amrex::Print() << "Refining on MAG_VORT" << std::endl;
     }
-    if (do_temp_ref) {
-        err_list.add("temp", 1, ErrorRec::Special, FORT_TEMPERROR);
-	amrex::Print() << "Refining on TEMP and/or GRAD T" << std::endl;
+    if (do_stress_ref) {
+        err_list.add("stress", 1, ErrorRec::Special, 
+                     BL_FORT_PROC_CALL(FORT_STRSERROR,fort_strserror));
+	amrex::Print() << "Refining on STRESS" << std::endl;
     }
 }

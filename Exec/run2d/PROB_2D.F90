@@ -71,12 +71,12 @@ contains
       parameter (nCompFile = 2)
       REAL_T dxFile(3)
 
-      namelist /fortin/ denerr, vorterr, adverr, temperr, &
-     			denfact, xblob, yblob, zblob, radblob, &
-                       velfact, probtype, randfact, bubgrad, &
-     			rhozero, tempzero, c_d, r_d, grav_angle, &
-                       adv_dir, adv_vel, axis_dir, radvort, &
-                       lid_vel 
+      namelist /fortin/ denerr, vorterr, adverr, temperr, stresserr,
+     &			denfact, xblob, yblob, zblob, radblob, 
+     &                  velfact, probtype, randfact, bubgrad,
+     &			rhozero, tempzero, c_d, r_d, grav_angle,
+     &                  adv_dir, adv_vel, axis_dir, radvort,
+     &          lid_vel
 #ifdef BL_DO_FLCT
                        ,forceInflow, numInflPlanesStore, strmwse_dir, &
                        forceLo, forceHi, flct_file, turb_scale
@@ -1566,33 +1566,89 @@ contains
 
       end subroutine FORT_MVERROR 
 
-!c ::: -----------------------------------------------------------
-!c ::: This routine is called during a filpatch operation when
-!c ::: the patch to be filled falls outside the interior
-!c ::: of the problem domain.  You are requested to supply the
-!c ::: data outside the problem interior in such a way that the
-!c ::: data is consistant with the types of the boundary conditions
-!c ::: you specified in the C++ code.  
-!c ::: 
-!c ::: NOTE:  you can assume all interior cells have been filled
-!c :::        with valid data and that all non-interior cells have
-!c ::         have been filled with a large real number.
-!c ::: 
-!c ::: INPUTS/OUTPUTS:
-!c ::: 
-!c ::: rho      <=  density array
-!c ::: DIMS(rho) => index extent of rho array
-!c ::: domlo,hi  => index extent of problem domain
-!c ::: dx        => cell spacing
-!c ::: xlo       => physical location of lower left hand
-!c :::	           corner of rho array
-!c ::: time      => problem evolution time
-!c ::: bc	=> array of boundary flags bc(BL_SPACEDIM,lo:hi)
-!c ::: -----------------------------------------------------------
+c ::: -----------------------------------------------------------
+c ::: This routine will tag high error cells based on the 
+c ::: magnitude of the stress tensor
+c ::: 
+c ::: INPUTS/OUTPUTS:
+c ::: 
+c ::: tag           <=  integer tag array
+c ::: DIMS(tag)     => index extent of tag array
+c ::: set           => integer value to tag cell for refinement
+c ::: clear         => integer value to untag cell
+c ::: stress        => array of vorticity values
+c ::: DIMS(stress)  => index extent of vort array
+c ::: nvar          => number of components in vort array (should be 1)
+c ::: lo,hi         => index extent of grid
+c ::: domlo,hi      => index extent of problem domain
+c ::: dx            => cell spacing
+c ::: xlo           => physical location of lower left hand
+c :::	           corner of tag array
+c ::: problo        => phys loc of lower left corner of prob domain
+c ::: time          => problem evolution time
+c ::: -----------------------------------------------------------
+      subroutine FORT_STRSERROR (tag,DIMS(tag),set,clear,
+     &                           stress,DIMS(stress),lo,hi,nvar,
+     &                           domlo,domhi,dx,xlo,
+     &			                 problo,time,level)
 
-      subroutine FORT_DENFILL (rho,DIMS(rho),domlo,domhi,dx, &
-                              xlo,time,bc ) &
-                              bind(C, name="FORT_DENFILL")
+      integer   DIMDEC(tag)
+      integer   DIMDEC(stress)
+      integer   nvar, set, clear, level
+      integer   lo(SDIM), hi(SDIM)
+      integer   domlo(SDIM), domhi(SDIM)
+      REAL_T    dx(SDIM), xlo(SDIM), problo(SDIM), time
+      integer   tag(DIMV(tag))
+      REAL_T    stress(DIMV(stress),nvar)
+
+      REAL_T    x, y
+      integer   i, j
+
+#include <probdata.H>
+#include <NSCOMM_F.H>
+
+c     probtype = LID-DRIVEN CAVITY
+      if (probtype .eq. 10) then
+        do j = lo(2), hi(2)
+           do i = lo(1), hi(1)
+              tag(i,j) =
+     &          merge(set,tag(i,j),abs(stress(i,j,1)-0.1).lt.stresserr)
+           end do
+        end do
+
+      else
+        print *,'DONT KNOW THIS PROBTYPE IN FORT_STRSERROR ',probtype
+        stop
+      end if
+
+      end
+
+c ::: -----------------------------------------------------------
+c ::: This routine is called during a filpatch operation when
+c ::: the patch to be filled falls outside the interior
+c ::: of the problem domain.  You are requested to supply the
+c ::: data outside the problem interior in such a way that the
+c ::: data is consistant with the types of the boundary conditions
+c ::: you specified in the C++ code.  
+c ::: 
+c ::: NOTE:  you can assume all interior cells have been filled
+c :::        with valid data and that all non-interior cells have
+c ::         have been filled with a large real number.
+c ::: 
+c ::: INPUTS/OUTPUTS:
+c ::: 
+c ::: rho      <=  density array
+c ::: DIMS(rho) => index extent of rho array
+c ::: domlo,hi  => index extent of problem domain
+c ::: dx        => cell spacing
+c ::: xlo       => physical location of lower left hand
+c :::	           corner of rho array
+c ::: time      => problem evolution time
+c ::: bc	=> array of boundary flags bc(BL_SPACEDIM,lo:hi)
+c ::: -----------------------------------------------------------
+
+      subroutine FORT_DENFILL (rho,DIMS(rho),domlo,domhi,dx,
+     &                         xlo,time,bc )
 
       integer    DIMDEC(rho)
       integer    domlo(SDIM), domhi(SDIM)
