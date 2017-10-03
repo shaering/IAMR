@@ -78,10 +78,10 @@ cg.maxiter              = 1000000
 #*******************************************************************************
 
 # Viscosity coefficient 
-ns.variable_vel_visc 	= 1
+ns.variable_vel_visc 	= 0
 ns.vel_visc_coef        = 0.1
-ns.yield_stress      	= 1.4142135623730951
-ns.reg_param         	= 0.0025
+#ns.yield_stress      	= 1.4142135623730951
+#ns.reg_param         	= 0.0025
 
 #*******************************************************************************
 
