@@ -625,6 +625,20 @@ c
          visc(i+1,j-1,1) = visc(i,j,1)
       end if
 
+      do j = lo(2), hi(2)
+         do i = lo(1), hi(1)
+            if (j.eq.480 .and. (i.ge.20.and.i.le.40)) then
+               ux  = uxcen(i,j)
+               vx  = vxcen(i,j)
+               uy  = uycen(i,j)
+               vy  = vycen(i,j)
+               strnrt = strnrt_fun(ux,vx,uy,vy)
+               print *, 'NS:VISC AT 480:', i, visc(i,j,1), 
+     &                  U(i-1,j), U(i,j), U(i+1,j), strnrt
+            end if
+         end do
+      end do
+
 #     undef U
 #     undef V      
 #     undef VLOX
