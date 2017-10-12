@@ -789,8 +789,7 @@ NavierStokes:: calcBingham  (MultiFab& visc)
 
        FORT_BINGHAM(viscdat, ARLIM(visc_lo), ARLIM(visc_hi),
                	    veldat,  ARLIM(vel_lo),  ARLIM(vel_hi),
-               	    lo, hi, domlo, domhi, dx, bc,
-		    &visc_coef[Xvel], &yield_stress, &reg_param);
+               	    lo, hi, domlo, domhi, dx, vel_bc.dataPtr());
     }
 }
 
@@ -2141,15 +2140,9 @@ NavierStokes::calcViscosity (const Real time,
                 //
                 // Compute apparent viscosity for regularised Bingham fluid
                 //
-<<<<<<< HEAD
-				calcBingham(*visc_cc);
-				//
-				// Need to figure out how to fill the ghost cells for visc_cc!
-=======
 				calcBingham(*visc_cc,time);
 				//
 				// Fill the ghost cells for visc_cc
->>>>>>> cleaned up code
 				//
 				visc_cc->FillBoundary(geom.periodicity());
             }
