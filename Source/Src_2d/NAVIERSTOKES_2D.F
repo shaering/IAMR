@@ -419,3 +419,270 @@ c     coarse face, leave the in-between faces alone.
 
       end
 
+      subroutine FORT_BINGHAM(visc, DIMS(visc), vel, DIMS(vel), 
+     &                        lo, hi, domlo, domhi, delta, vel_bc)
+      implicit none
+
+# include <NSCOMM_F.H>
+c
+c ::: This routine will compute the Papanastasiou regularised Bingham
+c ::: viscosity based on the velocity field
+c
+      integer    lo(2), hi(2)
+      integer    DIMDEC(visc)
+      integer    DIMDEC(vel)
+      integer    domlo(2), domhi(2)
+      integer    vel_bc(2,2,2)
+      REAL_T     delta(2)
+      REAL_T     visc(DIMV(visc),1)
+      REAL_T     vel(DIMV(vel),2)
+
+      integer   i,j
+      REAL_T    ux, vx, uy, vy, dx, dy
+      logical   fixlft, fixrgt, fixbot, fixtop
+      REAL_T    uxcen, uxlft, uxrgt, vxcen, vxlft, vxrgt
+      REAL_T    uycen, uybot, uytop, vycen, vybot, vytop
+      REAL_T    strnrt, strnrt_fun, bingham_exp, bingham_tlr
+c
+c     ::::: some useful macro definitions
+c
+#     define U(i,j) vel(i,j,1)
+#     define V(i,j) vel(i,j,2)
+
+#     define ULOX vel_bc(1,1,1)
+#     define UHIX vel_bc(1,2,1)
+
+#     define VLOX vel_bc(1,1,2)
+#     define VHIX vel_bc(1,2,2)
+
+#     define ULOY vel_bc(2,1,1)
+#     define UHIY vel_bc(2,2,1)
+
+#     define VLOY vel_bc(2,1,2)
+#     define VHIY vel_bc(2,2,2)
+c
+c     ::::: statement functions that implement stencil
+c
+      uxcen(i,j) = half*(U(i+1,j)-U(i-1,j))/dx
+      uxlft(i,j) = (U(i+1,j)+three*U(i,j)-four*U(i-1,j))/(three*dx)
+      uxrgt(i,j) = (four*U(i+1,j)-three*U(i,j)-U(i-1,j))/(three*dx)
+      
+      vxcen(i,j) = half*(V(i+1,j)-V(i-1,j))/dx
+      vxlft(i,j) = (V(i+1,j)+three*V(i,j)-four*V(i-1,j))/(three*dx)
+      vxrgt(i,j) = (four*V(i+1,j)-three*V(i,j)-V(i-1,j))/(three*dx)
+
+      uycen(i,j) = half*(U(i,j+1)-U(i,j-1))/dy
+      uybot(i,j) = (U(i,j+1)+three*U(i,j)-four*U(i,j-1))/(three*dy)
+      uytop(i,j) = (four*U(i,j+1)-three*U(i,j)-U(i,j-1))/(three*dy)
+
+      vycen(i,j) = half*(V(i,j+1)-V(i,j-1))/dy
+      vybot(i,j) = (V(i,j+1)+three*V(i,j)-four*V(i,j-1))/(three*dy)
+      vytop(i,j) = (four*V(i,j+1)-three*V(i,j)-V(i,j-1))/(three*dy)
+
+c
+c     ::::: function for computing magnitude of rate of strain tensor
+c
+      strnrt_fun(ux,vx,uy,vy) = sqrt(ux**2+half*(vx+uy)**2+vy**2)
+
+c
+c     ::::: Functions for computing the regularised Bingham viscosity.
+c     ::::: When the strain rate is small, Taylor expand the exponential
+c     ::::: to avoid floating point errors.
+c
+
+      bingham_exp(strnrt) = mu+half*tau*(1-exp(-strnrt/eps))/strnrt
+      bingham_tlr(strnrt) =
+     & mu+half*tau/eps*(one-half*strnrt/eps+half*third*strnrt**2/eps**2)
+
+      dx = delta(1)
+      dy = delta(2)
+
+      do j = lo(2), hi(2)
+         do i = lo(1), hi(1)
+            ux  = uxcen(i,j)
+            vx  = vxcen(i,j)
+            uy  = uycen(i,j)
+            vy  = vycen(i,j)
+            strnrt = strnrt_fun(ux,vx,uy,vy)
+            if (strnrt > 1.0e-8) then
+               visc(i,j,1) = bingham_exp(strnrt)
+            else
+               visc(i,j,1) = bingham_tlr(strnrt)
+            end if
+         end do
+      end do
+
+      fixlft = ( (lo(1) .eq. domlo(1)) .and. 
+     &           ( (ULOX .eq. EXT_DIR .or. ULOX .eq. HOEXTRAP .or. ULOX.eq.FOEXTRAP) .or. 
+     &             (VLOX .eq. EXT_DIR .or. VLOX .eq. HOEXTRAP .or. ULOX.eq.FOEXTRAP) ) )
+      fixrgt = ( (hi(1) .eq. domhi(1)) .and. 
+     &           ( (UHIX .eq. EXT_DIR .or. UHIX .eq. HOEXTRAP .or. UHIX.eq.FOEXTRAP) .or.
+     &             (VHIX .eq. EXT_DIR .or. VHIX .eq. HOEXTRAP .or. VHIX.eq.FOEXTRAP) ) )
+      fixbot = ( (lo(2) .eq. domlo(2)) .and. 
+     &           ( (ULOY .eq. EXT_DIR .or. ULOY .eq. HOEXTRAP .or. ULOY.eq.FOEXTRAP) .or.
+     &             (VLOY .eq. EXT_DIR .or. VLOY .eq. HOEXTRAP .or. VLOY.eq.FOEXTRAP) ) )
+      fixtop = ( (hi(2) .eq. domhi(2)) .and. 
+     &           ( (UHIY .eq. EXT_DIR .or. UHIY .eq. HOEXTRAP .or. UHIY.eq.FOEXTRAP) .or.
+     &             (VHIY .eq. EXT_DIR .or. VHIY .eq. HOEXTRAP .or. VHIY.eq.FOEXTRAP) ) )
+
+c
+c     ::::: handle special bndry conditions at the left edge
+c
+      if (fixlft) then
+         i = lo(1)
+         do j = lo(2), hi(2)
+            ux  = uxlft(i,j)
+            vx  = vxlft(i,j)
+            uy  = uycen(i,j) 
+            vy  = vycen(i,j)
+            strnrt = strnrt_fun(ux,vx,uy,vy)
+            if (strnrt > 1.0e-8) then
+               visc(i,j,1) = bingham_exp(strnrt)
+            else
+               visc(i,j,1) = bingham_tlr(strnrt)
+            end if
+            ! Linear extrapolation
+            visc(i-1,j,1) = visc(i,j,1)
+         end do
+      end if
+c 
+c     ::::: handle special bndry conditions on the right
+c 
+      if (fixrgt) then
+         i = hi(1)
+         do j = lo(2), hi(2)
+            ux  = uxrgt(i,j)
+            vx  = vxrgt(i,j)
+            uy  = uycen(i,j)
+            vy  = vycen(i,j)
+            strnrt = strnrt_fun(ux,vx,uy,vy)
+            if (strnrt > 1.0e-8) then
+               visc(i,j,1) = bingham_exp(strnrt)
+            else
+               visc(i,j,1) = bingham_tlr(strnrt)
+            end if
+            ! Linear extrapolation
+            visc(i+1,j,1) = visc(i,j,1)
+         end do
+      end if
+c
+c     ::::: handle special bndry conditions on bottom
+c
+      if (fixbot) then
+         j = lo(2)
+         do i = lo(1), hi(1)
+            ux  = uxcen(i,j)
+            vx  = vxcen(i,j)
+            uy  = uybot(i,j)
+            vy  = vybot(i,j)
+            strnrt = strnrt_fun(ux,vx,uy,vy)
+            if (strnrt > 1.0e-8) then
+               visc(i,j,1) = bingham_exp(strnrt)
+            else
+               visc(i,j,1) = bingham_tlr(strnrt)
+            end if
+            ! Linear extrapolation
+            visc(i,j-1,1) = visc(i,j,1)
+         end do
+      end if
+c
+c     ::::: handle special bndry conditions on top
+c
+      if (fixtop) then
+         j = hi(2)
+         do i = lo(1), hi(1)
+            ux  = uxcen(i,j)
+            vx  = vxcen(i,j)
+            uy  = uytop(i,j)
+            vy  = vytop(i,j)
+            strnrt = strnrt_fun(ux,vx,uy,vy)
+            if (strnrt > 1.0e-8) then
+               visc(i,j,1) = bingham_exp(strnrt)
+            else
+               visc(i,j,1) = bingham_tlr(strnrt)
+            end if
+            ! Linear extrapolation
+            visc(i,j+1,1) = visc(i,j,1)
+         end do
+      end if
+c
+c     ::::: check corners
+c
+      if (fixlft .and. fixbot) then
+         i = lo(1)
+         j = lo(2)
+         ux = uxlft(i,j)
+         vx = vxlft(i,j)
+         uy = uybot(i,j)
+         vy = vybot(i,j)
+         strnrt = strnrt_fun(ux,vx,uy,vy)
+         if (strnrt > 1.0e-8) then
+             visc(i,j,1) = bingham_exp(strnrt)
+         else
+             visc(i,j,1) = bingham_tlr(strnrt)
+         end if
+         ! Linear extrapolation
+         visc(i-1,j-1,1) = visc(i,j,1)
+      end if
+
+      if (fixlft .and. fixtop) then
+
+         i = lo(1)
+         j = hi(2)
+         ux = uxlft(i,j)
+         vx = vxlft(i,j)
+         uy = uytop(i,j)
+         vy = vytop(i,j)
+         strnrt = strnrt_fun(ux,vx,uy,vy)
+         if (strnrt > 1.0e-8) then
+             visc(i,j,1) = bingham_exp(strnrt)
+         else
+             visc(i,j,1) = bingham_tlr(strnrt)
+         end if
+         ! Linear extrapolation
+         visc(i-1,j+1,1) = visc(i,j,1)
+      end if
+
+      if (fixrgt .and. fixtop) then
+         i = hi(1)
+         j = hi(2)
+         ux = uxrgt(i,j)
+         vx = vxrgt(i,j)
+         uy = uytop(i,j)
+         vy = vytop(i,j)
+         strnrt = strnrt_fun(ux,vx,uy,vy)
+         if (strnrt > 1.0e-8) then
+             visc(i,j,1) = bingham_exp(strnrt)
+         else
+             visc(i,j,1) = bingham_tlr(strnrt)
+         end if
+         ! Linear extrapolation
+         visc(i+1,j+1,1) = visc(i,j,1)
+      end if
+
+      if (fixrgt .and. fixbot) then
+         i = hi(1)
+         j = lo(2)
+         ux = uxrgt(i,j)
+         vx = vxrgt(i,j)
+         uy = uybot(i,j)
+         vy = vybot(i,j)
+         strnrt = strnrt_fun(ux,vx,uy,vy)
+         if (strnrt > 1.0e-8) then
+             visc(i,j,1) = bingham_exp(strnrt)
+         else
+             visc(i,j,1) = bingham_tlr(strnrt)
+         end if
+         ! Linear extrapolation
+         visc(i+1,j-1,1) = visc(i,j,1)
+      end if
+
+#     undef U
+#     undef V      
+#     undef VLOX
+#     undef VHIX
+#     undef ULOY
+#     undef UHIY
+
+      end
+
