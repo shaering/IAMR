@@ -1357,7 +1357,7 @@ NavierStokesBase::estTimeStep ()
 #endif		 
 #endif		 
         tforces.minus(Gp[Rho_mfi],0,0,BL_SPACEDIM);
-		if (yield_stress > 0.0)
+		if (variable_vel_visc)
 		{
 		  tforces.minus(visc_terms[Rho_mfi],0,0,BL_SPACEDIM);
 		}
