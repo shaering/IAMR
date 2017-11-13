@@ -5243,6 +5243,20 @@ c
       bingham_tlr(strnrt) = 
      & mu+half*tau/eps*(one-half*strnrt/eps+half*third*strnrt**2/eps**2)
 
+c     ::::: If non-variable, viscosity coefficient equals mu everywhere
+      if (varvisc .eq. 0) then
+
+      do k = lo(3), hi(3)
+         do j = lo(2), hi(2)
+            do i = lo(1), hi(1)
+               visc(i,j,k,1) = mu
+            end do 
+         end do
+      end do
+
+c     ::::: Compute Bingham viscosity
+      else
+
       dx = delta(1)
       dy = delta(2)
       dz = delta(3)
@@ -5910,6 +5924,8 @@ c
          else
            visc(i,j,k,1) = bingham_tlr(strnrt)
          end if
+      end if
+
       end if
 
 #     undef U
@@ -6061,7 +6077,11 @@ c
                wy = wycen(i,j,k)
                wz = wzcen(i,j,k)
                strnrt = strnrt_fun(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-               stress(i,j,k,1) = stress_fun(strnrt)
+               if (varvisc .eq. 0) then 
+                  stress(i,j,k,1) = 2*mu*strnrt
+               else
+                  stress(i,j,k,1) = stress_fun(strnrt)
+               end if
             end do
          end do
       end do
@@ -6121,7 +6141,11 @@ c
                vz = vzcen(i,j,k)
                wz = wzcen(i,j,k)
                strnrt = strnrt_fun(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-               stress(i,j,k,1) = stress_fun(strnrt)
+               if (varvisc .eq. 0) then 
+                  stress(i,j,k,1) = 2*mu*strnrt
+               else
+                  stress(i,j,k,1) = stress_fun(strnrt)
+               end if
             end do
          end do
       end if
@@ -6140,7 +6164,11 @@ c
                vz = vzcen(i,j,k)
                wz = wzcen(i,j,k)
                strnrt = strnrt_fun(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-               stress(i,j,k,1) = stress_fun(strnrt)
+               if (varvisc .eq. 0) then 
+                  stress(i,j,k,1) = 2*mu*strnrt
+               else
+                  stress(i,j,k,1) = stress_fun(strnrt)
+               end if
             end do
          end do
       end if
@@ -6159,7 +6187,11 @@ c
                vz = vzcen(i,j,k)
                wz = wzcen(i,j,k)
                strnrt = strnrt_fun(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-               stress(i,j,k,1) = stress_fun(strnrt)
+               if (varvisc .eq. 0) then 
+                  stress(i,j,k,1) = 2*mu*strnrt
+               else
+                  stress(i,j,k,1) = stress_fun(strnrt)
+               end if
             end do
          end do
       end if
@@ -6178,7 +6210,11 @@ c
                vz = vzcen(i,j,k)
                wz = wzcen(i,j,k)
                strnrt = strnrt_fun(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-               stress(i,j,k,1) = stress_fun(strnrt)
+               if (varvisc .eq. 0) then 
+                  stress(i,j,k,1) = 2*mu*strnrt
+               else
+                  stress(i,j,k,1) = stress_fun(strnrt)
+               end if
             end do
          end do
       end if
@@ -6197,7 +6233,11 @@ c
                vz = merge(vzlo(i,j,k),vzcen(i,j,k),fixvlo_z)
                wz = merge(wzlo(i,j,k),wzcen(i,j,k),fixwlo_z)
                strnrt = strnrt_fun(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-               stress(i,j,k,1) = stress_fun(strnrt)
+               if (varvisc .eq. 0) then 
+                  stress(i,j,k,1) = 2*mu*strnrt
+               else
+                  stress(i,j,k,1) = stress_fun(strnrt)
+               end if
             end do
          end do
       end if
@@ -6216,7 +6256,11 @@ c
                vz = merge(vzhi(i,j,k),vzcen(i,j,k),fixvhi_z)
                wz = merge(wzhi(i,j,k),wzcen(i,j,k),fixwhi_z)
                strnrt = strnrt_fun(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-               stress(i,j,k,1) = stress_fun(strnrt)
+               if (varvisc .eq. 0) then 
+                  stress(i,j,k,1) = 2*mu*strnrt
+               else
+                  stress(i,j,k,1) = stress_fun(strnrt)
+               end if
             end do
          end do
       end if
@@ -6238,7 +6282,11 @@ c
             vz = vzcen(i,j,k)
             wz = wzcen(i,j,k)
             strnrt = strnrt_fun(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-            stress(i,j,k,1) = stress_fun(strnrt)
+            if (varvisc .eq. 0) then 
+              stress(i,j,k,1) = 2*mu*strnrt
+            else
+              stress(i,j,k,1) = stress_fun(strnrt)
+            end if
          end do
       end if
 
@@ -6257,7 +6305,11 @@ c
             vz = vzcen(i,j,k)
             wz = wzcen(i,j,k)
             strnrt = strnrt_fun(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-            stress(i,j,k,1) = stress_fun(strnrt)
+            if (varvisc .eq. 0) then 
+              stress(i,j,k,1) = 2*mu*strnrt
+            else
+              stress(i,j,k,1) = stress_fun(strnrt)
+            end if
          end do
       end if
 
@@ -6276,7 +6328,11 @@ c
             vz = vzcen(i,j,k)
             wz = wzcen(i,j,k)
             strnrt = strnrt_fun(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-            stress(i,j,k,1) = stress_fun(strnrt)
+            if (varvisc .eq. 0) then 
+              stress(i,j,k,1) = 2*mu*strnrt
+            else
+              stress(i,j,k,1) = stress_fun(strnrt)
+            end if
          end do
       end if
 
@@ -6295,7 +6351,11 @@ c
             vz = vzcen(i,j,k)
             wz = wzcen(i,j,k)
             strnrt = strnrt_fun(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-            stress(i,j,k,1) = stress_fun(strnrt)
+            if (varvisc .eq. 0) then 
+              stress(i,j,k,1) = 2*mu*strnrt
+            else
+              stress(i,j,k,1) = stress_fun(strnrt)
+            end if
          end do
       end if
 
@@ -6314,7 +6374,11 @@ c
             vz = merge(vzlo(i,j,k),vzcen(i,j,k),fixvlo_z)
             wz = merge(wzlo(i,j,k),wzcen(i,j,k),fixwlo_z)
             strnrt = strnrt_fun(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-            stress(i,j,k,1) = stress_fun(strnrt)
+            if (varvisc .eq. 0) then 
+              stress(i,j,k,1) = 2*mu*strnrt
+            else
+              stress(i,j,k,1) = stress_fun(strnrt)
+            end if
          end do
       end if
 
@@ -6333,7 +6397,11 @@ c
             vz = merge(vzlo(i,j,k),vzcen(i,j,k),fixvlo_z)
             wz = merge(wzlo(i,j,k),wzcen(i,j,k),fixwlo_z)
             strnrt = strnrt_fun(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-            stress(i,j,k,1) = stress_fun(strnrt)
+            if (varvisc .eq. 0) then 
+              stress(i,j,k,1) = 2*mu*strnrt
+            else
+              stress(i,j,k,1) = stress_fun(strnrt)
+            end if
          end do
       end if
 
@@ -6352,7 +6420,11 @@ c
             vz = merge(vzhi(i,j,k),vzcen(i,j,k),fixvhi_z)
             wz = merge(wzhi(i,j,k),wzcen(i,j,k),fixwhi_z)
             strnrt = strnrt_fun(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-            stress(i,j,k,1) = stress_fun(strnrt)
+            if (varvisc .eq. 0) then 
+              stress(i,j,k,1) = 2*mu*strnrt
+            else
+              stress(i,j,k,1) = stress_fun(strnrt)
+            end if
          end do
       end if
 
@@ -6371,7 +6443,11 @@ c
             vz = merge(vzhi(i,j,k),vzcen(i,j,k),fixvhi_z)
             wz = merge(wzhi(i,j,k),wzcen(i,j,k),fixwhi_z)
             strnrt = strnrt_fun(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-            stress(i,j,k,1) = stress_fun(strnrt)
+            if (varvisc .eq. 0) then 
+              stress(i,j,k,1) = 2*mu*strnrt
+            else
+              stress(i,j,k,1) = stress_fun(strnrt)
+            end if
          end do
       end if
 
@@ -6390,7 +6466,11 @@ c
             vz = merge(vzlo(i,j,k),vzcen(i,j,k),fixvlo_z)
             wz = merge(wzlo(i,j,k),wzcen(i,j,k),fixwlo_z)
             strnrt = strnrt_fun(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-            stress(i,j,k,1) = stress_fun(strnrt)
+            if (varvisc .eq. 0) then 
+              stress(i,j,k,1) = 2*mu*strnrt
+            else
+              stress(i,j,k,1) = stress_fun(strnrt)
+            end if
          end do
       end if
 
@@ -6409,7 +6489,11 @@ c
             vz = merge(vzlo(i,j,k),vzcen(i,j,k),fixvlo_z)
             wz = merge(wzlo(i,j,k),wzcen(i,j,k),fixwlo_z)
             strnrt = strnrt_fun(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-            stress(i,j,k,1) = stress_fun(strnrt)
+            if (varvisc .eq. 0) then 
+              stress(i,j,k,1) = 2*mu*strnrt
+            else
+              stress(i,j,k,1) = stress_fun(strnrt)
+            end if
          end do
       end if
 
@@ -6428,7 +6512,11 @@ c
             vz = merge(vzhi(i,j,k),vzcen(i,j,k),fixvhi_z)
             wz = merge(wzhi(i,j,k),wzcen(i,j,k),fixwhi_z)
             strnrt = strnrt_fun(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-            stress(i,j,k,1) = stress_fun(strnrt)
+            if (varvisc .eq. 0) then 
+              stress(i,j,k,1) = 2*mu*strnrt
+            else
+              stress(i,j,k,1) = stress_fun(strnrt)
+            end if
          end do
       end if
 
@@ -6447,7 +6535,11 @@ c
             vz = merge(vzhi(i,j,k),vzcen(i,j,k),fixvhi_z)
             wz = merge(wzhi(i,j,k),wzcen(i,j,k),fixwhi_z)
             strnrt = strnrt_fun(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-            stress(i,j,k,1) = stress_fun(strnrt)
+            if (varvisc .eq. 0) then 
+              stress(i,j,k,1) = 2*mu*strnrt
+            else
+              stress(i,j,k,1) = stress_fun(strnrt)
+            end if
          end do
       end if
 c
@@ -6469,7 +6561,11 @@ c
          vz = merge(vzlo(i,j,k),vzcen(i,j,k),fixvlo_z)
          wz = merge(wzlo(i,j,k),wzcen(i,j,k),fixwlo_z)
          strnrt = strnrt_fun(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-         stress(i,j,k,1) = stress_fun(strnrt)
+         if (varvisc .eq. 0) then 
+           stress(i,j,k,1) = 2*mu*strnrt
+         else
+           stress(i,j,k,1) = stress_fun(strnrt)
+         end if
       end if
 
       if ((fixuhi_x .or. fixvhi_x .or. fixwhi_x) .and. 
@@ -6488,7 +6584,11 @@ c
          vz = merge(vzlo(i,j,k),vzcen(i,j,k),fixvlo_z)
          wz = merge(wzlo(i,j,k),wzcen(i,j,k),fixwlo_z)
          strnrt = strnrt_fun(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-         stress(i,j,k,1) = stress_fun(strnrt)
+         if (varvisc .eq. 0) then 
+           stress(i,j,k,1) = 2*mu*strnrt
+         else
+           stress(i,j,k,1) = stress_fun(strnrt)
+         end if
       end if
 
       if ((fixulo_x .or. fixvlo_x .or. fixwlo_x) .and. 
@@ -6507,7 +6607,11 @@ c
          vz = merge(vzlo(i,j,k),vzcen(i,j,k),fixvlo_z)
          wz = merge(wzlo(i,j,k),wzcen(i,j,k),fixwlo_z)
          strnrt = strnrt_fun(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-         stress(i,j,k,1) = stress_fun(strnrt)
+         if (varvisc .eq. 0) then 
+           stress(i,j,k,1) = 2*mu*strnrt
+         else
+           stress(i,j,k,1) = stress_fun(strnrt)
+         end if
       end if
 
       if ((fixuhi_x .or. fixvhi_x .or. fixwhi_x) .and. 
@@ -6526,7 +6630,11 @@ c
          vz = merge(vzlo(i,j,k),vzcen(i,j,k),fixvlo_z)
          wz = merge(wzlo(i,j,k),wzcen(i,j,k),fixwlo_z)
          strnrt = strnrt_fun(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-         stress(i,j,k,1) = stress_fun(strnrt)
+         if (varvisc .eq. 0) then 
+           stress(i,j,k,1) = 2*mu*strnrt
+         else
+           stress(i,j,k,1) = stress_fun(strnrt)
+         end if
       end if
 
       if ((fixulo_x .or. fixvlo_x .or. fixwlo_x) .and. 
@@ -6545,7 +6653,11 @@ c
          vz = merge(vzhi(i,j,k),vzcen(i,j,k),fixvhi_z)
          wz = merge(wzhi(i,j,k),wzcen(i,j,k),fixwhi_z)
          strnrt = strnrt_fun(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-         stress(i,j,k,1) = stress_fun(strnrt)
+         if (varvisc .eq. 0) then 
+           stress(i,j,k,1) = 2*mu*strnrt
+         else
+           stress(i,j,k,1) = stress_fun(strnrt)
+         end if
       end if
 
       if ((fixuhi_x .or. fixvhi_x .or. fixwhi_x) .and. 
@@ -6564,7 +6676,11 @@ c
          vz = merge(vzhi(i,j,k),vzcen(i,j,k),fixvhi_z)
          wz = merge(wzhi(i,j,k),wzcen(i,j,k),fixwhi_z)
          strnrt = strnrt_fun(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-         stress(i,j,k,1) = stress_fun(strnrt)
+         if (varvisc .eq. 0) then 
+           stress(i,j,k,1) = 2*mu*strnrt
+         else
+           stress(i,j,k,1) = stress_fun(strnrt)
+         end if
       end if
 
       if ((fixvlo_x .or. fixwlo_x) .and. 
@@ -6583,7 +6699,11 @@ c
          vz = merge(vzhi(i,j,k),vzcen(i,j,k),fixvhi_z)
          wz = merge(wzhi(i,j,k),wzcen(i,j,k),fixwhi_z)
          strnrt = strnrt_fun(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-         stress(i,j,k,1) = stress_fun(strnrt)
+         if (varvisc .eq. 0) then 
+           stress(i,j,k,1) = 2*mu*strnrt
+         else
+           stress(i,j,k,1) = stress_fun(strnrt)
+         end if
       end if
 
       if ((fixuhi_x .or. fixvhi_x .or. fixwhi_x) .and. 
@@ -6602,7 +6722,11 @@ c
          vz = merge(vzhi(i,j,k),vzcen(i,j,k),fixvhi_z)
          wz = merge(wzhi(i,j,k),wzcen(i,j,k),fixwhi_z)
          strnrt = strnrt_fun(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-         stress(i,j,k,1) = stress_fun(strnrt)
+         if (varvisc .eq. 0) then 
+           stress(i,j,k,1) = 2*mu*strnrt
+         else
+           stress(i,j,k,1) = stress_fun(strnrt)
+         end if
       end if
 
 #     undef U
