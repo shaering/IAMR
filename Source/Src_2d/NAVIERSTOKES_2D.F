@@ -423,8 +423,6 @@ c     coarse face, leave the in-between faces alone.
      &                                 lo, hi, domlo, domhi, delta, vel_bc)
       use viscoplasticity_module
       implicit none
-
-# include <NSCOMM_F.H>
 c
 c ::: This routine will compute the Papanastasiou regularised Bingham
 c ::: viscosity based on the velocity field
