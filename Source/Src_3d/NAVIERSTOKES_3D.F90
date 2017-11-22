@@ -1226,11 +1226,11 @@ contains
 end module navierstokes_3d_module
 
 
-      subroutine FORT_BINGHAM(visc, DIMS(visc), vel, DIMS(vel),
-     &                        lo, hi, domlo, domhi, delta, vel_bc)
+      subroutine FORT_HERSCHEL_BULKLEY(visc, DIMS(visc), vel, DIMS(vel),
+     &                                 lo, hi, domlo, domhi, delta, vel_bc)
+      use viscoplasticity_module
       implicit none
 
-#include <NSCOMM_F.H>
 c
 c ::: This routine will compute the Papanastasiou regularised Bingham
 c ::: viscosity based on the velocity field
@@ -1249,7 +1249,7 @@ c
       REAL_T  uxcen, uycen, uzcen, uxlo, uylo, uzlo, uxhi, uyhi, uzhi
       REAL_T  vxcen, vycen, vzcen, vxlo, vylo, vzlo, vxhi, vyhi, vzhi
       REAL_T  wxcen, wycen, wzcen, wxlo, wylo, wzlo, wxhi, wyhi, wzhi
-      REAL_T  strnrt, strnrt_fun, bingham_exp, bingham_tlr
+      REAL_T  strnrt
 
       logical fixulo_x, fixvlo_x, fixwlo_x, fixuhi_x, fixvhi_x, fixwhi_x
       logical fixulo_y, fixvlo_y, fixwlo_y, fixuhi_y, fixvhi_y, fixwhi_y
@@ -1319,19 +1319,7 @@ c
       wzcen(i,j,k) = half*(W(i,j,k+1)-W(i,j,k-1))/dz
       wzlo(i,j,k)  = (W(i,j,k+1)+three*W(i,j,k)-four*W(i,j,k-1))/(three*dz)
       wzhi(i,j,k)  =-(W(i,j,k-1)+three*W(i,j,k)-four*W(i,j,k+1))/(three*dz)
-c
-c     ::::: function for computing magnitude of rate-of-strain tensor
-c
-      strnrt_fun(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-     & = sqrt(ux**2+vy**2+wz**2+half*(uy+vx)**2+half*(uz+wx)**2+half*(vz+wy)**2)
-c
-c     ::::: Functions for computing the regularised Bingham viscosity
-c     ::::: When the strain rate is small, Taylor expand the exponential 
-c     ::::: to avoid floating point errors. 
-c
-      bingham_exp(strnrt) = mu+half*tau*(1-exp(-strnrt/eps))/strnrt
-      bingham_tlr(strnrt) = 
-     & mu+half*tau/eps*(one-half*strnrt/eps+half*third*strnrt**2/eps**2)
+
 
       dx = delta(1)
       dy = delta(2)
@@ -1349,12 +1337,8 @@ c
                wx = wxcen(i,j,k)
                wy = wycen(i,j,k)
                wz = wzcen(i,j,k)
-               strnrt = strnrt_fun(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-               if (strnrt > 1.0e-8) then
-                 visc(i,j,k,1) = bingham_exp(strnrt)
-               else
-                 visc(i,j,k,1) = bingham_tlr(strnrt)
-               end if
+               strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
+               visc(i,j,k,1) = visc_fun(strnrt)
             end do
          end do
       end do
@@ -1413,12 +1397,8 @@ c
                uz = uzcen(i,j,k)
                vz = vzcen(i,j,k)
                wz = wzcen(i,j,k)
-               strnrt = strnrt_fun(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-               if (strnrt > 1.0e-8) then
-                 visc(i,j,k,1) = bingham_exp(strnrt)
-               else
-                 visc(i,j,k,1) = bingham_tlr(strnrt)
-               end if
+               strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
+               visc(i,j,k,1) = visc_fun(strnrt)
                ! Linear extrapolation 
                visc(i-1,j,k,1) = visc(i,j,k,1)
             end do
@@ -1438,12 +1418,8 @@ c
                uz = uzcen(i,j,k)
                vz = vzcen(i,j,k)
                wz = wzcen(i,j,k)
-               strnrt = strnrt_fun(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-               if (strnrt > 1.0e-8) then
-                 visc(i,j,k,1) = bingham_exp(strnrt)
-               else
-                 visc(i,j,k,1) = bingham_tlr(strnrt)
-               end if
+               strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
+               visc(i,j,k,1) = visc_fun(strnrt)
                ! Linear extrapolation 
                visc(i+1,j,k,1) = visc(i,j,k,1)
             end do
@@ -1463,12 +1439,8 @@ c
                uz = uzcen(i,j,k)
                vz = vzcen(i,j,k)
                wz = wzcen(i,j,k)
-               strnrt = strnrt_fun(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-               if (strnrt > 1.0e-8) then
-                 visc(i,j,k,1) = bingham_exp(strnrt)
-               else
-                 visc(i,j,k,1) = bingham_tlr(strnrt)
-               end if
+               strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
+               visc(i,j,k,1) = visc_fun(strnrt)
                ! Linear extrapolation 
                visc(i,j-1,k,1) = visc(i,j,k,1)
             end do
@@ -1488,12 +1460,8 @@ c
                uz = uzcen(i,j,k)
                vz = vzcen(i,j,k)
                wz = wzcen(i,j,k)
-               strnrt = strnrt_fun(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-               if (strnrt > 1.0e-8) then
-                 visc(i,j,k,1) = bingham_exp(strnrt)
-               else
-                 visc(i,j,k,1) = bingham_tlr(strnrt)
-               end if
+               strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
+               visc(i,j,k,1) = visc_fun(strnrt)
                ! Linear extrapolation 
                visc(i,j+1,k,1) = visc(i,j,k,1)
             end do
@@ -1513,12 +1481,8 @@ c
                uz = merge(uzlo(i,j,k),uzcen(i,j,k),fixulo_z)
                vz = merge(vzlo(i,j,k),vzcen(i,j,k),fixvlo_z)
                wz = merge(wzlo(i,j,k),wzcen(i,j,k),fixwlo_z)
-               strnrt = strnrt_fun(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-               if (strnrt > 1.0e-8) then
-                 visc(i,j,k,1) = bingham_exp(strnrt)
-               else
-                 visc(i,j,k,1) = bingham_tlr(strnrt)
-               end if
+               strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
+               visc(i,j,k,1) = visc_fun(strnrt)
                ! Linear extrapolation 
                visc(i,j,k-1,1) = visc(i,j,k,1)
             end do
@@ -1538,12 +1502,8 @@ c
                uz = merge(uzhi(i,j,k),uzcen(i,j,k),fixuhi_z)
                vz = merge(vzhi(i,j,k),vzcen(i,j,k),fixvhi_z)
                wz = merge(wzhi(i,j,k),wzcen(i,j,k),fixwhi_z)
-               strnrt = strnrt_fun(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-               if (strnrt > 1.0e-8) then
-                 visc(i,j,k,1) = bingham_exp(strnrt)
-               else
-                 visc(i,j,k,1) = bingham_tlr(strnrt)
-               end if
+               strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
+               visc(i,j,k,1) = visc_fun(strnrt)
                ! Linear extrapolation 
                visc(i,j,k+1,1) = visc(i,j,k,1)
             end do
@@ -1566,12 +1526,8 @@ c
             uz = uzcen(i,j,k)
             vz = vzcen(i,j,k)
             wz = wzcen(i,j,k)
-            strnrt = strnrt_fun(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-            if (strnrt > 1.0e-8) then
-              visc(i,j,k,1) = bingham_exp(strnrt)
-            else
-              visc(i,j,k,1) = bingham_tlr(strnrt)
-            end if
+            strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
+            visc(i,j,k,1) = visc_fun(strnrt)
             ! Linear extrapolation 
             visc(i-1,j-1,k,1) = visc(i,j,k,1)
          end do
@@ -1591,12 +1547,8 @@ c
             uz = uzcen(i,j,k)
             vz = vzcen(i,j,k)
             wz = wzcen(i,j,k)
-            strnrt = strnrt_fun(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-            if (strnrt > 1.0e-8) then
-              visc(i,j,k,1) = bingham_exp(strnrt)
-            else
-              visc(i,j,k,1) = bingham_tlr(strnrt)
-            end if
+            strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
+            visc(i,j,k,1) = visc_fun(strnrt)
             ! Linear extrapolation 
             visc(i+1,j-1,k,1) = visc(i,j,k,1)
          end do
@@ -1616,12 +1568,8 @@ c
             uz = uzcen(i,j,k)
             vz = vzcen(i,j,k)
             wz = wzcen(i,j,k)
-            strnrt = strnrt_fun(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-            if (strnrt > 1.0e-8) then
-              visc(i,j,k,1) = bingham_exp(strnrt)
-            else
-              visc(i,j,k,1) = bingham_tlr(strnrt)
-            end if
+            strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
+            visc(i,j,k,1) = visc_fun(strnrt)
             ! Linear extrapolation 
             visc(i-1,j+1,k,1) = visc(i,j,k,1)
          end do
@@ -1641,12 +1589,8 @@ c
             uz = uzcen(i,j,k)
             vz = vzcen(i,j,k)
             wz = wzcen(i,j,k)
-            strnrt = strnrt_fun(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-            if (strnrt > 1.0e-8) then
-              visc(i,j,k,1) = bingham_exp(strnrt)
-            else
-              visc(i,j,k,1) = bingham_tlr(strnrt)
-            end if
+            strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
+            visc(i,j,k,1) = visc_fun(strnrt)
             ! Linear extrapolation 
             visc(i+1,j+1,k,1) = visc(i,j,k,1)
          end do
@@ -1666,12 +1610,8 @@ c
             uz = merge(uzlo(i,j,k),uzcen(i,j,k),fixulo_z)
             vz = merge(vzlo(i,j,k),vzcen(i,j,k),fixvlo_z)
             wz = merge(wzlo(i,j,k),wzcen(i,j,k),fixwlo_z)
-            strnrt = strnrt_fun(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-            if (strnrt > 1.0e-8) then
-              visc(i,j,k,1) = bingham_exp(strnrt)
-            else
-              visc(i,j,k,1) = bingham_tlr(strnrt)
-            end if
+            strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
+            visc(i,j,k,1) = visc_fun(strnrt)
             ! Linear extrapolation 
             visc(i-1,j,k-1,1) = visc(i,j,k,1)
          end do
@@ -1691,12 +1631,8 @@ c
             uz = merge(uzlo(i,j,k),uzcen(i,j,k),fixulo_z)
             vz = merge(vzlo(i,j,k),vzcen(i,j,k),fixvlo_z)
             wz = merge(wzlo(i,j,k),wzcen(i,j,k),fixwlo_z)
-            strnrt = strnrt_fun(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-            if (strnrt > 1.0e-8) then
-              visc(i,j,k,1) = bingham_exp(strnrt)
-            else
-              visc(i,j,k,1) = bingham_tlr(strnrt)
-            end if
+            strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
+            visc(i,j,k,1) = visc_fun(strnrt)
             ! Linear extrapolation 
             visc(i+1,j,k-1,1) = visc(i,j,k,1)
          end do
@@ -1716,12 +1652,8 @@ c
             uz = merge(uzhi(i,j,k),uzcen(i,j,k),fixuhi_z)
             vz = merge(vzhi(i,j,k),vzcen(i,j,k),fixvhi_z)
             wz = merge(wzhi(i,j,k),wzcen(i,j,k),fixwhi_z)
-            strnrt = strnrt_fun(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-            if (strnrt > 1.0e-8) then
-              visc(i,j,k,1) = bingham_exp(strnrt)
-            else
-              visc(i,j,k,1) = bingham_tlr(strnrt)
-            end if
+            strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
+            visc(i,j,k,1) = visc_fun(strnrt)
             ! Linear extrapolation 
             visc(i-1,j,k+1,1) = visc(i,j,k,1)
          end do
@@ -1741,12 +1673,8 @@ c
             uz = merge(uzhi(i,j,k),uzcen(i,j,k),fixuhi_z)
             vz = merge(vzhi(i,j,k),vzcen(i,j,k),fixvhi_z)
             wz = merge(wzhi(i,j,k),wzcen(i,j,k),fixwhi_z)
-            strnrt = strnrt_fun(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-            if (strnrt > 1.0e-8) then
-              visc(i,j,k,1) = bingham_exp(strnrt)
-            else
-              visc(i,j,k,1) = bingham_tlr(strnrt)
-            end if
+            strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
+            visc(i,j,k,1) = visc_fun(strnrt)
             ! Linear extrapolation 
             visc(i+1,j,k+1,1) = visc(i,j,k,1)
          end do
@@ -1766,12 +1694,8 @@ c
             uz = merge(uzlo(i,j,k),uzcen(i,j,k),fixulo_z)
             vz = merge(vzlo(i,j,k),vzcen(i,j,k),fixvlo_z)
             wz = merge(wzlo(i,j,k),wzcen(i,j,k),fixwlo_z)
-            strnrt = strnrt_fun(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-            if (strnrt > 1.0e-8) then
-              visc(i,j,k,1) = bingham_exp(strnrt)
-            else
-              visc(i,j,k,1) = bingham_tlr(strnrt)
-            end if
+            strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
+            visc(i,j,k,1) = visc_fun(strnrt)
             ! Linear extrapolation 
             visc(i,j-1,k-1,1) = visc(i,j,k,1)
          end do
@@ -1791,12 +1715,8 @@ c
             uz = merge(uzlo(i,j,k),uzcen(i,j,k),fixulo_z)
             vz = merge(vzlo(i,j,k),vzcen(i,j,k),fixvlo_z)
             wz = merge(wzlo(i,j,k),wzcen(i,j,k),fixwlo_z)
-            strnrt = strnrt_fun(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-            if (strnrt > 1.0e-8) then
-              visc(i,j,k,1) = bingham_exp(strnrt)
-            else
-              visc(i,j,k,1) = bingham_tlr(strnrt)
-            end if
+            strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
+            visc(i,j,k,1) = visc_fun(strnrt)
             ! Linear extrapolation 
             visc(i,j+1,k-1,1) = visc(i,j,k,1)
          end do
@@ -1816,12 +1736,8 @@ c
             uz = merge(uzhi(i,j,k),uzcen(i,j,k),fixuhi_z)
             vz = merge(vzhi(i,j,k),vzcen(i,j,k),fixvhi_z)
             wz = merge(wzhi(i,j,k),wzcen(i,j,k),fixwhi_z)
-            strnrt = strnrt_fun(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-            if (strnrt > 1.0e-8) then
-              visc(i,j,k,1) = bingham_exp(strnrt)
-            else
-              visc(i,j,k,1) = bingham_tlr(strnrt)
-            end if
+            strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
+            visc(i,j,k,1) = visc_fun(strnrt)
             ! Linear extrapolation 
             visc(i,j-1,k+1,1) = visc(i,j,k,1)
          end do
@@ -1841,12 +1757,8 @@ c
             uz = merge(uzhi(i,j,k),uzcen(i,j,k),fixuhi_z)
             vz = merge(vzhi(i,j,k),vzcen(i,j,k),fixvhi_z)
             wz = merge(wzhi(i,j,k),wzcen(i,j,k),fixwhi_z)
-            strnrt = strnrt_fun(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-            if (strnrt > 1.0e-8) then
-              visc(i,j,k,1) = bingham_exp(strnrt)
-            else
-              visc(i,j,k,1) = bingham_tlr(strnrt)
-            end if
+            strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
+            visc(i,j,k,1) = visc_fun(strnrt)
             ! Linear extrapolation 
             visc(i,j+1,k+1,1) = visc(i,j,k,1)
          end do
@@ -1869,12 +1781,8 @@ c
          uz = merge(uzlo(i,j,k),uzcen(i,j,k),fixulo_z)
          vz = merge(vzlo(i,j,k),vzcen(i,j,k),fixvlo_z)
          wz = merge(wzlo(i,j,k),wzcen(i,j,k),fixwlo_z)
-         strnrt = strnrt_fun(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-         if (strnrt > 1.0e-8) then
-           visc(i,j,k,1) = bingham_exp(strnrt)
-         else
-           visc(i,j,k,1) = bingham_tlr(strnrt)
-         end if
+         strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
+         visc(i,j,k,1) = visc_fun(strnrt)
          ! Linear extrapolation 
          visc(i-1,j-1,k-1,1) = visc(i,j,k,1)
       end if
@@ -1894,12 +1802,8 @@ c
          uz = merge(uzlo(i,j,k),uzcen(i,j,k),fixulo_z)
          vz = merge(vzlo(i,j,k),vzcen(i,j,k),fixvlo_z)
          wz = merge(wzlo(i,j,k),wzcen(i,j,k),fixwlo_z)
-         strnrt = strnrt_fun(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-         if (strnrt > 1.0e-8) then
-           visc(i,j,k,1) = bingham_exp(strnrt)
-         else
-           visc(i,j,k,1) = bingham_tlr(strnrt)
-         end if
+         strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
+         visc(i,j,k,1) = visc_fun(strnrt)
          ! Linear extrapolation 
          visc(i+1,j-1,k-1,1) = visc(i,j,k,1)
       end if
@@ -1919,12 +1823,8 @@ c
          uz = merge(uzlo(i,j,k),uzcen(i,j,k),fixulo_z)
          vz = merge(vzlo(i,j,k),vzcen(i,j,k),fixvlo_z)
          wz = merge(wzlo(i,j,k),wzcen(i,j,k),fixwlo_z)
-         strnrt = strnrt_fun(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-         if (strnrt > 1.0e-8) then
-           visc(i,j,k,1) = bingham_exp(strnrt)
-         else
-           visc(i,j,k,1) = bingham_tlr(strnrt)
-         end if
+         strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
+         visc(i,j,k,1) = visc_fun(strnrt)
          ! Linear extrapolation 
          visc(i-1,j+1,k-1,1) = visc(i,j,k,1)
       end if
@@ -1944,12 +1844,8 @@ c
          uz = merge(uzlo(i,j,k),uzcen(i,j,k),fixulo_z)
          vz = merge(vzlo(i,j,k),vzcen(i,j,k),fixvlo_z)
          wz = merge(wzlo(i,j,k),wzcen(i,j,k),fixwlo_z)
-         strnrt = strnrt_fun(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-         if (strnrt > 1.0e-8) then
-           visc(i,j,k,1) = bingham_exp(strnrt)
-         else
-           visc(i,j,k,1) = bingham_tlr(strnrt)
-         end if
+         strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
+         visc(i,j,k,1) = visc_fun(strnrt)
          ! Linear extrapolation 
          visc(i+1,j+1,k-1,1) = visc(i,j,k,1)
       end if
@@ -1969,12 +1865,8 @@ c
          uz = merge(uzhi(i,j,k),uzcen(i,j,k),fixuhi_z)
          vz = merge(vzhi(i,j,k),vzcen(i,j,k),fixvhi_z)
          wz = merge(wzhi(i,j,k),wzcen(i,j,k),fixwhi_z)
-         strnrt = strnrt_fun(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-         if (strnrt > 1.0e-8) then
-           visc(i,j,k,1) = bingham_exp(strnrt)
-         else
-           visc(i,j,k,1) = bingham_tlr(strnrt)
-         end if
+         strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
+         visc(i,j,k,1) = visc_fun(strnrt)
          ! Linear extrapolation 
          visc(i-1,j-1,k+1,1) = visc(i,j,k,1)
       end if
@@ -1994,12 +1886,8 @@ c
          uz = merge(uzhi(i,j,k),uzcen(i,j,k),fixuhi_z)
          vz = merge(vzhi(i,j,k),vzcen(i,j,k),fixvhi_z)
          wz = merge(wzhi(i,j,k),wzcen(i,j,k),fixwhi_z)
-         strnrt = strnrt_fun(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-         if (strnrt > 1.0e-8) then
-           visc(i,j,k,1) = bingham_exp(strnrt)
-         else
-           visc(i,j,k,1) = bingham_tlr(strnrt)
-         end if
+         strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
+         visc(i,j,k,1) = visc_fun(strnrt)
          ! Linear extrapolation 
          visc(i+1,j-1,k+1,1) = visc(i,j,k,1)
       end if
@@ -2019,12 +1907,8 @@ c
          uz = merge(uzhi(i,j,k),uzcen(i,j,k),fixuhi_z)
          vz = merge(vzhi(i,j,k),vzcen(i,j,k),fixvhi_z)
          wz = merge(wzhi(i,j,k),wzcen(i,j,k),fixwhi_z)
-         strnrt = strnrt_fun(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-         if (strnrt > 1.0e-8) then
-           visc(i,j,k,1) = bingham_exp(strnrt)
-         else
-           visc(i,j,k,1) = bingham_tlr(strnrt)
-         end if
+         strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
+         visc(i,j,k,1) = visc_fun(strnrt)
          ! Linear extrapolation 
          visc(i-1,j+1,k+1,1) = visc(i,j,k,1)
       end if
@@ -2044,12 +1928,8 @@ c
          uz = merge(uzhi(i,j,k),uzcen(i,j,k),fixuhi_z)
          vz = merge(vzhi(i,j,k),vzcen(i,j,k),fixvhi_z)
          wz = merge(wzhi(i,j,k),wzcen(i,j,k),fixwhi_z)
-         strnrt = strnrt_fun(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-         if (strnrt > 1.0e-8) then
-           visc(i,j,k,1) = bingham_exp(strnrt)
-         else
-           visc(i,j,k,1) = bingham_tlr(strnrt)
-         end if
+         strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
+         visc(i,j,k,1) = visc_fun(strnrt)
          ! Linear extrapolation 
          visc(i+1,j+1,k+1,1) = visc(i,j,k,1)
       end if
