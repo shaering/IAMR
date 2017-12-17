@@ -7,8 +7,8 @@
 #include <AMReX_REAL.H>
 #include <AMReX_CONSTANTS.H>
 #include <AMReX_BC_TYPES.H>
-#include <NAVIERSTOKES_F.H>
 #include <AMReX_ArrayLim.H>
+#include <NAVIERSTOKES_F.H>
 
 #define SDIM 2
 
@@ -419,11 +419,10 @@ c     coarse face, leave the in-between faces alone.
 
       end
 
-      subroutine FORT_BINGHAM(visc, DIMS(visc), vel, DIMS(vel), 
-     &                        lo, hi, domlo, domhi, delta, vel_bc)
+      subroutine FORT_HERSCHEL_BULKLEY(visc, DIMS(visc), vel, DIMS(vel), 
+     &                                 lo, hi, domlo, domhi, delta, vel_bc)
+      use viscoplasticity_module
       implicit none
-
-# include <NSCOMM_F.H>
 c
 c ::: This routine will compute the Papanastasiou regularised Bingham
 c ::: viscosity based on the velocity field
@@ -442,7 +441,7 @@ c
       logical   fixlft, fixrgt, fixbot, fixtop
       REAL_T    uxcen, uxlft, uxrgt, vxcen, vxlft, vxrgt
       REAL_T    uycen, uybot, uytop, vycen, vybot, vytop
-      REAL_T    strnrt, strnrt_fun, bingham_exp, bingham_tlr
+      REAL_T    strnrt
 c
 c     ::::: some useful macro definitions
 c
@@ -479,20 +478,6 @@ c
       vybot(i,j) = (V(i,j+1)+three*V(i,j)-four*V(i,j-1))/(three*dy)
       vytop(i,j) = (four*V(i,j+1)-three*V(i,j)-V(i,j-1))/(three*dy)
 
-c
-c     ::::: function for computing magnitude of rate of strain tensor
-c
-      strnrt_fun(ux,vx,uy,vy) = sqrt(ux**2+half*(vx+uy)**2+vy**2)
-
-c
-c     ::::: Functions for computing the regularised Bingham viscosity.
-c     ::::: When the strain rate is small, Taylor expand the exponential
-c     ::::: to avoid floating point errors.
-c
-
-      bingham_exp(strnrt) = mu+half*tau*(1-exp(-strnrt/eps))/strnrt
-      bingham_tlr(strnrt) =
-     & mu+half*tau/eps*(one-half*strnrt/eps+half*third*strnrt**2/eps**2)
 
       dx = delta(1)
       dy = delta(2)
@@ -503,12 +488,8 @@ c
             vx  = vxcen(i,j)
             uy  = uycen(i,j)
             vy  = vycen(i,j)
-            strnrt = strnrt_fun(ux,vx,uy,vy)
-            if (strnrt > 1.0e-8) then
-               visc(i,j,1) = bingham_exp(strnrt)
-            else
-               visc(i,j,1) = bingham_tlr(strnrt)
-            end if
+            strnrt = strnrt_fun_2d(ux,vx,uy,vy)
+            visc(i,j,1) = visc_fun(strnrt)
          end do
       end do
 
@@ -535,12 +516,8 @@ c
             vx  = vxlft(i,j)
             uy  = uycen(i,j) 
             vy  = vycen(i,j)
-            strnrt = strnrt_fun(ux,vx,uy,vy)
-            if (strnrt > 1.0e-8) then
-               visc(i,j,1) = bingham_exp(strnrt)
-            else
-               visc(i,j,1) = bingham_tlr(strnrt)
-            end if
+            strnrt = strnrt_fun_2d(ux,vx,uy,vy)
+            visc(i,j,1) = visc_fun(strnrt)
             ! Linear extrapolation
             visc(i-1,j,1) = visc(i,j,1)
          end do
@@ -555,12 +532,8 @@ c
             vx  = vxrgt(i,j)
             uy  = uycen(i,j)
             vy  = vycen(i,j)
-            strnrt = strnrt_fun(ux,vx,uy,vy)
-            if (strnrt > 1.0e-8) then
-               visc(i,j,1) = bingham_exp(strnrt)
-            else
-               visc(i,j,1) = bingham_tlr(strnrt)
-            end if
+            strnrt = strnrt_fun_2d(ux,vx,uy,vy)
+            visc(i,j,1) = visc_fun(strnrt)
             ! Linear extrapolation
             visc(i+1,j,1) = visc(i,j,1)
          end do
@@ -575,12 +548,8 @@ c
             vx  = vxcen(i,j)
             uy  = uybot(i,j)
             vy  = vybot(i,j)
-            strnrt = strnrt_fun(ux,vx,uy,vy)
-            if (strnrt > 1.0e-8) then
-               visc(i,j,1) = bingham_exp(strnrt)
-            else
-               visc(i,j,1) = bingham_tlr(strnrt)
-            end if
+            strnrt = strnrt_fun_2d(ux,vx,uy,vy)
+            visc(i,j,1) = visc_fun(strnrt)
             ! Linear extrapolation
             visc(i,j-1,1) = visc(i,j,1)
          end do
@@ -595,12 +564,8 @@ c
             vx  = vxcen(i,j)
             uy  = uytop(i,j)
             vy  = vytop(i,j)
-            strnrt = strnrt_fun(ux,vx,uy,vy)
-            if (strnrt > 1.0e-8) then
-               visc(i,j,1) = bingham_exp(strnrt)
-            else
-               visc(i,j,1) = bingham_tlr(strnrt)
-            end if
+            strnrt = strnrt_fun_2d(ux,vx,uy,vy)
+            visc(i,j,1) = visc_fun(strnrt)
             ! Linear extrapolation
             visc(i,j+1,1) = visc(i,j,1)
          end do
@@ -615,12 +580,8 @@ c
          vx = vxlft(i,j)
          uy = uybot(i,j)
          vy = vybot(i,j)
-         strnrt = strnrt_fun(ux,vx,uy,vy)
-         if (strnrt > 1.0e-8) then
-             visc(i,j,1) = bingham_exp(strnrt)
-         else
-             visc(i,j,1) = bingham_tlr(strnrt)
-         end if
+         strnrt = strnrt_fun_2d(ux,vx,uy,vy)
+         visc(i,j,1) = visc_fun(strnrt)
          ! Linear extrapolation
          visc(i-1,j-1,1) = visc(i,j,1)
       end if
@@ -633,12 +594,8 @@ c
          vx = vxlft(i,j)
          uy = uytop(i,j)
          vy = vytop(i,j)
-         strnrt = strnrt_fun(ux,vx,uy,vy)
-         if (strnrt > 1.0e-8) then
-             visc(i,j,1) = bingham_exp(strnrt)
-         else
-             visc(i,j,1) = bingham_tlr(strnrt)
-         end if
+         strnrt = strnrt_fun_2d(ux,vx,uy,vy)
+         visc(i,j,1) = visc_fun(strnrt)
          ! Linear extrapolation
          visc(i-1,j+1,1) = visc(i,j,1)
       end if
@@ -650,12 +607,8 @@ c
          vx = vxrgt(i,j)
          uy = uytop(i,j)
          vy = vytop(i,j)
-         strnrt = strnrt_fun(ux,vx,uy,vy)
-         if (strnrt > 1.0e-8) then
-             visc(i,j,1) = bingham_exp(strnrt)
-         else
-             visc(i,j,1) = bingham_tlr(strnrt)
-         end if
+         strnrt = strnrt_fun_2d(ux,vx,uy,vy)
+         visc(i,j,1) = visc_fun(strnrt)
          ! Linear extrapolation
          visc(i+1,j+1,1) = visc(i,j,1)
       end if
@@ -667,12 +620,8 @@ c
          vx = vxrgt(i,j)
          uy = uybot(i,j)
          vy = vybot(i,j)
-         strnrt = strnrt_fun(ux,vx,uy,vy)
-         if (strnrt > 1.0e-8) then
-             visc(i,j,1) = bingham_exp(strnrt)
-         else
-             visc(i,j,1) = bingham_tlr(strnrt)
-         end if
+         strnrt = strnrt_fun_2d(ux,vx,uy,vy)
+         visc(i,j,1) = visc_fun(strnrt)
          ! Linear extrapolation
          visc(i+1,j-1,1) = visc(i,j,1)
       end if
@@ -685,4 +634,3 @@ c
 #     undef UHIY
 
       end
-

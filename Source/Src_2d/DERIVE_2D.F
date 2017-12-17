@@ -7,9 +7,9 @@
 #include <AMReX_REAL.H> 
 #include <AMReX_CONSTANTS.H> 
 #include <AMReX_BC_TYPES.H> 
+#include <AMReX_ArrayLim.H>
 #include <DERIVE_F.H> 
 #include <PROB_NS_F.H>
-#include <AMReX_ArrayLim.H>
 
 #define SDIM 2
 
@@ -514,6 +514,7 @@ c
       subroutine FORT_DERMGSTRNRT (strnrt,DIMS(strnrt),nv,dat,DIMS(dat),ncomp,
      &                             lo,hi,domlo,domhi,delta,xlo,time,dt,
      $                             bc,level,grid_no)
+      use viscoplasticity_module
       implicit none
 c
 c ::: This routine will derive magnitude of rate-of-strain tensor from
@@ -535,7 +536,6 @@ c
       logical   fixlft, fixrgt, fixbot, fixtop
       REAL_T    uxcen, uxlft, uxrgt, vxcen, vxlft, vxrgt
       REAL_T    uycen, uybot, uytop, vycen, vybot, vytop
-      REAL_T    strnrt_fun
 c
 c     ::::: some useful macro definitions
 c
@@ -572,10 +572,6 @@ c
       vycen(i,j) = half*(V(i,j+1)-V(i,j-1))/dy
       vybot(i,j) = (V(i,j+1)+three*V(i,j)-four*V(i,j-1))/(three*dy)
       vytop(i,j) = (four*V(i,j+1)-three*V(i,j)-V(i,j-1))/(three*dy)
-c
-c     ::::: function for computing magnitude of rate of strain tensor
-c
-      strnrt_fun(ux,vx,uy,vy) = sqrt(ux**2+half*(vx+uy)**2+vy**2)
 
       dx = delta(1)
       dy = delta(2)
@@ -586,7 +582,7 @@ c
             vx  = vxcen(i,j)
             uy  = uycen(i,j)
             vy  = vycen(i,j)
-            strnrt(i,j,1) = strnrt_fun(ux,vx,uy,vy)
+            strnrt(i,j,1) = strnrt_fun_2d(ux,vx,uy,vy)
          end do
       end do
 
@@ -612,7 +608,7 @@ c
             vx  = vxlft(i,j)
             uy  = uycen(i,j)
             vy  = vycen(i,j)
-            strnrt(i,j,1) = strnrt_fun(ux,vx,uy,vy)
+            strnrt(i,j,1) = strnrt_fun_2d(ux,vx,uy,vy)
          end do
       end if
 c
@@ -625,7 +621,7 @@ c
             vx  = vxrgt(i,j)
             uy  = uycen(i,j)
             vy  = vycen(i,j)
-            strnrt(i,j,1) = strnrt_fun(ux,vx,uy,vy)
+            strnrt(i,j,1) = strnrt_fun_2d(ux,vx,uy,vy)
          end do
       end if
 c
@@ -638,7 +634,7 @@ c
             vx  = vxcen(i,j)
             uy  = uybot(i,j)
             vy  = vybot(i,j)
-            strnrt(i,j,1) = strnrt_fun(ux,vx,uy,vy)
+            strnrt(i,j,1) = strnrt_fun_2d(ux,vx,uy,vy)
          end do
       end if
 c
@@ -651,7 +647,7 @@ c
             vx  = vxcen(i,j)
             uy  = uytop(i,j)
             vy  = vytop(i,j)
-            strnrt(i,j,1) = strnrt_fun(ux,vx,uy,vy)
+            strnrt(i,j,1) = strnrt_fun_2d(ux,vx,uy,vy)
          end do
       end if
 c
@@ -664,7 +660,7 @@ c
          vx = vxlft(i,j)
          uy = uybot(i,j)
          vy = vybot(i,j)
-         strnrt(i,j,1) = strnrt_fun(ux,vx,uy,vy)
+         strnrt(i,j,1) = strnrt_fun_2d(ux,vx,uy,vy)
       end if
       if (fixlft .and. fixtop) then
          i = lo(1)
@@ -673,7 +669,7 @@ c
          vx = vxlft(i,j)
          uy = uytop(i,j)
          vy = vytop(i,j)
-         strnrt(i,j,1) = strnrt_fun(ux,vx,uy,vy)
+         strnrt(i,j,1) = strnrt_fun_2d(ux,vx,uy,vy)
       end if
       if (fixrgt .and. fixtop) then
          i = hi(1)
@@ -682,7 +678,7 @@ c
          vx = vxrgt(i,j)
          uy = uytop(i,j)
          vy = vytop(i,j)
-         strnrt(i,j,1) = strnrt_fun(ux,vx,uy,vy)
+         strnrt(i,j,1) = strnrt_fun_2d(ux,vx,uy,vy)
       end if
       if (fixrgt .and. fixbot) then
          i = hi(1)
@@ -691,7 +687,7 @@ c
          vx = vxrgt(i,j)
          uy = uybot(i,j)
          vy = vybot(i,j)
-         strnrt(i,j,1) = strnrt_fun(ux,vx,uy,vy)
+         strnrt(i,j,1) = strnrt_fun_2d(ux,vx,uy,vy)
       end if
 
 #     undef U
@@ -703,16 +699,16 @@ c
 
       end
 
-      subroutine FORT_DERVISC (visc,DIMS(visc),nv,dat,DIMS(dat),ncomp,
-     &                         lo,hi,domlo,domhi,delta,xlo,time,dt,
-     $                         bc,level,grid_no)
-      implicit none
-
-#include <NSCOMM_F.H>
 c
 c ::: This routine will compute the 
 c ::: viscosity based on the velocity field
 c
+      subroutine FORT_DERVISC (visc,DIMS(visc),nv,dat,DIMS(dat),ncomp,
+     &                         lo,hi,domlo,domhi,delta,xlo,time,dt,
+     $                         bc,level,grid_no)
+      use viscoplasticity_module
+      implicit none
+
       integer    lo(2), hi(2)
       integer    DIMDEC(visc)
       integer    DIMDEC(dat)
@@ -729,7 +725,7 @@ c
       logical   fixlft, fixrgt, fixbot, fixtop
       REAL_T    uxcen, uxlft, uxrgt, vxcen, vxlft, vxrgt
       REAL_T    uycen, uybot, uytop, vycen, vybot, vytop
-      REAL_T    strnrt, strnrt_fun, bingham_exp, bingham_tlr
+      REAL_T    strnrt
 c
 c     ::::: some useful macro definitions
 c
@@ -766,18 +762,18 @@ c
       vycen(i,j) = half*(V(i,j+1)-V(i,j-1))/dy
       vybot(i,j) = (V(i,j+1)+three*V(i,j)-four*V(i,j-1))/(three*dy)
       vytop(i,j) = (four*V(i,j+1)-three*V(i,j)-V(i,j-1))/(three*dy)
-c
-c     ::::: function for computing magnitude of rate of strain tensor
-c
-      strnrt_fun(ux,vx,uy,vy) = sqrt(ux**2+half*(vx+uy)**2+vy**2)
-c
-c     ::::: Functions for computing the regularised Bingham viscosity.
-c     ::::: When the strain rate is small, Taylor expand the exponential
-c     ::::: to avoid floating point errors.
-c
-      bingham_exp(strnrt) = mu+half*tau*(1-exp(-strnrt/eps))/strnrt
-      bingham_tlr(strnrt) =
-     & mu+half*tau/eps*(one-half*strnrt/eps+half*third*strnrt**2/eps**2)
+      
+      if (varvisc .eq. 0) then
+      ! If non-variable, viscosity coefficient equals mu everywhere
+
+      do j = lo(2), hi(2)
+         do i = lo(1), hi(1)
+            visc(i,j,1) = mu
+         end do
+      end do
+
+      else 
+      ! Compute Herschel-Bulkley viscosity
 
       dx = delta(1)
       dy = delta(2)
@@ -788,12 +784,8 @@ c
             vx  = vxcen(i,j)
             uy  = uycen(i,j)
             vy  = vycen(i,j)
-            strnrt = strnrt_fun(ux,vx,uy,vy)
-            if (strnrt > 1.0e-8) then
-               visc(i,j,1) = bingham_exp(strnrt)
-            else
-               visc(i,j,1) = bingham_tlr(strnrt)
-            end if
+            strnrt = strnrt_fun_2d(ux,vx,uy,vy)
+            visc(i,j,1) = visc_fun(strnrt)
          end do
       end do
 
@@ -820,12 +812,8 @@ c
             vx  = vxlft(i,j)
             uy  = uycen(i,j)
             vy  = vycen(i,j)
-            strnrt = strnrt_fun(ux,vx,uy,vy)
-            if (strnrt > 1.0e-8) then
-               visc(i,j,1) = bingham_exp(strnrt)
-            else
-               visc(i,j,1) = bingham_tlr(strnrt)
-            end if
+            strnrt = strnrt_fun_2d(ux,vx,uy,vy)
+            visc(i,j,1) = visc_fun(strnrt)
          end do
       end if
 c
@@ -838,12 +826,8 @@ c
             vx  = vxrgt(i,j)
             uy  = uycen(i,j)
             vy  = vycen(i,j)
-            strnrt = strnrt_fun(ux,vx,uy,vy)
-            if (strnrt > 1.0e-8) then
-               visc(i,j,1) = bingham_exp(strnrt)
-            else
-               visc(i,j,1) = bingham_tlr(strnrt)
-            end if
+            strnrt = strnrt_fun_2d(ux,vx,uy,vy)
+            visc(i,j,1) = visc_fun(strnrt)
          end do
       end if
 c
@@ -856,12 +840,8 @@ c
             vx  = vxcen(i,j)
             uy  = uybot(i,j)
             vy  = vybot(i,j)
-            strnrt = strnrt_fun(ux,vx,uy,vy)
-            if (strnrt > 1.0e-8) then
-               visc(i,j,1) = bingham_exp(strnrt)
-            else
-               visc(i,j,1) = bingham_tlr(strnrt)
-            end if
+            strnrt = strnrt_fun_2d(ux,vx,uy,vy)
+            visc(i,j,1) = visc_fun(strnrt)
          end do
       end if
 c
@@ -874,12 +854,8 @@ c
             vx  = vxcen(i,j)
             uy  = uytop(i,j)
             vy  = vytop(i,j)
-            strnrt = strnrt_fun(ux,vx,uy,vy)
-            if (strnrt > 1.0e-8) then
-               visc(i,j,1) = bingham_exp(strnrt)
-            else
-               visc(i,j,1) = bingham_tlr(strnrt)
-            end if
+            strnrt = strnrt_fun_2d(ux,vx,uy,vy)
+            visc(i,j,1) = visc_fun(strnrt)
          end do
       end if
 c
@@ -892,12 +868,8 @@ c
          vx = vxlft(i,j)
          uy = uybot(i,j)
          vy = vybot(i,j)
-         strnrt = strnrt_fun(ux,vx,uy,vy)
-         if (strnrt > 1.0e-8) then
-             visc(i,j,1) = bingham_exp(strnrt)
-         else
-             visc(i,j,1) = bingham_tlr(strnrt)
-         end if
+         strnrt = strnrt_fun_2d(ux,vx,uy,vy)
+         visc(i,j,1) = visc_fun(strnrt)
       end if
       if (fixlft .and. fixtop) then
          i = lo(1)
@@ -906,12 +878,8 @@ c
          vx = vxlft(i,j)
          uy = uytop(i,j)
          vy = vytop(i,j)
-         strnrt = strnrt_fun(ux,vx,uy,vy)
-         if (strnrt > 1.0e-8) then
-             visc(i,j,1) = bingham_exp(strnrt)
-         else
-             visc(i,j,1) = bingham_tlr(strnrt)
-         end if
+         strnrt = strnrt_fun_2d(ux,vx,uy,vy)
+         visc(i,j,1) = visc_fun(strnrt)
       end if
       if (fixrgt .and. fixtop) then
          i = hi(1)
@@ -920,12 +888,8 @@ c
          vx = vxrgt(i,j)
          uy = uytop(i,j)
          vy = vytop(i,j)
-         strnrt = strnrt_fun(ux,vx,uy,vy)
-         if (strnrt > 1.0e-8) then
-             visc(i,j,1) = bingham_exp(strnrt)
-         else
-             visc(i,j,1) = bingham_tlr(strnrt)
-         end if
+         strnrt = strnrt_fun_2d(ux,vx,uy,vy)
+         visc(i,j,1) = visc_fun(strnrt)
       end if
       if (fixrgt .and. fixbot) then
          i = hi(1)
@@ -934,12 +898,10 @@ c
          vx = vxrgt(i,j)
          uy = uybot(i,j)
          vy = vybot(i,j)
-         strnrt = strnrt_fun(ux,vx,uy,vy)
-         if (strnrt > 1.0e-8) then
-             visc(i,j,1) = bingham_exp(strnrt)
-         else
-             visc(i,j,1) = bingham_tlr(strnrt)
-         end if
+         strnrt = strnrt_fun_2d(ux,vx,uy,vy)
+         visc(i,j,1) = visc_fun(strnrt)
+      end if
+
       end if
 
 #     undef U
@@ -954,13 +916,12 @@ c
       subroutine FORT_DERSTRESS (stress,DIMS(stress),nv,dat,DIMS(dat),ncomp,
      &                           lo,hi,domlo,domhi,delta,xlo,time,dt,
      $                           bc,level,grid_no)
+      use viscoplasticity_module
       implicit none
-
-#include <NSCOMM_F.H>
 
 c
 c ::: This routine will compute the 
-c ::: stressosity based on the velocity field
+c ::: stress based on the velocity field
 c
       integer    lo(2), hi(2)
       integer    DIMDEC(stress)
@@ -978,7 +939,7 @@ c
       logical   fixlft, fixrgt, fixbot, fixtop
       REAL_T    uxcen, uxlft, uxrgt, vxcen, vxlft, vxrgt
       REAL_T    uycen, uybot, uytop, vycen, vybot, vytop
-      REAL_T    strnrt, strnrt_fun, stress_fun 
+      REAL_T    strnrt
 c
 c     ::::: some useful macro definitions
 c
@@ -1016,16 +977,6 @@ c
       vybot(i,j) = (V(i,j+1)+three*V(i,j)-four*V(i,j-1))/(three*dy)
       vytop(i,j) = (four*V(i,j+1)-three*V(i,j)-V(i,j-1))/(three*dy)
 
-c
-c     ::::: function for computing magnitude of rate of strain tensor
-c
-      strnrt_fun(ux,vx,uy,vy) = sqrt(ux**2+half*(vx+uy)**2+vy**2)
-
-c
-c     ::::: Functions for computing the regularised Bingham stress.
-c
-      stress_fun(strnrt) = 2*mu*strnrt+tau*(1-exp(-strnrt/eps))
-
       dx = delta(1)
       dy = delta(2)
 
@@ -1035,7 +986,7 @@ c
             vx  = vxcen(i,j)
             uy  = uycen(i,j)
             vy  = vycen(i,j)
-            strnrt = strnrt_fun(ux,vx,uy,vy)
+            strnrt = strnrt_fun_2d(ux,vx,uy,vy)
             stress(i,j,1) = stress_fun(strnrt)
          end do
       end do
@@ -1062,7 +1013,7 @@ c
             vx  = vxlft(i,j)
             uy  = uycen(i,j)
             vy  = vycen(i,j)
-            strnrt = strnrt_fun(ux,vx,uy,vy)
+            strnrt = strnrt_fun_2d(ux,vx,uy,vy)
             stress(i,j,1) = stress_fun(strnrt)
          end do
       end if
@@ -1076,7 +1027,7 @@ c
             vx  = vxrgt(i,j)
             uy  = uycen(i,j)
             vy  = vycen(i,j)
-            strnrt = strnrt_fun(ux,vx,uy,vy)
+            strnrt = strnrt_fun_2d(ux,vx,uy,vy)
             stress(i,j,1) = stress_fun(strnrt)
          end do
       end if
@@ -1090,7 +1041,7 @@ c
             vx  = vxcen(i,j)
             uy  = uybot(i,j)
             vy  = vybot(i,j)
-            strnrt = strnrt_fun(ux,vx,uy,vy)
+            strnrt = strnrt_fun_2d(ux,vx,uy,vy)
             stress(i,j,1) = stress_fun(strnrt)
          end do
       end if
@@ -1104,7 +1055,7 @@ c
             vx  = vxcen(i,j)
             uy  = uytop(i,j)
             vy  = vytop(i,j)
-            strnrt = strnrt_fun(ux,vx,uy,vy)
+            strnrt = strnrt_fun_2d(ux,vx,uy,vy)
             stress(i,j,1) = stress_fun(strnrt)
          end do
       end if
@@ -1118,7 +1069,7 @@ c
          vx = vxlft(i,j)
          uy = uybot(i,j)
          vy = vybot(i,j)
-         strnrt = strnrt_fun(ux,vx,uy,vy)
+         strnrt = strnrt_fun_2d(ux,vx,uy,vy)
          stress(i,j,1) = stress_fun(strnrt)
       end if
       if (fixlft .and. fixtop) then
@@ -1128,7 +1079,7 @@ c
          vx = vxlft(i,j)
          uy = uytop(i,j)
          vy = vytop(i,j)
-         strnrt = strnrt_fun(ux,vx,uy,vy)
+         strnrt = strnrt_fun_2d(ux,vx,uy,vy)
          stress(i,j,1) = stress_fun(strnrt)
       end if
       if (fixrgt .and. fixtop) then
@@ -1138,7 +1089,7 @@ c
          vx = vxrgt(i,j)
          uy = uytop(i,j)
          vy = vytop(i,j)
-         strnrt = strnrt_fun(ux,vx,uy,vy)
+         strnrt = strnrt_fun_2d(ux,vx,uy,vy)
          stress(i,j,1) = stress_fun(strnrt)
       end if
       if (fixrgt .and. fixbot) then
@@ -1148,7 +1099,7 @@ c
          vx = vxrgt(i,j)
          uy = uybot(i,j)
          vy = vybot(i,j)
-         strnrt = strnrt_fun(ux,vx,uy,vy)
+         strnrt = strnrt_fun_2d(ux,vx,uy,vy)
          stress(i,j,1) = stress_fun(strnrt)
       end if
 
