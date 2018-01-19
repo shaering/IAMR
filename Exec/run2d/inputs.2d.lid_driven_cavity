@@ -67,17 +67,10 @@ diffuse.use_mlmg_solver = 1
 #*******************************************************************************
 
 # Viscosity coefficient 
-<<<<<<< 3d977cdc0550cc6d5e2a59cdf19c0fa24d54a63c
-ns.variable_vel_visc 	= 1
-ns.vel_visc_coef        = 1.0
-ns.yield_stress      	= 14.142135623730951
-ns.flow_index      		= 1.0
-=======
 ns.variable_vel_visc 	= 0
 ns.vel_visc_coef        = 0.01
 ns.yield_stress      	= 0.014142135623730951
 ns.flow_index      		= 0.5
->>>>>>> recreating amr problems
 ns.reg_param         	= 0.0025
 
 #*******************************************************************************
