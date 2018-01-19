@@ -1253,6 +1253,10 @@ NavierStokesBase::create_umac_grown (int nGrow)
         const int*  lo  = dm.loVect();
         const int*  hi  = dm.hiVect();
 
+		// call FillBoundary to make sure that fine/fine grow cells are valid 
+		// before FORT_HOEXTRAPTOCC is called
+		u_mac[n].FillBoundary(geom.periodicity());
+
         //
         // HOEXTRAPTOCC isn't threaded.  OMP over calls to it.
         //
