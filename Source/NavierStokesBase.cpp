@@ -1269,8 +1269,6 @@ NavierStokesBase::create_umac_grown (int nGrow)
             FArrayBox& fab = u_mac[n][mfi];
             amrex_hoextraptocc(BL_TO_FORTRAN_ANYD(fab),lo,hi,dx,xlo);
         }
-        // call FillBoundary to make sure that fine/fine grow cells are valid
-	u_mac[n].FillBoundary(geom.periodicity());
     }
 }
 
