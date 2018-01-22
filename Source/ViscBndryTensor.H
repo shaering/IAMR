@@ -13,17 +13,17 @@ class ViscBndryTensor
 public:
     ViscBndryTensor () {}
 
-    ViscBndryTensor (const amrex::BoxArray& grids,
-                     const amrex::DistributionMapping& dmap,
-                     const amrex::Geometry& geom)
+    ViscBndryTensor (const amrex::BoxArray& grids_,
+                     const amrex::DistributionMapping& dmap_,
+                     const amrex::Geometry& geom_)
         :
-        amrex::MCInterpBndryData(grids,dmap,amrex::MCLinOp::bcComponentsNeeded(),geom) {}
+        amrex::MCInterpBndryData(grids_,dmap_,amrex::MCLinOp::bcComponentsNeeded(),geom_) {}
 
     virtual void setBndryConds (const amrex::BCRec& phys_bc,
                                 int          ratio,
                                 int          comp=0) override;
 
-    void setHomogValues (const amrex::Array<amrex::BCRec>& phys_bc,
+    void setHomogValues (const amrex::Vector<amrex::BCRec>& phys_bc,
                          int                 ratio);
 
 };

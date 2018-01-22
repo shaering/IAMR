@@ -217,7 +217,8 @@ c ::: -----------------------------------------------------------
      &                     vel,scal,DIMS(state),
      &                         dx,xlo,xhi)
 
-      else if (probtype .eq. 10 .or. probtype .eq. 11) then
+      else if (probtype .eq. 10 .or. probtype .eq. 11 .or.
+     &         probtype .eq. 12) then
          call initfromrest(lo,hi,nscal,
      &                  vel,scal,DIMS(state),
      &                      dx,xlo,xhi)
@@ -769,7 +770,7 @@ c     ::::: local variables
       
 c ::: -----------------------------------------------------------
 c ::: This routine will tag high error cells based on the 
-c ::: density gradient
+c ::: magnitude of the density
 c ::: 
 c ::: INPUTS/OUTPUTS:
 c ::: 
@@ -1114,7 +1115,7 @@ c
       end
 c ::: -----------------------------------------------------------
 c ::: This routine will tag high error cells based on the 
-c ::: density gradient
+c ::: magnitude of the tracer
 c ::: 
 c ::: INPUTS/OUTPUTS:
 c ::: 
@@ -1336,7 +1337,7 @@ c     probtype = RT
 
 c ::: -----------------------------------------------------------
 c ::: This routine will tag high error cells based on the
-c ::: temperature gradient
+c ::: magnitude or gradient of the temperature
 c :::
 c ::: INPUTS/OUTPUTS:
 c :::
@@ -1728,11 +1729,23 @@ c ::: -----------------------------------------------------------
 
       if (bc(2,1).eq.EXT_DIR.and.ARG_L2(adv).lt.domlo(2)) then
 
-         do j = ARG_L2(adv), domlo(2)-1
-            do i = ARG_L1(adv), ARG_H1(adv)
-               adv(i,j) = zero
+         if (probtype .eq. 12) then
+
+            do j = ARG_L2(adv), domlo(2)-1
+               do i = ARG_L1(adv), ARG_H1(adv)
+                  adv(i,j) = 1.d0
+               end do
             end do
-         end do
+
+         else
+
+            do j = ARG_L2(adv), domlo(2)-1
+               do i = ARG_L1(adv), ARG_H1(adv)
+                  adv(i,j) = zero
+               end do
+            end do
+
+         end if
 
       end if            
 
@@ -2037,6 +2050,8 @@ c ::: -----------------------------------------------------------
       REAL_T     y_vel
       integer    lo(SDIM),hi(SDIM)
 
+      REAL_T  x
+
 #ifdef BL_DO_FLCT
       integer loFlctArray(SDIM), hiFlctArray(SDIM)
       integer DIMDEC(vflct)
@@ -2093,23 +2108,45 @@ c ::: -----------------------------------------------------------
              v(i,j) = zero
            end do
          end do
-      end if            
+      end if   
 
       if (bc(2,1).eq.EXT_DIR.and.ARG_L2(v).lt.domlo(2)) then
-         do j = ARG_L2(v), domlo(2)-1
-           do i = ARG_L1(v), ARG_H1(v)
+
+         if (probtype .eq. 12) then
+
+            do j = ARG_L2(v), domlo(2)-1
+               do i = ARG_L1(v), ARG_H1(v)
+              
+                  x = xlo(1) + dx(1)*(float(i-lo(1)) + half)
+                  if (x .gt. 0.45d0 .and. 
+     &                x .lt. 0.55d0 .and.
+     &                time .lt. 1.d0) then
+                     v(i,j) = adv_vel
+                  else
+                     v(i,j) = 0.d0
+                  end if
+               end do
+            end do
+
+         else
+
+            do j = ARG_L2(v), domlo(2)-1
+               do i = ARG_L1(v), ARG_H1(v)
 #ifdef BL_DO_FLCT
-              if (forceLo .and. adv_dir .eq. 2) then
-                 v(i,j) = y_vel + vflct(i,1)*turb_scale
-              else
-                 v(i,j) = y_vel
-              end if
+                  if (forceLo .and. adv_dir .eq. 2) then
+                     v(i,j) = y_vel + vflct(i,1)*turb_scale
+                  else
+                     v(i,j) = y_vel
+                  end if
 #else
-              v(i,j) = y_vel
+                  v(i,j) = y_vel
 #endif
-           end do
-         end do
-      end if            
+               end do
+            end do
+
+         end if            
+
+      end if
 
       if (bc(2,2).eq.EXT_DIR.and.ARG_H2(v).gt.domhi(2)) then
          do j = domhi(2)+1, ARG_H2(v)
@@ -2125,6 +2162,9 @@ c ::: -----------------------------------------------------------
 
       end
 
+
+
+         
 c ::: -----------------------------------------------------------
 c ::: This routine is called during a filpatch operation when
 c ::: the patch to be filled falls outside the interior

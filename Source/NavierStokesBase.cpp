@@ -39,11 +39,11 @@ Real NavierStokesBase::gravity     = 0.0;
 int  NavierStokesBase::NUM_SCALARS = 0;
 int  NavierStokesBase::NUM_STATE   = 0;
 
-Array<AdvectionForm> NavierStokesBase::advectionType;
-Array<DiffusionForm> NavierStokesBase::diffusionType;
+Vector<AdvectionForm> NavierStokesBase::advectionType;
+Vector<DiffusionForm> NavierStokesBase::diffusionType;
 
-Array<int>  NavierStokesBase::is_diffusive;
-Array<Real> NavierStokesBase::visc_coef;
+Vector<int>  NavierStokesBase::is_diffusive;
+Vector<Real> NavierStokesBase::visc_coef;
 Real        NavierStokesBase::visc_tol           = 1.0e-10;
 Real        NavierStokesBase::visc_abs_tol       = 1.0e-10;
 Real        NavierStokesBase::be_cn_theta        = 0.5;
@@ -77,7 +77,7 @@ int         NavierStokesBase::do_tracer2_ref            = 0;
 int         NavierStokesBase::do_vorticity_ref          = 0;
 int         NavierStokesBase::do_stress_ref          	= 0;
 int         NavierStokesBase::do_scalar_update_in_order = 0; 
-Array<int>  NavierStokesBase::scalarUpdateOrder;
+Vector<int>  NavierStokesBase::scalarUpdateOrder;
 int         NavierStokesBase::getForceVerbose           = 0;
 
 int  NavierStokesBase::Dpdt_Type = -1;
@@ -340,7 +340,7 @@ NavierStokesBase::Initialize ()
 
     pp.query("v",verbose);
 
-    Array<int> lo_bc(BL_SPACEDIM), hi_bc(BL_SPACEDIM);
+    Vector<int> lo_bc(BL_SPACEDIM), hi_bc(BL_SPACEDIM);
     pp.getarr("lo_bc",lo_bc,0,BL_SPACEDIM);
     pp.getarr("hi_bc",hi_bc,0,BL_SPACEDIM);
     for (int i = 0; i < BL_SPACEDIM; i++)
@@ -521,7 +521,7 @@ NavierStokesBase::Initialize ()
     //
     // Set the coefficients for the scalars, but temperature.
     //
-    Array<Real> scal_diff_coefs(n_scal_diff_coefs);
+    Vector<Real> scal_diff_coefs(n_scal_diff_coefs);
     pp.getarr("scal_diff_coefs",scal_diff_coefs,0,n_scal_diff_coefs);
 
     int scalId = Density;
@@ -672,8 +672,8 @@ NavierStokesBase::advance_setup (Real time,
 
         for (int dir = 0; dir < BL_SPACEDIM; dir++)
         {
-	    const BoxArray& edge_grids = getEdgeBoxArray(dir);
-            u_mac[dir].define(edge_grids,dmap,1,umac_n_grow);
+	    const BoxArray& edgeba = getEdgeBoxArray(dir);
+            u_mac[dir].define(edgeba,dmap,1,umac_n_grow);
             u_mac[dir].setVal(1.e40);
         }
     }
@@ -867,9 +867,9 @@ NavierStokesBase::checkPoint (const std::string& dir,
 void
 NavierStokesBase::computeInitialDt (int                   finest_level,
 				    int                   sub_cycle,
-				    Array<int>&           n_cycle,
-				    const Array<IntVect>& ref_ratio,
-				    Array<Real>&          dt_level, 
+				    Vector<int>&           n_cycle,
+				    const Vector<IntVect>& ref_ratio,
+				    Vector<Real>&          dt_level, 
 				    Real                  stop_time)
 {
     //
@@ -912,10 +912,10 @@ NavierStokesBase::computeInitialDt (int                   finest_level,
 void
 NavierStokesBase::computeNewDt (int                   finest_level,
 				int                   sub_cycle,
-				Array<int>&           n_cycle,
-				const Array<IntVect>& ref_ratio,
-				Array<Real>&          dt_min,
-				Array<Real>&          dt_level,
+				Vector<int>&           n_cycle,
+				const Vector<IntVect>& ref_ratio,
+				Vector<Real>&          dt_min,
+				Vector<Real>&          dt_level,
 				Real                  stop_time,
 				int                   post_regrid_flag) 
 {
@@ -1202,7 +1202,7 @@ NavierStokesBase::errorEst (TagBoxArray& tags,
 	    int i = mfi.index();
             const Box&  vbx     = mfi.validbox();
             RealBox     gridloc = RealBox(grids[i],geom.CellSize(),geom.ProbLo());
-            Array<int>  itags   = tags[mfi].tags();
+            Vector<int>  itags   = tags[mfi].tags();
             int*        tptr    = itags.dataPtr();
             const int*  tlo     = tags[mfi].box().loVect();
             const int*  thi     = tags[mfi].box().hiVect();
@@ -1477,9 +1477,9 @@ NavierStokesBase::getGradP (MultiFab& gp, Real      time)
                 pMF.plus(dpdtMF,0,1,NGrow);
             }
 
-            for (MFIter mfi(pMF); mfi.isValid(); ++mfi) 
+	    for (MFIter mfi(gp, true); mfi.isValid(); ++mfi) 
             {
-                Projection::getGradP(pMF[mfi],gp[mfi],gp[mfi].box(),dx);
+                Projection::getGradP(pMF[mfi],gp[mfi],mfi.growntilebox(),dx);
             }
         }
         //
@@ -1487,12 +1487,16 @@ NavierStokesBase::getGradP (MultiFab& gp, Real      time)
         //
         MultiFab gpTmp(gp.boxArray(),gp.DistributionMap(),1,NGrow);
 
-        for (FillPatchIterator P_fpi(*this,P_old,NGrow,time,Press_Type,0,1);
-             P_fpi.isValid();
-             ++P_fpi) 
-        {
-            Projection::getGradP(P_fpi(),gpTmp[P_fpi],gpTmp[P_fpi].box(),dx);
-        }
+	{
+
+	  FillPatchIterator P_fpi(*this,P_old,NGrow,time,Press_Type,0,1);
+	  MultiFab& pMF = P_fpi.get_mf();
+
+	  for (MFIter mfi(gpTmp, true); mfi.isValid(); ++mfi) 
+	  {
+	    Projection::getGradP(pMF[mfi],gpTmp[mfi],mfi.growntilebox(),dx);
+	  }
+	}
         //
         // Now must decide which parts of gpTmp to copy to gp.
         //
@@ -1537,16 +1541,16 @@ NavierStokesBase::getGradP (MultiFab& gp, Real      time)
     }
     else
     {
+
         FillPatchIterator P_fpi(*this,P_old,NGrow,time,Press_Type,0,1);
-
-        for ( ; P_fpi.isValid(); ++P_fpi) 
+	MultiFab& pMF = P_fpi.get_mf();
+	
+	for (MFIter mfi(gp, true); mfi.isValid(); ++mfi) 
         {
-            BL_ASSERT(amrex::grow(grids[P_fpi.index()],NGrow) == gp[P_fpi].box());
+	  BL_ASSERT(amrex::grow(grids[mfi.index()],NGrow) == gp[mfi].box());
 
-            FArrayBox& gpfab = gp[P_fpi];
-
-            Projection::getGradP(P_fpi(),gpfab,gpfab.box(),dx);
-        }
+	  Projection::getGradP(pMF[mfi],gp[mfi],mfi.growntilebox(),dx);
+	}
     }
 }
 
@@ -1577,7 +1581,7 @@ NavierStokesBase::getState (int  ngrow,
 }
 
 void
-NavierStokesBase::getOutFlowFaces (Array<Orientation>& outFaces)
+NavierStokesBase::getOutFlowFaces (Vector<Orientation>& outFaces)
 {
     outFaces.resize(0);
     for (int idir = 0; idir < BL_SPACEDIM; idir++)
@@ -1741,8 +1745,8 @@ NavierStokesBase::init ()
 
     BL_ASSERT(level > 0);
 
-    const Array<Real>& dt_amr = parent->dtLevel();
-    Array<Real>        dt_new(level+1);
+    const Vector<Real>& dt_amr = parent->dtLevel();
+    Vector<Real>        dt_new(level+1);
 
     for (int lev = 0; lev < level; lev++)
         dt_new[lev] = dt_amr[lev];
@@ -1899,7 +1903,7 @@ void
 NavierStokesBase::injectDown (const Box&       ovlp,
 			      FArrayBox&       Pcrse,
 			      const FArrayBox& Pfine,
-			      IntVect&         fine_ratio )
+			      IntVect&         fratio )
 {
     BL_PROFILE("NavierStokesBase::injectDown()");
 
@@ -1914,7 +1918,7 @@ NavierStokesBase::injectDown (const Box&       ovlp,
 
     FORT_PUTDOWN(cpres,ARLIM(clo),ARLIM(chi),
                  fpres,ARLIM(flo),ARLIM(fhi),
-                 ovlo,ovhi,fine_ratio.getVect());
+                 ovlo,ovhi,fratio.getVect());
 }
 
 void
@@ -1982,8 +1986,8 @@ NavierStokesBase::level_sync (int crse_iteration)
     //
     const int N = grids.size();
 
-    Array<int*>         sync_bc(N);
-    Array< Array<int> > sync_bc_array(N);
+    Vector<int*>         sync_bc(N);
+    Vector< Vector<int> > sync_bc_array(N);
 
     for (int i = 0; i < N; i++)
     {
@@ -2065,7 +2069,7 @@ NavierStokesBase::level_sync (int crse_iteration)
     if (do_MLsync_proj)
     {
         
-        MultiFab&       vel_fine    = fine_level.get_new_data(State_Type);
+        MultiFab&         v_fine    = fine_level.get_new_data(State_Type);
         MultiFab&       rho_fine    = fine_level.rho_avg;
         const Geometry& crse_geom   = parent->Geom(level);
         const BoxArray& P_finegrids = pres_fine.boxArray();
@@ -2103,7 +2107,7 @@ NavierStokesBase::level_sync (int crse_iteration)
         bool pressure_time_is_interval = 
          (state[Press_Type].descriptor()->timeType() == StateDescriptor::Interval);
         projector->MLsyncProject(level,pres,vel,cc_rhs_crse,
-                                 pres_fine,vel_fine,cc_rhs_fine,
+                                 pres_fine,v_fine,cc_rhs_fine,
                                  Rh,rho_fine,Vsync,V_corr,
                                  phi,&rhs_sync_reg,crsr_sync_ptr,
                                  dt,ratio,crse_iteration,crse_dt_ratio, 
@@ -2116,14 +2120,14 @@ NavierStokesBase::level_sync (int crse_iteration)
         //
         // Correct pressure and velocities after the projection.
         //
-        const int N = finegrids.size();
+        const int Nf = finegrids.size();
 
         ratio = IntVect::TheUnitVector();
 
-        Array<int*>         fine_sync_bc(N);
-        Array< Array<int> > fine_sync_bc_array(N);
+        Vector<int*>         fine_sync_bc(Nf);
+        Vector< Vector<int> > fine_sync_bc_array(Nf);
 
-        for (int i = 0; i < N; i++)
+        for (int i = 0; i < Nf; i++)
         {
             fine_sync_bc_array[i] = getLevel(level+1).getBCArray(State_Type,
                                                                  i,
@@ -2135,10 +2139,10 @@ NavierStokesBase::level_sync (int crse_iteration)
         for (int lev = level+2; lev <= finest_level; lev++)
         {
             ratio                 *= parent->refRatio(lev-1);
-            NavierStokesBase& fine_lev = getLevel(lev);
-            MultiFab&     P_new    = fine_lev.get_new_data(Press_Type);
-            MultiFab&     P_old    = fine_lev.get_old_data(Press_Type);
-            MultiFab&     U_new    = fine_lev.get_new_data(State_Type);
+            NavierStokesBase& flev = getLevel(lev);
+            MultiFab&     P_new    = flev.get_new_data(Press_Type);
+            MultiFab&     P_old    = flev.get_old_data(Press_Type);
+            MultiFab&     U_new    = flev.get_new_data(State_Type);
 
             SyncInterp(V_corr, level+1, U_new, lev, ratio,
                        0, 0, BL_SPACEDIM, 1 , dt, fine_sync_bc.dataPtr());
@@ -2259,9 +2263,9 @@ NavierStokesBase::mac_project (Real      time,
 
 void
 NavierStokesBase::manual_tags_placement (TagBoxArray&    tags,
-					 const Array<IntVect>& bf_lev)
+					 const Vector<IntVect>& bf_lev)
 {
-    Array<Orientation> outFaces;
+    Vector<Orientation> outFaces;
     getOutFlowFaces(outFaces);
     if (outFaces.size()>0)
     {
@@ -2314,22 +2318,22 @@ NavierStokesBase::manual_tags_placement (TagBoxArray&    tags,
                 // Adjust this to get the number of cells to be left uncovered at
                 // levels higher than 0
                 //
-                for (int i = 1; i <= level; ++i)
+                for (int j = 1; j <= level; ++j)
                 {
                     /*** Calculate the minimum cells at this level ***/
                     
-                    const int rat = (parent->refRatio(i-1))[oDir];
+                    const int rat = (parent->refRatio(j-1))[oDir];
                     N_level_cells = N_level_cells * rat + np;
                     
                     /*** Calculate the required number of coarse cells ***/
                     
                     N_coarse_cells = N_level_cells / bf_lev[i][oDir];
-                    if (N_level_cells % bf_lev[i][oDir] != 0)
+                    if (N_level_cells % bf_lev[j][oDir] != 0)
                         N_coarse_cells++;
                     
                     /*** Calculate the corresponding number of level cells ***/
                     
-                    N_level_cells = N_coarse_cells * bf_lev[i][oDir];
+                    N_level_cells = N_coarse_cells * bf_lev[j][oDir];
                 }
                 //
                 // Untag the cells near the outflow
@@ -2407,17 +2411,15 @@ NavierStokesBase::steadyState()
 
     if (verbose)
     {
-        const int IOProc = ParallelDescriptor::IOProcessorNumber();
+        amrex::Print() << "steadyState :: \n" << "LEV = " << level 
+                       << " MAX_CHANGE = " << max_change << std::endl; 
 
-		amrex::Print() << "steadyState :: \n" << "LEV = " << level 
-			<< " MAX_CHANGE = " << max_change << std::endl; 
-
-		if (steady)
-		{
-		    amrex::Print() 
-			  << "System reached steady-state, stopping simulation." 
-			  << std::endl;
-		}
+        if (steady)
+        {
+            amrex::Print() 
+                << "System reached steady-state, stopping simulation." 
+                << std::endl;
+        }
     }
 
     return steady;
@@ -2428,8 +2430,8 @@ NavierStokesBase::steadyState()
 //
 void
 NavierStokesBase::post_init_estDT (Real&        dt_init,
-				   Array<int>&  nc_save,
-				   Array<Real>& dt_save,
+				   Vector<int>&  nc_save,
+				   Vector<Real>& dt_save,
 				   Real         stop_time)
 {
     const Real strt_time    = state[State_Type].curTime();
@@ -2449,8 +2451,8 @@ NavierStokesBase::post_init_estDT (Real&        dt_init,
         dt_init    = std::min( dt_init, dt_save[k]/((Real) n_factor) );
     }
  
-    Array<Real> dt_level(finest_level+1,dt_init);
-    Array<int>  n_cycle(finest_level+1,1);
+    Vector<Real> dt_level(finest_level+1,dt_init);
+    Vector<int>  n_cycle(finest_level+1,1);
 
     Real dt0 = dt_save[0];
     n_factor = 1;
@@ -2818,7 +2820,7 @@ NavierStokesBase::scalar_advection_update (Real dt,
     MultiFab&  Aofs      = *aofs;
 
     const Real prev_time = state[State_Type].prevTime();
-    Array<int> state_bc;
+    Vector<int> state_bc;
     FArrayBox  tforces;
     //
     // Compute inviscid estimate of scalars.
@@ -3167,7 +3169,7 @@ NavierStokesBase::SyncInterp (MultiFab&      CrseSync,
     // since the length of their BoxArrays are equal.
     //
     FArrayBox    fdata;
-    Array<BCRec> bc_interp(num_comp);
+    Vector<BCRec> bc_interp(num_comp);
 
     MultiFab* fine_stateMF = 0;
     if (interpolater == &protected_interp)
@@ -3263,7 +3265,7 @@ NavierStokesBase::SyncProjInterp (MultiFab& phi,
     for (int i = 0; i < N; i++)
         crse_ba.set(i,node_bilinear_interp.CoarseBox(P_grids[i],ratio));
 
-    Array<BCRec> bc(BL_SPACEDIM);
+    Vector<BCRec> bc(BL_SPACEDIM);
     MultiFab     crse_phi(crse_ba,P_new.DistributionMap(),1,0);
 
     crse_phi.setVal(1.e200);
@@ -3361,7 +3363,7 @@ NavierStokesBase::velocity_advection (Real dt)
     else
         visc_terms.setVal(0,1);
 
-    Array<int> bndry[BL_SPACEDIM];
+    Vector<int> bndry[BL_SPACEDIM];
 
     MultiFab divu_fp(grids,dmap,1,1);
 
@@ -4070,10 +4072,10 @@ NavierStokesBase::sum_jet_quantities ()
         FILE *file;
         std::string filename;
 
-	Array<Real> r(rsize);
+	Vector<Real> r(rsize);
 	for (int i=0; i<rsize; i++)
 	    r[i] = dx[0]*(0.5+(double)i);
-	Array<Real> z(ksize);
+	Vector<Real> z(ksize);
 	for (int k=0; k<ksize; k++)
 	    z[k] = dx[2]*(0.5+(double)k);
 
