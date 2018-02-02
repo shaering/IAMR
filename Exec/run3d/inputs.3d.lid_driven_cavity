@@ -102,6 +102,5 @@ ns.hi_bc             	=  5 5 5
 # 2 = Outflow            5 = NoSlipWall
 
 #*******************************************************************************
-
 # Which derived variables to write to plot files
 amr.plot_vars   	      =  x_velocity y_velocity z_velocity
