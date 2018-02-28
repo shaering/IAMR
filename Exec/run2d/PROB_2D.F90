@@ -236,11 +236,15 @@ contains
                           vel,scal,DIMS(state), &
                               dx,xlo,xhi)
 
-      else if (probtype .eq. 10 .or. probtype .eq. 11 .or. &
-              probtype .eq. 12) then
-         call initfromrest(lo,hi,nscal, &
-                       vel,scal,DIMS(state), &
-                           dx,xlo,xhi)
+      else if (probtype .eq. 10 .or. probtype .eq. 12) then        
+        call initfromrest(lo,hi,nscal,
+     &                  vel,scal,DIMS(state),
+     &                      dx,xlo,xhi)
+
+      else if (probtype .eq. 11) then        
+        call initpoiseuille(lo,hi,nscal,
+     &                  vel,scal,DIMS(state),
+     &                      dx,xlo,xhi)
 
       else
          write(6,*) "INITDATA: bad probtype = ",probtype
@@ -766,6 +770,7 @@ contains
       
       end subroutine inittraceradvect
       
+<<<<<<< HEAD:Exec/run2d/PROB_2D.F90
 !c
 !c ::: -----------------------------------------------------------
 !c ::: Initialise system from rest. Introduced for the lid-driven cavity
@@ -775,6 +780,15 @@ contains
                          vel,scal,DIMS(state), &
                              dx,xlo,xhi) &
                              bind(C, name="initfromrest")
+=======
+c
+c ::: -----------------------------------------------------------
+c ::: Initialise system from rest. Introduced for the lid-driven cavity
+c
+      subroutine initfromrest(lo,hi,nscal,
+     &                    vel,scal,DIMS(state),
+     &                        dx,xlo,xhi)
+>>>>>>> trying to initiate from a Poiseuille steady-state and sustain it. initialisation seems fine (plt0 ok) but get nans in New scalar 2 after first step...:Exec/run2d/PROB_2D.F
 
       integer    nscal
       integer    lo(SDIM), hi(SDIM)
@@ -803,6 +817,7 @@ contains
       
       end subroutine initfromrest
       
+<<<<<<< HEAD:Exec/run2d/PROB_2D.F90
 !c ::: -----------------------------------------------------------
 !c ::: This routine will tag high error cells based on the 
 !c ::: magnitude of the density
@@ -829,6 +844,73 @@ contains
                                domlo,domhi,dx,xlo, &
      			        problo,time,level) &
                   bind(C, name="FORT_DENERROR")
+=======
+c
+c ::: -----------------------------------------------------------
+c ::: Initialise system from at steady-state for Poiseuille flow. 
+c
+      subroutine initpoiseuille(lo,hi,nscal,
+     &                    vel,scal,DIMS(state),
+     &                        dx,xlo,xhi)
+
+      integer    nscal
+      integer    lo(SDIM), hi(SDIM)
+      integer    DIMDEC(state)
+      REAL_T     dx(SDIM)
+      REAL_T     xlo(SDIM), xhi(SDIM)
+      REAL_T     vel(DIMV(state),SDIM)
+      REAL_T    scal(DIMV(state),nscal)
+
+
+c     ::::: local variables
+      integer i, j
+      REAL_T  x, y
+      REAL_T  hx, hy
+
+#include <probdata.H>
+
+      hx = dx(1)
+      hy = dx(2)
+
+      do j=lo(2),hi(2)
+         y = xlo(2) + hy*(float(j-lo(2)) + half)
+         do i=lo(1),hi(1)
+            vel(i,j,1) = 1.5d0 * (1.0d0 - y*y)
+            vel(i,j,2) = 0.0d0
+            scal(i,j,1) = 1.0d0
+            scal(i,j,2) = 0.0d0
+
+         end do
+      end do
+      
+      end
+      
+c ::: -----------------------------------------------------------
+c ::: This routine will tag high error cells based on the 
+c ::: magnitude of the density
+c ::: 
+c ::: INPUTS/OUTPUTS:
+c ::: 
+c ::: tag      <=  integer tag array
+c ::: DIMS(tag) => index extent of tag array
+c ::: set       => integer value to tag cell for refinement
+c ::: clear     => integer value to untag cell
+c ::: rho       => density array
+c ::: DIMS(rho) => index extent of rho array
+c ::: lo,hi     => index extent of grid
+c ::: nvar      => number of components in rho array (should be 1)
+c ::: domlo,hi  => index extent of problem domain
+c ::: dx        => cell spacing
+c ::: xlo       => physical location of lower left hand
+c :::	           corner of tag array
+c ::: problo    => phys loc of lower left corner of prob domain
+c ::: time      => problem evolution time
+c ::: -----------------------------------------------------------
+      subroutine FORT_DENERROR (tag,DIMS(tag),set,clear,
+     &                          rho,DIMS(rho),lo,hi,nvar,
+     &                          domlo,domhi,dx,xlo,
+     &			        problo,time,level)
+>>>>>>> trying to initiate from a Poiseuille steady-state and sustain it. initialisation seems fine (plt0 ok) but get nans in New scalar 2 after first step...:Exec/run2d/PROB_2D.F
 
       integer   DIMDEC(rho)
       integer   DIMDEC(tag)
@@ -2017,6 +2099,7 @@ c ::: -----------------------------------------------------------
       REAL_T  t_flct
       REAL_T, allocatable :: uflct(:,:)
 #endif
+      REAL_T  y, hy
 
 #include <probdata.H>
 
@@ -2028,6 +2111,8 @@ c ::: -----------------------------------------------------------
       lo(2) = ARG_L2(u)
       hi(1) = ARG_H1(u)
       hi(2) = ARG_H2(u)
+
+      hy = dx(2)
 
 #ifdef BL_DO_FLCT
       if (forceInflow) then
@@ -2061,7 +2146,12 @@ c ::: -----------------------------------------------------------
       if (bc(1,1).eq.EXT_DIR.and.ARG_L1(u).lt.domlo(1)) then
          do i = ARG_L1(u), domlo(1)-1
             do j = ARG_L2(u), ARG_H2(u)
-               u(i,j) = x_vel
+               if (probtype .eq. 11) then
+                   y = xlo(2) + hy*(float(j-lo(2)) + half)
+                   u(i,j) = 1.5d0 * (1.0d0 - y*y)
+               else
+                   u(i,j) = x_vel
+               end if
             end do
          end do
       end if            
