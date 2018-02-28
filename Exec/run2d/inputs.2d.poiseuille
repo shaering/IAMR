@@ -6,20 +6,20 @@
 
 # Maximum number of coarse grid timesteps to be taken, if stop_time is
 #  not reached first.
-max_step 				= 1000
+max_step 				= 10
 
 # Time at which calculation stops, if max_step is not reached first.
 stop_time 				= -1
 
 # Tolerance for assuming system has reached steady-state
-ns.stop_when_steady 	= 1
+ns.stop_when_steady 	= 0
 ns.steady_tol 			= 1.0e-5
 
 #*******************************************************************************
 
 # Number of cells in each coordinate direction at the coarsest level
-amr.n_cell 				= 32 32  
-amr.max_grid_size		= 16
+amr.n_cell 				= 320 64
+amr.max_grid_size		= 32
 
 #*******************************************************************************
 
@@ -44,17 +44,24 @@ amr.check_int			= -1
 #*******************************************************************************
 
 # Interval (in number of coarse timesteps) between plot files
-amr.plot_int			= 10
+amr.plot_int			= 1
 
 #*******************************************************************************
 
 # CFL number to be used in calculating the time step : dt = dx / max(velocity)
-ns.cfl                  = 0.5  # CFL number used to set dt
+ns.cfl                  = 0.9  # CFL number used to set dt
 
 #*******************************************************************************
 
 # Factor by which the first time is shrunk relative to CFL constraint
 ns.init_shrink          = 0.3  # factor which multiplies the very first time step
+
+#*******************************************************************************
+
+# Linear solver settings
+proj.use_mlmg_solver 	= 1
+mac.use_mlmg_solver 	= 1
+diffuse.use_mlmg_solver = 1
 
 #*******************************************************************************
 
@@ -69,7 +76,7 @@ ns.scal_diff_coefs      = 0.0
 #*******************************************************************************
 
 # Forcing term defaults to  rho * abs(gravity) "down"
-ns.gravity              = 1.0  
+ns.gravity              = 0.0  
 
 #*******************************************************************************
 
@@ -84,10 +91,10 @@ geometry.coord_sys   	=  0
 #*******************************************************************************
 
 # Physical dimensions of the low end of the domain.
-geometry.prob_lo     	=  0. 0. 
+geometry.prob_lo     	=  0. -1. 
 
 # Physical dimensions of the high end of the domain.
-geometry.prob_hi     	=  1. 1. 
+geometry.prob_hi     	=  10. 1. 
 
 #*******************************************************************************
 
@@ -97,10 +104,10 @@ geometry.is_periodic 	=  0 0
 #*******************************************************************************
 
 # Boundary conditions on the low end of the domain.
-ns.lo_bc             	= 5 2
+ns.lo_bc             	= 1 5
 
 # Boundary conditions on the high end of the domain.
-ns.hi_bc             	= 5 2  
+ns.hi_bc             	= 2 5  
 
 # 0 = Interior/Periodic  3 = Symmetry
 # 1 = Inflow             4 = SlipWall

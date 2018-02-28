@@ -217,9 +217,13 @@ c ::: -----------------------------------------------------------
      &                     vel,scal,DIMS(state),
      &                         dx,xlo,xhi)
 
-      else if (probtype .eq. 10 .or. probtype .eq. 11 .or.
-     &         probtype .eq. 12) then
-         call initfromrest(lo,hi,nscal,
+      else if (probtype .eq. 10 .or. probtype .eq. 12) then        
+        call initfromrest(lo,hi,nscal,
+     &                  vel,scal,DIMS(state),
+     &                      dx,xlo,xhi)
+
+      else if (probtype .eq. 11) then        
+        call initpoiseuille(lo,hi,nscal,
      &                  vel,scal,DIMS(state),
      &                      dx,xlo,xhi)
 
@@ -735,7 +739,6 @@ c     ::::: local variables
 c
 c ::: -----------------------------------------------------------
 c ::: Initialise system from rest. Introduced for the lid-driven cavity
-c ::: test case, also used for Poiseuille flow in square duct. 
 c
       subroutine initfromrest(lo,hi,nscal,
      &                    vel,scal,DIMS(state),
@@ -759,6 +762,46 @@ c     ::::: local variables
          do i=lo(1),hi(1)
 
             vel(i,j,1) = 0.0d0
+            vel(i,j,2) = 0.0d0
+            scal(i,j,1) = 1.0d0
+            scal(i,j,2) = 0.0d0
+
+         end do
+      end do
+      
+      end
+      
+c
+c ::: -----------------------------------------------------------
+c ::: Initialise system from at steady-state for Poiseuille flow. 
+c
+      subroutine initpoiseuille(lo,hi,nscal,
+     &                    vel,scal,DIMS(state),
+     &                        dx,xlo,xhi)
+
+      integer    nscal
+      integer    lo(SDIM), hi(SDIM)
+      integer    DIMDEC(state)
+      REAL_T     dx(SDIM)
+      REAL_T     xlo(SDIM), xhi(SDIM)
+      REAL_T     vel(DIMV(state),SDIM)
+      REAL_T    scal(DIMV(state),nscal)
+
+
+c     ::::: local variables
+      integer i, j
+      REAL_T  x, y
+      REAL_T  hx, hy
+
+#include <probdata.H>
+
+      hx = dx(1)
+      hy = dx(2)
+
+      do j=lo(2),hi(2)
+         y = xlo(2) + hy*(float(j-lo(2)) + half)
+         do i=lo(1),hi(1)
+            vel(i,j,1) = 1.5d0 * (1.0d0 - y*y)
             vel(i,j,2) = 0.0d0
             scal(i,j,1) = 1.0d0
             scal(i,j,2) = 0.0d0
@@ -1922,6 +1965,7 @@ c ::: -----------------------------------------------------------
       REAL_T  t_flct
       REAL_T, allocatable :: uflct(:,:)
 #endif
+      REAL_T  y, hy
 
 #include <probdata.H>
 
@@ -1933,6 +1977,8 @@ c ::: -----------------------------------------------------------
       lo(2) = ARG_L2(u)
       hi(1) = ARG_H1(u)
       hi(2) = ARG_H2(u)
+
+      hy = dx(2)
 
 #ifdef BL_DO_FLCT
       if (forceInflow) then
@@ -1966,7 +2012,12 @@ c
       if (bc(1,1).eq.EXT_DIR.and.ARG_L1(u).lt.domlo(1)) then
          do i = ARG_L1(u), domlo(1)-1
             do j = ARG_L2(u), ARG_H2(u)
-               u(i,j) = x_vel
+               if (probtype .eq. 11) then
+                   y = xlo(2) + hy*(float(j-lo(2)) + half)
+                   u(i,j) = 1.5d0 * (1.0d0 - y*y)
+               else
+                   u(i,j) = x_vel
+               end if
             end do
          end do
       end if            
