@@ -6,7 +6,7 @@
 
 # Maximum number of coarse grid timesteps to be taken, if stop_time is
 #  not reached first.
-max_step 				= 100
+max_step 				= 1000
 
 # Time at which calculation stops, if max_step is not reached first.
 stop_time 				= -1
@@ -68,7 +68,7 @@ diffuse.use_mlmg_solver = 1
 # Viscosity coefficient 
 ns.variable_vel_visc 	= 1
 ns.vel_visc_coef        = 1.0
-ns.yield_stress      	= 1.4142135623730951
+ns.yield_stress      	= 5.656854249492381
 ns.flow_index      		= 1.0
 ns.reg_param         	= 0.0025
 
