@@ -824,7 +824,7 @@ c     ::::: local variables
 
             vel(i,j,2) = 0.0d0
             scal(i,j,1) = 1.0d0
-            scal(i,j,2) = 0.0d0
+            scal(i,j,2) = 1.0d0
 
          end do
       end do
