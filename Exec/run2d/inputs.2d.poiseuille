@@ -11,7 +11,7 @@ ns.do_denminmax = 1
 
 # Maximum number of coarse grid timesteps to be taken, if stop_time is
 #  not reached first.
-max_step 				= 10
+max_step 				= 100
 
 # Time at which calculation stops, if max_step is not reached first.
 stop_time 				= -1
@@ -56,7 +56,7 @@ amr.check_int			= -1
 #*******************************************************************************
 
 # Interval (in number of coarse timesteps) between plot files
-amr.plot_int			= 1
+amr.plot_int			= 10
 
 #*******************************************************************************
 
@@ -79,7 +79,7 @@ diffuse.use_mlmg_solver = 1
 #*******************************************************************************
 
 # Viscosity coefficient 
-ns.variable_vel_visc 	= 1
+ns.variable_vel_visc 	= 0
 ns.vel_visc_coef        = 1.0
 ns.yield_stress      	= 1.414213562
 ns.flow_index      		= 1.0
