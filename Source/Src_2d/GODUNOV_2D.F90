@@ -431,7 +431,8 @@ contains
             v       = max(v,abs(vel(i,j,2)))
             tforce1 = max(tforce1,abs(tforces(i,j,1)/rho(i,j)))
             tforce2 = max(tforce2,abs(tforces(i,j,2)/rho(i,j)))
-            yield   = max(yield, 1.0e3*(tau/sqrt(2.0)+mu)/rho(i,j))
+c           TODO: find proper measure of viscoplastic impact on CFL
+            yield   = max(yield, 1.0e1*(tau/sqrt(2.0)+mu)/rho(i,j))
          end do
       end do
 
