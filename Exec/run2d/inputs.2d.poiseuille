@@ -11,7 +11,7 @@ ns.do_denminmax = 1
 
 # Maximum number of coarse grid timesteps to be taken, if stop_time is
 #  not reached first.
-max_step 				= 1000
+max_step 				= 10
 
 # Time at which calculation stops, if max_step is not reached first.
 stop_time 				= -1
@@ -23,8 +23,8 @@ ns.steady_tol 		= 1.0e-5
 #*******************************************************************************
 
 # Number of cells in each coordinate direction at the coarsest level
-amr.n_cell 				= 160 32
-amr.max_grid_size		= 32
+amr.n_cell 				= 320 64
+amr.max_grid_size		= 64
 
 #*******************************************************************************
 
@@ -81,7 +81,7 @@ diffuse.use_mlmg_solver = 1
 # Viscosity coefficient 
 ns.variable_vel_visc 	= 1
 ns.vel_visc_coef        = 1.0
-ns.yield_stress      	= 5.656854249492381
+ns.yield_stress      	= 1.414213562
 ns.flow_index      		= 1.0
 ns.reg_param         	= 0.0025
 

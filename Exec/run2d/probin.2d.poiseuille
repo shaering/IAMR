@@ -3,5 +3,6 @@
 
   probtype = 11
   denfact = 1.0
+  max_vel = 1.0
 
 /
