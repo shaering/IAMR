@@ -47,6 +47,7 @@ Real        NavierStokesBase::visc_abs_tol       = 1.0e-10;
 Real        NavierStokesBase::be_cn_theta        = 0.5;
 int         NavierStokesBase::variable_vel_visc  = 0;
 int         NavierStokesBase::variable_scal_diff = 0;
+Real        NavierStokesBase::dyn_visc_coef      = 1.0;
 Real        NavierStokesBase::flow_index         = 1.0;
 Real        NavierStokesBase::yield_stress       = 0.0;
 Real        NavierStokesBase::reg_param          = 0.01;
@@ -551,6 +552,7 @@ NavierStokesBase::Initialize_specific ()
     //
     // Viscosity parameters for Herschel-Bulkley model
     //
+    pp.query("dyn_visc_coef",dyn_visc_coef);
     pp.query("flow_index",flow_index);
     pp.query("yield_stress",yield_stress);
     pp.query("reg_param",reg_param);
@@ -559,7 +561,7 @@ NavierStokesBase::Initialize_specific ()
     const int n_temp_cond_coef  = pp.countval("temp_cond_coef");
     const int n_scal_diff_coefs = pp.countval("scal_diff_coefs");
 
-    if (n_vel_visc_coef != 1)
+    if (n_vel_visc_coef != 1 && variable_vel_visc == 0)
         amrex::Abort("NavierStokesBase::Initialize(): Only one vel_visc_coef allowed");
 
     if (do_temp && n_temp_cond_coef != 1)
@@ -652,7 +654,7 @@ NavierStokesBase::Initialize_specific ()
     read_particle_params ();
 #endif
 
-    FORT_SET_NS_PARAMS(visc_coef[0], flow_index, yield_stress, reg_param, variable_vel_visc);
+    FORT_SET_NS_PARAMS(dyn_visc_coef, flow_index, yield_stress, reg_param, variable_vel_visc);
 
     amrex::ExecOnFinalize(NavierStokesBase::Finalize);
 

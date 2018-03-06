@@ -78,9 +78,12 @@ diffuse.use_mlmg_solver = 1
 
 #*******************************************************************************
 
-# Viscosity coefficient 
+# Viscosity 
+# ns.variable_vel_visc 	= 0
+# ns.vel_visc_coef 		= 1.0
+# If variable_vel_visc=1, dyn_visc_coef is used instead of vel_visc_coef (to allow 2-fluid flow)
 ns.variable_vel_visc 	= 1
-ns.vel_visc_coef        = 1.0
+ns.dyn_visc_coef        = 1.0
 ns.yield_stress      	= 1.414213562
 ns.flow_index      		= 1.0
 ns.reg_param         	= 0.0025
