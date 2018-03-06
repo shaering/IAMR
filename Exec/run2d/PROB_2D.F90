@@ -1775,8 +1775,8 @@ c     probtype = LID-DRIVEN CAVITY
       if (probtype .eq. 10) then
         do j = lo(2), hi(2)
            do i = lo(1), hi(1)
-              tag(i,j) =
-     &          merge(set,tag(i,j),abs(stress(i,j,1)-tau).lt.stresserr)
+c              tag(i,j) =
+c     &          merge(set,tag(i,j),abs(stress(i,j,1)-tau).lt.stresserr)
 c              tag(i,j) =
 c     &          merge(set,tag(i,j),abs(domhi(2)-j).lt.16)
 c              tag(i,j) =
@@ -2120,7 +2120,7 @@ c ::: -----------------------------------------------------------
       REAL_T, allocatable :: uflct(:,:)
 #endif
       REAL_T  y, hy
-      REAL_T  Bi, y0
+      REAL_T  tau, mu, Bi, y0
 
 #include <probdata.H>
 #include <NSCOMM_F.H>
@@ -2137,11 +2137,17 @@ c ::: -----------------------------------------------------------
       hy = dx(2)
 
       if (varvisc .eq. 1) then 
-         if (.not. tau > 0) then
-            print *, 'Need tau > 0 for variable visc in this test case!'
+         if (numflds .ne. 1) then 
+            print*,"PROB_2D.F::FORT_XVELFILL(): Can only have 1 fluid for this test case!"
          else
-            Bi = tau / ( sqrt(2.0d0) * mu * max_vel )
-            y0 = 1.d0 - ( sqrt(1.0d0 + 2.0d0 * Bi) - 1 ) / Bi
+            tau = tau_in(1)
+            mu = mu_in(1)
+            if (.not. tau > 0) then
+                print*,"PROB_2D.F::FORT_XVELFILL(): Need tau > 0 for variable visc in this test case!"
+            else
+                Bi = tau / ( sqrt(2.0d0) * mu * max_vel )
+                y0 = 1.d0 - ( sqrt(1.0d0 + 2.0d0 * Bi) - 1 ) / Bi
+            end if
          end if
       end if
 
