@@ -432,7 +432,6 @@ contains
             tforce1 = max(tforce1,abs(tforces(i,j,1)/rho(i,j)))
             tforce2 = max(tforce2,abs(tforces(i,j,2)/rho(i,j)))
 c           TODO: find proper measure of viscoplastic impact on CFL
-            yield   = max(yield, 1.0e1*(tau/sqrt(2.0)+mu)/rho(i,j))
          end do
       end do
 
@@ -454,10 +453,8 @@ c           TODO: find proper measure of viscoplastic impact on CFL
       end if
 
       if (varvisc .ne. 0) then
-        if (yield .gt. small) then
-          dt  = min(dt,dx(1)/yield)
-          dt  = min(dt,dx(2)/yield)
-        end if
+        dt  = min(dt,two*dx(1)/tforce1)
+        dt  = min(dt,two*dx(2)/tforce2)
       end if
 
       if (dt .eq. dt_start) dt = min(dx(1),dx(2))
