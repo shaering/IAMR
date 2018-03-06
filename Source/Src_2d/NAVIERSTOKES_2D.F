@@ -419,8 +419,11 @@ c     coarse face, leave the in-between faces alone.
 
       end
 
-      subroutine FORT_HERSCHEL_BULKLEY(visc, DIMS(visc), vel, DIMS(vel), 
-     &                                 lo, hi, domlo, domhi, delta, vel_bc)
+      subroutine FORT_HERSCHEL_BULKLEY(visc, DIMS(visc), 
+     &                                 vel, DIMS(vel),
+     &                                 ind, DIMS(ind), 
+     &                                 lo, hi, domlo, domhi, delta,
+     &                                 vel_bc, ind_bc)
       use viscoplasticity_module
       implicit none
 c
@@ -430,11 +433,14 @@ c
       integer    lo(2), hi(2)
       integer    DIMDEC(visc)
       integer    DIMDEC(vel)
+      integer    DIMDEC(ind)
       integer    domlo(2), domhi(2)
       integer    vel_bc(2,2,2)
+      integer    ind_bc(2,2,1)
       REAL_T     delta(2)
       REAL_T     visc(DIMV(visc),1)
       REAL_T     vel(DIMV(vel),2)
+      REAL_T     ind(DIMV(ind),1)
 
       integer   i,j
       REAL_T    ux, vx, uy, vy, dx, dy
@@ -489,7 +495,7 @@ c
             uy  = uycen(i,j)
             vy  = vycen(i,j)
             strnrt = strnrt_fun_2d(ux,vx,uy,vy)
-            visc(i,j,1) = visc_fun(strnrt)
+            visc(i,j,1) = visc_fun(strnrt, ind(i,j,1))
          end do
       end do
 
@@ -517,7 +523,7 @@ c
             uy  = uycen(i,j) 
             vy  = vycen(i,j)
             strnrt = strnrt_fun_2d(ux,vx,uy,vy)
-            visc(i,j,1) = visc_fun(strnrt)
+            visc(i,j,1) = visc_fun(strnrt, ind(i,j,1))
             ! Linear extrapolation
             visc(i-1,j,1) = visc(i,j,1)
          end do
@@ -533,7 +539,7 @@ c
             uy  = uycen(i,j)
             vy  = vycen(i,j)
             strnrt = strnrt_fun_2d(ux,vx,uy,vy)
-            visc(i,j,1) = visc_fun(strnrt)
+            visc(i,j,1) = visc_fun(strnrt, ind(i,j,1))
             ! Linear extrapolation
             visc(i+1,j,1) = visc(i,j,1)
          end do
@@ -549,7 +555,7 @@ c
             uy  = uybot(i,j)
             vy  = vybot(i,j)
             strnrt = strnrt_fun_2d(ux,vx,uy,vy)
-            visc(i,j,1) = visc_fun(strnrt)
+            visc(i,j,1) = visc_fun(strnrt, ind(i,j,1))
             ! Linear extrapolation
             visc(i,j-1,1) = visc(i,j,1)
          end do
@@ -565,7 +571,7 @@ c
             uy  = uytop(i,j)
             vy  = vytop(i,j)
             strnrt = strnrt_fun_2d(ux,vx,uy,vy)
-            visc(i,j,1) = visc_fun(strnrt)
+            visc(i,j,1) = visc_fun(strnrt, ind(i,j,1))
             ! Linear extrapolation
             visc(i,j+1,1) = visc(i,j,1)
          end do
@@ -581,7 +587,7 @@ c
          uy = uybot(i,j)
          vy = vybot(i,j)
          strnrt = strnrt_fun_2d(ux,vx,uy,vy)
-         visc(i,j,1) = visc_fun(strnrt)
+         visc(i,j,1) = visc_fun(strnrt, ind(i,j,1))
          ! Linear extrapolation
          visc(i-1,j-1,1) = visc(i,j,1)
       end if
@@ -595,7 +601,7 @@ c
          uy = uytop(i,j)
          vy = vytop(i,j)
          strnrt = strnrt_fun_2d(ux,vx,uy,vy)
-         visc(i,j,1) = visc_fun(strnrt)
+         visc(i,j,1) = visc_fun(strnrt, ind(i,j,1))
          ! Linear extrapolation
          visc(i-1,j+1,1) = visc(i,j,1)
       end if
@@ -608,7 +614,7 @@ c
          uy = uytop(i,j)
          vy = vytop(i,j)
          strnrt = strnrt_fun_2d(ux,vx,uy,vy)
-         visc(i,j,1) = visc_fun(strnrt)
+         visc(i,j,1) = visc_fun(strnrt, ind(i,j,1))
          ! Linear extrapolation
          visc(i+1,j+1,1) = visc(i,j,1)
       end if
@@ -621,7 +627,7 @@ c
          uy = uybot(i,j)
          vy = vybot(i,j)
          strnrt = strnrt_fun_2d(ux,vx,uy,vy)
-         visc(i,j,1) = visc_fun(strnrt)
+         visc(i,j,1) = visc_fun(strnrt, ind(i,j,1))
          ! Linear extrapolation
          visc(i+1,j-1,1) = visc(i,j,1)
       end if

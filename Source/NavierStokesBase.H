@@ -648,9 +648,9 @@ protected:
     static amrex::Real        be_cn_theta;
     static int         variable_vel_visc;  // variable viscosity flag
     static int         variable_scal_diff; // variable scalar diffusion flag
-    static amrex::Real        dyn_visc_coef;
-    static amrex::Real        flow_index;
-    static amrex::Real        yield_stress;
+    static amrex::Vector<amrex::Real> dyn_visc_coef;       // const coef viscosity terms
+    static amrex::Vector<amrex::Real> yield_stress;       // const coef viscosity terms
+    static amrex::Vector<amrex::Real> flow_index;       // const coef viscosity terms
     static amrex::Real        reg_param;
     //
     // Internal switches.

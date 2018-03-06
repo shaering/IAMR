@@ -6,10 +6,10 @@
 
 # Maximum number of coarse grid timesteps to be taken, if stop_time is
 #  not reached first.
-max_step 				= 10000
+max_step 				= 1000
 
 # Time at which calculation stops, if max_step is not reached first.
-stop_time 				= 10
+stop_time 				= 1
 
 # Tolerance for assuming system has reached steady-state
 ns.stop_when_steady 	= 0
@@ -65,14 +65,19 @@ diffuse.use_mlmg_solver = 1
 
 #*******************************************************************************
 
-# Viscosity 
-ns.variable_vel_visc 	= 0
-ns.vel_visc_coef 		= 1.0
-# If variable_vel_visc=1, dyn_visc_coef is used instead of vel_visc_coef (to allow 2-fluid flow)
+# Variable viscosity function?
 ns.variable_vel_visc 	= 1
-ns.dyn_visc_coef        = 1.0
-ns.yield_stress      	= 1.414213562
-ns.flow_index      		= 1.0
+
+# Dynamic coefficient of viscosity
+ns.dyn_visc_coef        = 2.0 1.0
+
+# Yield stress
+ns.yield_stress      	= 0.0 0.0
+
+# Flow index
+ns.flow_index      		= 1.0 1.0
+
+# Papanastasiou regularisation parameter
 ns.reg_param         	= 0.0025
 
 #*******************************************************************************
@@ -98,10 +103,10 @@ geometry.coord_sys   	=  0
 #*******************************************************************************
 
 # Physical dimensions of the low end of the domain.
-geometry.prob_lo     	=  0. 0. 
+geometry.prob_lo     	=  0.0 0.0
 
 # Physical dimensions of the high end of the domain.
-geometry.prob_hi     	=  5. 1. 
+geometry.prob_hi     	=  5.0 1.0
 
 #*******************************************************************************
 
