@@ -187,7 +187,7 @@ extern "C" {
                       const int* lo, const int* hi, const int* domain_lo, const int* domain_hi,
 		              const amrex::Real* delta, const int* vel_bc);
 
-   void FORT_SET_NS_PARAMS(const amrex::Real& vel_visc_coef,
+   void FORT_SET_NS_PARAMS(const amrex::Real& dyn_visc_coef,
                         const amrex::Real& flow_index, 
                         const amrex::Real& yield_stress, 
                         const amrex::Real& reg_param, 
