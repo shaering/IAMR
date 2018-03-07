@@ -353,9 +353,9 @@ NavierStokes::variableSetUp ()
     //
     // apparent viscosity
     //
-    derive_lst.add("viscosity",IndexType::TheCellType(),1,FORT_DERVISC,grow_box_by_one);
-    derive_lst.addComponent("viscosity",desc_lst,State_Type,Xvel,BL_SPACEDIM);
-    derive_lst.addComponent("viscosity",desc_lst,State_Type,Trac,1);
+    derive_lst.add("eff_visc",IndexType::TheCellType(),1,FORT_DERVISC,grow_box_by_one);
+    derive_lst.addComponent("eff_visc",desc_lst,State_Type,Xvel,BL_SPACEDIM);
+    derive_lst.addComponent("eff_visc",desc_lst,State_Type,Trac,1);
     //
     // magnitude of stress tensor
     //

@@ -191,11 +191,11 @@ extern "C" {
 		              const amrex::Real* delta, const int* vel_bc);
 
    void FORT_SET_NS_PARAMS(const int& n_fluids, 
-	   					   const amrex::Vector<amrex::Real> dyn_visc_coef,
-                           const amrex::Vector<amrex::Real> flow_index, 
-                           const amrex::Vector<amrex::Real> yield_stress, 
-                           const amrex::Real& reg_param, 
-						   const int& variable_vel_visc);
+	   		   const amrex::Real* dyn_visc_coef,
+                           const amrex::Real* flow_index, 
+                           const amrex::Real* yield_stress, 
+                           const amrex::Real* reg_param, 
+			   int& variable_vel_visc);
 #ifdef __cplusplus
 }
 #endif

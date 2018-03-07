@@ -136,6 +136,6 @@ ns.hi_bc             	= 2 5
 #*******************************************************************************
 
 # Write all derived quantities to plot files
-amr.derive_plot_vars    = viscosity
+amr.derive_plot_vars    = eff_visc
 
 #*******************************************************************************
