@@ -6,7 +6,7 @@
 
 # Maximum number of coarse grid timesteps to be taken, if stop_time is
 #  not reached first.
-max_step 				= 1000
+max_step 				= 1
 
 # Time at which calculation stops, if max_step is not reached first.
 stop_time 				= 1
@@ -65,6 +65,9 @@ diffuse.use_mlmg_solver = 1
 
 #*******************************************************************************
 
+# Dynamic coefficient of viscosity
+ns.vel_visc_coef        = 1.0
+
 # Variable viscosity function?
 ns.variable_vel_visc 	= 1
 
@@ -93,7 +96,7 @@ ns.gravity              = 0.0
 #*******************************************************************************
 
 # Name of the file which specifies problem-specific parameters (defaults to "probin")
-amr.probin_file 		= probin.2d.poiseuille  
+amr.probin_file 		= probin.2d.displacement  
 
 #*******************************************************************************
 
@@ -133,6 +136,6 @@ ns.hi_bc             	= 2 5
 #*******************************************************************************
 
 # Write all derived quantities to plot files
-amr.derive_plot_vars    = ALL
+amr.derive_plot_vars    = viscosity
 
 #*******************************************************************************

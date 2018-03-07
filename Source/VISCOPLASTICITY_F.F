@@ -68,9 +68,9 @@ c
             tau = tau_in(1)
             n = n_in(1)
          else
-            mu = lambda * mu_in(1) + (one - lambda) * mu_in(2)
-            tau = lambda * tau_in(1) + (one - lambda) * tau_in(2)
-            n = lambda * n_in(1) + (one - lambda) * n_in(2)
+            mu = lambda * mu_in(2) + (one - lambda) * mu_in(1)
+            tau = lambda * tau_in(2) + (one - lambda) * tau_in(1)
+            n = lambda * n_in(2) + (one - lambda) * n_in(1)
          end if
 
          if (n .lt. one) then

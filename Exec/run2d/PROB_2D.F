@@ -792,7 +792,7 @@ c     ::::: local variables
       integer i, j
       REAL_T  x, y
       REAL_T  hx, hy
-      REAL_T  Bi, y0
+      REAL_T  mu, tau, Bi, y0
 
 #include <probdata.H>
 #include <NSCOMM_F.H>
@@ -801,31 +801,30 @@ c     ::::: local variables
       hy = dx(2)
 
       if (varvisc .eq. 1) then 
-         if (.not. tau > 0) then
-            print *, 'Need tau > 0 for variable visc in this test case!'
+         tau = tau_in(2)
+         mu = mu_in(2)
+         if (abs(tau) < 1.0e-9) then
+            y0 = 0.0d0
          else
             Bi = tau / ( sqrt(2.0d0) * mu * max_vel )
             y0 = 1.d0 - ( sqrt(1.0d0 + 2.0d0 * Bi) - 1 ) / Bi
          end if
+      else
+          y0 = 0.0d0
       end if
 
       do j=lo(2),hi(2)
          y = xlo(2) + hy*(float(j-lo(2)) + half)
          do i=lo(1),hi(1)
-            if (varvisc .eq. 0) then 
-               vel(i,j,1) = max_vel * (1.0d0 - y*y)
+            if (y .le. y0) then 
+               vel(i,j,1) = max_vel
             else
-               if (y .le. y0) then 
-                  vel(i,j,1) = max_vel
-               else
-                  vel(i,j,1) = max_vel * ( 1.0d0 - ((y - y0) / (1.0d0 - y0))**2 )
-               end if
+               vel(i,j,1) = max_vel * (one - ((y-y0)/(one-y0))**2)
             end if
 
             vel(i,j,2) = 0.0d0
             scal(i,j,1) = 1.0d0
             scal(i,j,2) = 1.0d0
-
          end do
       end do
       
@@ -2003,18 +2002,16 @@ c ::: -----------------------------------------------------------
       hy = dx(2)
 
       if (varvisc .eq. 1) then 
-         if (numflds .ne. 1) then 
-            print*,"PROB_2D.F::FORT_XVELFILL(): Can only have 1 fluid for this test case!"
+         tau = tau_in(1)
+         mu = mu_in(1)
+         if (abs(tau) < 1.0e-9) then
+            y0 = 0.0d0
          else
-            tau = tau_in(1)
-            mu = mu_in(1)
-            if (.not. tau > 0) then
-                print*,"PROB_2D.F::FORT_XVELFILL(): Need tau > 0 for variable visc in this test case!"
-            else
-                Bi = tau / ( sqrt(2.0d0) * mu * max_vel )
-                y0 = 1.d0 - ( sqrt(1.0d0 + 2.0d0 * Bi) - 1 ) / Bi
-            end if
+            Bi = tau / ( sqrt(2.0d0) * mu * max_vel )
+            y0 = 1.d0 - ( sqrt(1.0d0 + 2.0d0 * Bi) - 1 ) / Bi
          end if
+      else
+          y0 = 0.0d0
       end if
 
 #ifdef BL_DO_FLCT
@@ -2034,7 +2031,8 @@ c     the INFL_FILL routine.  Just to be sure, we set convVel = 1 here again.
 c
          convVel = one
          t_flct = adv_vel*time
-         call INFL_FILL(FLCT_XVEL,DIMS(uflct),uflct,xlo,dx,t_flct,bc,f_problo,f_probhi)
+         call INFL_FILL(FLCT_XVEL,DIMS(uflct),uflct,
+     &                  xlo,dx,t_flct,bc,f_problo,f_probhi)
       end if
 #endif
 
@@ -2051,14 +2049,10 @@ c
             do j = ARG_L2(u), ARG_H2(u)
                if (probtype .eq. 11) then
                    y = xlo(2) + hy*(float(j-lo(2)) + half)
-                   if (varvisc .eq. 0) then 
-                     u(i,j) = max_vel * (1.0d0 - y*y)
+                   if (y .le. y0) then 
+                       u(i,j) = max_vel
                    else
-                     if (y .le. y0) then 
-                         u(i,j) = max_vel
-                     else
-                         u(i,j) = max_vel * ( 1.0d0 - ((y - y0) / (1.0d0 - y0))**2 )
-                     end if
+                       u(i,j) = max_vel * (one - ((y-y0)/(one-y0))**2)
                    end if
                else
                    u(i,j) = x_vel
