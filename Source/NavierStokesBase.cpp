@@ -667,8 +667,19 @@ NavierStokesBase::Initialize_specific ()
 		pp.getarr("flow_index",flow_index,0,n_fluids);
 		pp.query("reg_param",reg_param);
 
-		FORT_SET_NS_PARAMS(n_fluids, dyn_visc_coef, yield_stress, flow_index, reg_param, variable_vel_visc);
+		FORT_SET_NS_PARAMS(n_fluids, dyn_visc_coef, yield_stress, flow_index, reg_param, 
+                           variable_vel_visc);
 	}
+    else
+    {
+		dyn_visc_coef.resize(1);
+		yield_stress.resize(1);
+		flow_index.resize(1);
+        dyn_visc_coef[0] = visc_coef[0];
+        yield_stress[0] = 0.0;
+        flow_index[0] = 1.0;
+		FORT_SET_NS_PARAMS(1, dyn_visc_coef, yield_stress, flow_index, 0.025, false);
+    }
 
     amrex::ExecOnFinalize(NavierStokesBase::Finalize);
 

@@ -760,8 +760,7 @@ NavierStokes:: calcHerschelBulkley  (MultiFab& visc, Real time)
 {
     BL_PROFILE("NavierStokes::calcHerschelBulkley()");
 
-    MultiFab& vel = get_new_data(State_Type);
-    MultiFab& ind = get_new_data(State_Type);
+    MultiFab& dat = get_new_data(State_Type);
 
     const int *domlo   = geom.Domain().loVect();
     const int *domhi   = geom.Domain().hiVect();
@@ -771,8 +770,7 @@ NavierStokes:: calcHerschelBulkley  (MultiFab& visc, Real time)
     Array<int> vel_bc;
     Array<int> ind_bc;
 
-    FillPatchIterator fpi(*this,vel,vel.nGrow(),time,State_Type,Xvel,BL_SPACEDIM);
-    FillPatchIterator fpi2(*this,ind,ind.nGrow(),time,State_Type,Density+1,BL_SPACEDIM);
+    FillPatchIterator fpi(*this,dat,dat.nGrow(),time,State_Type,Xvel,BL_SPACEDIM+2);
     for ( ; fpi.isValid(); ++fpi)
     {
        const int  i    = fpi.index();
@@ -784,23 +782,16 @@ NavierStokes:: calcHerschelBulkley  (MultiFab& visc, Real time)
        const int *visc_lo = visc[i].loVect();
        const int *visc_hi = visc[i].hiVect();
 
-       FArrayBox& vfab    = fpi();
-       const Real *veldat = vfab.dataPtr();
-       const int *vel_lo  = vfab.loVect();
-       const int *vel_hi  = vfab.hiVect();
+       FArrayBox& fab    = fpi();
+       const Real *fabdat = fab.dataPtr();
+       const int *dat_lo  = fab.loVect();
+       const int *dat_hi  = fab.hiVect();
        vel_bc = getBCArray(State_Type,i,Xvel,BL_SPACEDIM);
 
-       FArrayBox& ifab    = fpi2();
-       const Real *inddat = ifab.dataPtr();
-       const int *ind_lo  = ifab.loVect();
-       const int *ind_hi  = ifab.hiVect();
-       ind_bc = getBCArray(State_Type,i,Density+1,BL_SPACEDIM);
-
        FORT_HERSCHEL_BULKLEY(viscdat, ARLIM(visc_lo), ARLIM(visc_hi),
-               	    		 veldat,  ARLIM(vel_lo),  ARLIM(vel_hi),
-							 inddat,  ARLIM(ind_lo),  ARLIM(ind_hi),
-               	    		 lo, hi, domlo, domhi, dx, vel_bc.dataPtr(), ind_bc.dataPtr());
-	   ++fpi2;
+               	    		 fabdat,  ARLIM(dat_lo),  ARLIM(dat_hi),
+               	    		 lo, hi, domlo, domhi, dx, 
+                             vel_bc.dataPtr());
     }
 }
 
