@@ -6,10 +6,10 @@
 
 # Maximum number of coarse grid timesteps to be taken, if stop_time is
 #  not reached first.
-max_step 				= 1
+max_step 				= 10000
 
 # Time at which calculation stops, if max_step is not reached first.
-stop_time 				= 1
+stop_time 				= 6
 
 # Tolerance for assuming system has reached steady-state
 ns.stop_when_steady 	= 0
@@ -72,16 +72,13 @@ ns.vel_visc_coef        = 1.0
 ns.variable_vel_visc 	= 1
 
 # Dynamic coefficient of viscosity
-ns.dyn_visc_coef        = 2.0 1.0
+ns.dyn_visc_coef        = 2.5 1.0
 
 # Yield stress
 ns.yield_stress      	= 0.0 0.0
 
 # Flow index
 ns.flow_index      		= 1.0 1.0
-
-# Papanastasiou regularisation parameter
-ns.reg_param         	= 0.0025
 
 #*******************************************************************************
 
@@ -136,6 +133,6 @@ ns.hi_bc             	= 2 5
 #*******************************************************************************
 
 # Write all derived quantities to plot files
-amr.derive_plot_vars    = eff_visc
+amr.derive_plot_vars    = ALL
 
 #*******************************************************************************

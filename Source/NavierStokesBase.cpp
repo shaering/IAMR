@@ -621,7 +621,7 @@ NavierStokesBase::Initialize ()
                 dyn_visc_coef[0] = visc_coef[0];
                 yield_stress[0] = 0.0;
                 flow_index[0] = 1.0;
-                reg_param = 0.025;
+                reg_param = 0.0025;
 		FORT_SET_NS_PARAMS(n_fluids, 
                                    dyn_visc_coef.dataPtr(), yield_stress.dataPtr(), 
                                    flow_index.dataPtr(), &reg_param, 
