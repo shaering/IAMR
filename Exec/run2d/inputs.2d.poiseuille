@@ -86,7 +86,6 @@ ns.variable_vel_visc 	= 1
 ns.dyn_visc_coef        = 1.0
 ns.yield_stress      	= 1.414213562
 ns.flow_index      		= 1.0
-ns.reg_param         	= 0.0025
 
 #*******************************************************************************
 

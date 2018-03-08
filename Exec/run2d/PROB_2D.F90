@@ -875,8 +875,8 @@ c     ::::: local variables
       hy = dx(2)
 
       if (varvisc .eq. 1) then 
-         tau = tau_in(2)
-         mu = mu_in(2)
+         tau = tau_in(numflds)
+         mu = mu_in(numflds)
          if (abs(tau) < 1.0e-9) then
             y0 = 0.0d0
          else
