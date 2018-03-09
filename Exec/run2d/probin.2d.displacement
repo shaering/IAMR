@@ -1,8 +1,9 @@
 
 &fortin
 
-  probtype = 11
+  probtype = 13
   denfact = 1.0
-  max_vel = 1.0
+  avg_vel = 1.0
+  y0 = 0.8653863642502769
 
 /
