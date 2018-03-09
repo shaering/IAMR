@@ -76,7 +76,7 @@ contains
      &                  velfact, probtype, randfact, bubgrad,
      &			rhozero, tempzero, c_d, r_d, grav_angle,
      &                  adv_dir, adv_vel, axis_dir, radvort,
-     &          lid_vel, max_vel
+     &          lid_vel, max_vel, avg_vel, y0
 #ifdef BL_DO_FLCT
                        ,forceInflow, numInflPlanesStore, strmwse_dir, &
                        forceLo, forceHi, flct_file, turb_scale
@@ -243,6 +243,11 @@ contains
 
       else if (probtype .eq. 11) then        
         call initpoiseuille(lo,hi,nscal,
+     &                  vel,scal,DIMS(state),
+     &                      dx,xlo,xhi)
+
+      else if (probtype .eq. 13) then        
+        call initdisplace(lo,hi,nscal,
      &                  vel,scal,DIMS(state),
      &                      dx,xlo,xhi)
 
@@ -866,7 +871,7 @@ c     ::::: local variables
       integer i, j
       REAL_T  x, y
       REAL_T  hx, hy
-      REAL_T  mu, tau, Bi, y0
+      REAL_T  mu, tau, Bi, y_0
 
 #include <probdata.H>
 #include <NSCOMM_F.H>
@@ -878,22 +883,87 @@ c     ::::: local variables
          tau = tau_in(numflds)
          mu = mu_in(numflds)
          if (abs(tau) < 1.0e-9) then
-            y0 = 0.0d0
+            y_0 = 0.0d0
          else
             Bi = tau / ( sqrt(2.0d0) * mu * max_vel )
-            y0 = 1.d0 - ( sqrt(1.0d0 + 2.0d0 * Bi) - 1 ) / Bi
+            y_0 = 1.d0 - ( sqrt(1.0d0 + 2.0d0 * Bi) - 1 ) / Bi
          end if
       else
-          y0 = 0.0d0
+          y_0 = 0.0d0
       end if
 
       do j=lo(2),hi(2)
          y = xlo(2) + hy*(float(j-lo(2)) + half)
          do i=lo(1),hi(1)
-            if (y .le. y0) then 
+            if (y .le. y_0) then 
                vel(i,j,1) = max_vel
             else
-               vel(i,j,1) = max_vel * (one - ((y-y0)/(one-y0))**2)
+               vel(i,j,1) = max_vel * (one - ((y-y_0)/(one-y_0))**2)
+            end if
+
+            vel(i,j,2) = 0.0d0
+            scal(i,j,1) = 1.0d0
+            scal(i,j,2) = 1.0d0
+         end do
+      end do
+      
+      end
+      
+c
+c ::: -----------------------------------------------------------
+c ::: Initialise system from at steady-state for displacement flow
+c
+      subroutine initdisplace(lo,hi,nscal,
+     &                    vel,scal,DIMS(state),
+     &                        dx,xlo,xhi)
+
+      integer    nscal
+      integer    lo(SDIM), hi(SDIM)
+      integer    DIMDEC(state)
+      REAL_T     dx(SDIM)
+      REAL_T     xlo(SDIM), xhi(SDIM)
+      REAL_T     vel(DIMV(state),SDIM)
+      REAL_T    scal(DIMV(state),nscal)
+
+
+c     ::::: local variables
+      integer i, j
+      REAL_T  x, y
+      REAL_T  hx, hy
+      REAL_T  mu, tau, alpha, u0
+
+#include <probdata.H>
+#include <NSCOMM_F.H>
+
+      hx = dx(1)
+      hy = dx(2)
+
+      if (varvisc .eq. 1) then 
+         if(numflds .ne. 2) then
+             print*,"NEED TWO FLUIDS FOR DISPLACEMENT FLOW!"
+         else
+             tau = tau_in(numflds)
+             mu = mu_in(numflds)
+             
+             if (abs(six * sqrt(two) * y0 * avg_vel * mu - 
+     &               (one - y0)**2 * (two + y0) * tau) > 1.0e-9) then
+                print*,"ERROR IN RELATION BETWEEN y0, avg_vel, mu, tau!"
+             else
+                u0 = three * avg_vel / (two + y0)
+             end if
+         end if
+      else
+          print*,"NEED varvisc = 1 FOR DISPLACEMENT FLOW!"
+      end if
+
+      do j=lo(2),hi(2)
+         y = xlo(2) + hy*(float(j-lo(2)) + half)
+         alpha = (y - y0) / (one - y0)
+         do i=lo(1),hi(1)
+            if (y .le. y0) then 
+               vel(i,j,1) = u0
+            else
+               vel(i,j,1) = u0 * (one - alpha**2)
             end if
 
             vel(i,j,2) = 0.0d0
@@ -2119,7 +2189,7 @@ c ::: -----------------------------------------------------------
       REAL_T, allocatable :: uflct(:,:)
 #endif
       REAL_T  y, hy
-      REAL_T  tau, mu, Bi, y0
+      REAL_T  tau, mu, Bi, y_0, alpha
 
 #include <probdata.H>
 #include <NSCOMM_F.H>
@@ -2138,14 +2208,29 @@ c ::: -----------------------------------------------------------
       if (varvisc .eq. 1) then 
          tau = tau_in(1)
          mu = mu_in(1)
-         if (abs(tau) < 1.0e-9) then
-            y0 = 0.0d0
-         else
-            Bi = tau / ( sqrt(2.0d0) * mu * max_vel )
-            y0 = 1.d0 - ( sqrt(1.0d0 + 2.0d0 * Bi) - 1 ) / Bi
+         if (probtype .eq. 11) then
+            if (abs(tau) < 1.0e-9) then
+               y_0 = 0.0d0
+            else
+               Bi = tau / ( sqrt(2.0d0) * mu * max_vel )
+               y_0 = 1.d0 - ( sqrt(1.0d0 + 2.0d0 * Bi) - 1 ) / Bi
+            end if
+         else if (probtype .eq. 13) then 
+            if(numflds .ne. 2) then
+                print*,"NEED TWO FLUIDS FOR DISPLACEMENT FLOW!"
+            else
+                tau = tau_in(1)
+                mu = mu_in(1)
+                if (abs(tau) < 1.0e-9) then
+                   y_0 = 0.0d0
+                   max_vel = three * avg_vel / two
+                else
+                   print*,"DON'T MAKE DISPLACING FLUID BINGHAM!"
+                end if
+            end if
          end if
       else
-          y0 = 0.0d0
+          y_0 = 0.0d0
       end if
 
 #ifdef BL_DO_FLCT
@@ -2181,12 +2266,13 @@ c ::: -----------------------------------------------------------
       if (bc(1,1).eq.EXT_DIR.and.ARG_L1(u).lt.domlo(1)) then
          do i = ARG_L1(u), domlo(1)-1
             do j = ARG_L2(u), ARG_H2(u)
-               if (probtype .eq. 11) then
+               if (probtype .eq. 11 .or. probtype .eq. 13) then
                    y = xlo(2) + hy*(float(j-lo(2)) + half)
-                   if (y .le. y0) then 
+                   alpha = (y - y_0) / (one - y_0)
+                   if (y .le. y_0) then 
                        u(i,j) = max_vel
                    else
-                       u(i,j) = max_vel * (one - ((y-y0)/(one-y0))**2)
+                       u(i,j) = max_vel * (1 - alpha**2)
                    end if
                else
                    u(i,j) = x_vel

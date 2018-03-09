@@ -18,7 +18,7 @@ ns.steady_tol 			= 1.0e-5
 #*******************************************************************************
 
 # Number of cells in each coordinate direction at the coarsest level
-amr.n_cell 				= 160 32
+amr.n_cell 				= 640 32
 amr.max_grid_size		= 32
 
 #*******************************************************************************
@@ -72,10 +72,10 @@ ns.vel_visc_coef        = 1.0
 ns.variable_vel_visc 	= 1
 
 # Dynamic coefficient of viscosity
-ns.dyn_visc_coef        = 2.5 1.0
+ns.dyn_visc_coef        = 10.0 1.0
 
 # Yield stress
-ns.yield_stress      	= 0.0 0.0
+ns.yield_stress      	= 0.0 141.4213562373095
 
 # Flow index
 ns.flow_index      		= 1.0 1.0
@@ -106,7 +106,7 @@ geometry.coord_sys   	=  0
 geometry.prob_lo     	=  0.0 0.0
 
 # Physical dimensions of the high end of the domain.
-geometry.prob_hi     	=  5.0 1.0
+geometry.prob_hi     	=  20.0 1.0
 
 #*******************************************************************************
 
