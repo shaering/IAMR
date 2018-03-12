@@ -11,14 +11,14 @@
 
 c=========================================================
 
-      subroutine FORT_SET_NS_PARAMS(vel_visc_coef,flow_index,yield_stress,reg_param,variable_vel_visc)
+      subroutine FORT_SET_NS_PARAMS(dyn_visc_coef,flow_index,yield_stress,reg_param,variable_vel_visc)
       implicit none
-      REAL_T vel_visc_coef,flow_index,yield_stress,reg_param
+      REAL_T dyn_visc_coef,flow_index,yield_stress,reg_param
       integer variable_vel_visc
 
 #include <NSCOMM_F.H>
 
-      mu        = vel_visc_coef
+      mu        = dyn_visc_coef
       n         = flow_index
       tau       = yield_stress
       eps       = reg_param

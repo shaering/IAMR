@@ -59,7 +59,7 @@ c
      &                  velfact, probtype, randfact, bubgrad,
      &			rhozero, tempzero, c_d, r_d, grav_angle,
      &                  adv_dir, adv_vel, axis_dir, radvort,
-     &          lid_vel
+     &          lid_vel, max_vel
 #ifdef BL_DO_FLCT
      &                  ,forceInflow, numInflPlanesStore, strmwse_dir,
      $                  forceLo, forceHi, flct_file, turb_scale
@@ -217,9 +217,13 @@ c ::: -----------------------------------------------------------
      &                     vel,scal,DIMS(state),
      &                         dx,xlo,xhi)
 
-      else if (probtype .eq. 10 .or. probtype .eq. 11 .or.
-     &         probtype .eq. 12) then
-         call initfromrest(lo,hi,nscal,
+      else if (probtype .eq. 10 .or. probtype .eq. 12) then        
+        call initfromrest(lo,hi,nscal,
+     &                  vel,scal,DIMS(state),
+     &                      dx,xlo,xhi)
+
+      else if (probtype .eq. 11) then        
+        call initpoiseuille(lo,hi,nscal,
      &                  vel,scal,DIMS(state),
      &                      dx,xlo,xhi)
 
@@ -735,7 +739,6 @@ c     ::::: local variables
 c
 c ::: -----------------------------------------------------------
 c ::: Initialise system from rest. Introduced for the lid-driven cavity
-c ::: test case, also used for Poiseuille flow in square duct. 
 c
       subroutine initfromrest(lo,hi,nscal,
      &                    vel,scal,DIMS(state),
@@ -762,6 +765,66 @@ c     ::::: local variables
             vel(i,j,2) = 0.0d0
             scal(i,j,1) = 1.0d0
             scal(i,j,2) = 0.0d0
+
+         end do
+      end do
+      
+      end
+      
+c
+c ::: -----------------------------------------------------------
+c ::: Initialise system from at steady-state for Poiseuille flow. 
+c
+      subroutine initpoiseuille(lo,hi,nscal,
+     &                    vel,scal,DIMS(state),
+     &                        dx,xlo,xhi)
+
+      integer    nscal
+      integer    lo(SDIM), hi(SDIM)
+      integer    DIMDEC(state)
+      REAL_T     dx(SDIM)
+      REAL_T     xlo(SDIM), xhi(SDIM)
+      REAL_T     vel(DIMV(state),SDIM)
+      REAL_T    scal(DIMV(state),nscal)
+
+
+c     ::::: local variables
+      integer i, j
+      REAL_T  x, y
+      REAL_T  hx, hy
+      REAL_T  Bi, y0
+
+#include <probdata.H>
+#include <NSCOMM_F.H>
+
+      hx = dx(1)
+      hy = dx(2)
+
+      if (varvisc .eq. 1) then 
+         if (.not. tau > 0) then
+            print *, 'Need tau > 0 for variable visc in this test case!'
+         else
+            Bi = tau / ( sqrt(2.0d0) * mu * max_vel )
+            y0 = 1.d0 - ( sqrt(1.0d0 + 2.0d0 * Bi) - 1 ) / Bi
+         end if
+      end if
+
+      do j=lo(2),hi(2)
+         y = xlo(2) + hy*(float(j-lo(2)) + half)
+         do i=lo(1),hi(1)
+            if (varvisc .eq. 0) then 
+               vel(i,j,1) = max_vel * (1.0d0 - y*y)
+            else
+               if (y .le. y0) then 
+                  vel(i,j,1) = max_vel
+               else
+                  vel(i,j,1) = max_vel * ( 1.0d0 - ((y - y0) / (1.0d0 - y0))**2 )
+               end if
+            end if
+
+            vel(i,j,2) = 0.0d0
+            scal(i,j,1) = 1.0d0
+            scal(i,j,2) = 1.0d0
 
          end do
       end do
@@ -1922,8 +1985,11 @@ c ::: -----------------------------------------------------------
       REAL_T  t_flct
       REAL_T, allocatable :: uflct(:,:)
 #endif
+      REAL_T  y, hy
+      REAL_T  Bi, y0
 
 #include <probdata.H>
+#include <NSCOMM_F.H>
 
 #ifdef BL_DO_FLCT
 #include <INFL_FORCE_F.H>
@@ -1933,6 +1999,17 @@ c ::: -----------------------------------------------------------
       lo(2) = ARG_L2(u)
       hi(1) = ARG_H1(u)
       hi(2) = ARG_H2(u)
+
+      hy = dx(2)
+
+      if (varvisc .eq. 1) then 
+         if (.not. tau > 0) then
+            print *, 'Need tau > 0 for variable visc in this test case!'
+         else
+            Bi = tau / ( sqrt(2.0d0) * mu * max_vel )
+            y0 = 1.d0 - ( sqrt(1.0d0 + 2.0d0 * Bi) - 1 ) / Bi
+         end if
+      end if
 
 #ifdef BL_DO_FLCT
       if (forceInflow) then
@@ -1966,7 +2043,20 @@ c
       if (bc(1,1).eq.EXT_DIR.and.ARG_L1(u).lt.domlo(1)) then
          do i = ARG_L1(u), domlo(1)-1
             do j = ARG_L2(u), ARG_H2(u)
-               u(i,j) = x_vel
+               if (probtype .eq. 11) then
+                   y = xlo(2) + hy*(float(j-lo(2)) + half)
+                   if (varvisc .eq. 0) then 
+                     u(i,j) = max_vel * (1.0d0 - y*y)
+                   else
+                     if (y .le. y0) then 
+                         u(i,j) = max_vel
+                     else
+                         u(i,j) = max_vel * ( 1.0d0 - ((y - y0) / (1.0d0 - y0))**2 )
+                     end if
+                   end if
+               else
+                   u(i,j) = x_vel
+               end if
             end do
          end do
       end if            

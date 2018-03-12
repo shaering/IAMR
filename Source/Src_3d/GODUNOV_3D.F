@@ -73,7 +73,6 @@ c
                tforce1  = max(tforce1,abs(tforces(i,j,k,1)*irho))
                tforce2  = max(tforce2,abs(tforces(i,j,k,2)*irho))
                tforce3  = max(tforce3,abs(tforces(i,j,k,3)*irho))
-               yield    = max(yield,1.0e3*(tau/sqrt(2.0)+mu)/rho(i,j,k))
             end do
          end do
       end do
@@ -94,10 +93,9 @@ c
       if (tforce3 .gt. small) dt = min(dt,sqrt(two*dx(3)/tforce3))
 
       if (varvisc .ne. 0) then 
-        if (yield .gt. small) then 
-          dt = min(dt,dx(1)/yield)
-          dt = min(dt,dx(2)/yield)
-        end if
+        dt = min(dt,two*dx(1)/tforce1)
+        dt = min(dt,two*dx(2)/tforce2)
+        dt = min(dt,two*dx(3)/tforce3)
       end if
 
       if (dt .eq. dt_start) dt = min(dx(1),dx(2),dx(3))
