@@ -6,10 +6,10 @@
 
 # Maximum number of coarse grid timesteps to be taken, if stop_time is
 #  not reached first.
-max_step 				= 10000
+max_step 				= 500000
 
 # Time at which calculation stops, if max_step is not reached first.
-stop_time 				= 6
+stop_time 				= 10
 
 # Tolerance for assuming system has reached steady-state
 ns.stop_when_steady 	= 0
@@ -18,7 +18,7 @@ ns.steady_tol 			= 1.0e-5
 #*******************************************************************************
 
 # Number of cells in each coordinate direction at the coarsest level
-amr.n_cell 				= 640 32
+amr.n_cell 				= 320 32
 amr.max_grid_size		= 32
 
 #*******************************************************************************
@@ -44,7 +44,7 @@ amr.check_int			= -1
 #*******************************************************************************
 
 # Interval (in number of coarse timesteps) between plot files
-amr.plot_per			= 0.1
+amr.plot_per			= 0.05
 
 #*******************************************************************************
 
@@ -62,6 +62,7 @@ ns.init_shrink          = 0.3  # factor which multiplies the very first time ste
 proj.use_mlmg_solver 	= 1
 mac.use_mlmg_solver 	= 1
 diffuse.use_mlmg_solver = 1
+cg.maxiter 				= 1000000
 
 #*******************************************************************************
 
@@ -79,6 +80,9 @@ ns.yield_stress      	= 0.0 141.4213562373095
 
 # Flow index
 ns.flow_index      		= 1.0 1.0
+
+# Regularisation paramter
+ns.reg_param 			= 0.01
 
 #*******************************************************************************
 
@@ -106,7 +110,7 @@ geometry.coord_sys   	=  0
 geometry.prob_lo     	=  0.0 0.0
 
 # Physical dimensions of the high end of the domain.
-geometry.prob_hi     	=  20.0 1.0
+geometry.prob_hi     	=  10.0 1.0
 
 #*******************************************************************************
 
