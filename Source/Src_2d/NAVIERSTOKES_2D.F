@@ -434,7 +434,6 @@ c
       integer    DIMDEC(dat)
       integer    domlo(2), domhi(2)
       integer    vel_bc(2,2,2)
-      integer    ind_bc(2,2,1)
       REAL_T     delta(2)
       REAL_T     visc(DIMV(visc),1)
       REAL_T     dat(DIMV(dat),4)
