@@ -236,7 +236,7 @@ contains
                           vel,scal,DIMS(state), &
                               dx,xlo,xhi)
 
-      else if (probtype .eq. 10 .or. probtype .eq. 12) then        
+      else if (probtype .eq. 10) then        
         call initfromrest(lo,hi,nscal,
      &                  vel,scal,DIMS(state),
      &                      dx,xlo,xhi)
