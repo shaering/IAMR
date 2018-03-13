@@ -1991,25 +1991,15 @@ c ::: -----------------------------------------------------------
       end if            
 
       if (bc(2,1).eq.EXT_DIR.and.ARG_L2(adv).lt.domlo(2)) then
-
-         if (probtype .eq. 12) then
-
-            do j = ARG_L2(adv), domlo(2)-1
-               do i = ARG_L1(adv), ARG_H1(adv)
-                  adv(i,j) = 1.d0
-               end do
-            end do
-
-         else
-
-            do j = ARG_L2(adv), domlo(2)-1
-               do i = ARG_L1(adv), ARG_H1(adv)
-                  adv(i,j) = zero
-               end do
-            end do
-
-         end if
-
+         do j = ARG_L2(adv), domlo(2)-1
+             do i = ARG_L1(adv), ARG_H1(adv)
+               if (probtype .eq. 12) then
+                   adv(i,j) = 1.d0
+               else
+                   adv(i,j) = zero
+               end if
+             end do
+         end do
       end if            
 
       if (bc(2,2).eq.EXT_DIR.and.ARG_H2(adv).gt.domhi(2)) then
