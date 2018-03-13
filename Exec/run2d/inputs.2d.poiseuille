@@ -6,7 +6,7 @@
 
 # Maximum number of coarse grid timesteps to be taken, if stop_time is
 #  not reached first.
-max_step 				= 10000
+max_step 				= 10
 
 # Time at which calculation stops, if max_step is not reached first.
 stop_time 				= 10
@@ -28,13 +28,12 @@ amr.max_level			= 0 # maximum number of levels of refinement
 
 #*******************************************************************************
 
-# Sets the "NavierStokes" code to not be verbose
+# Sets verbosity
 ns.v                    = 1
-
-#*******************************************************************************
-
-# Sets the "amr" code to be verbose
 amr.v                   = 1
+proj.v                  = 1
+mac.v                   = 1
+diffuse.v               = 1
 
 #*******************************************************************************
 
