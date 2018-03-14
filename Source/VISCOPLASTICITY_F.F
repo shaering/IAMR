@@ -93,19 +93,20 @@ c
 !   magnitude during post-processing. Don't worry about this being
 !   wrong.
 !
-      REAL_T function stress_fun(strnrt)
+      REAL_T function stress_fun(strnrt, lambda)
       ! Regularised Herschel-Bulkley stress
          REAL_T, intent(in)  :: strnrt
+         REAL_T, intent(in)  :: lambda
          REAL_T              :: visc
-!         if (varvisc .eq. 0) then
-!            ! If non-variable, stress equals 2 mu strnrt everywhere
-!            stress_fun = 2*mu*strnrt
-!         else
-!            ! Calculate viscosity based on flow index value, use this to
-!            ! find stress
-!            visc = visc_fun(strnrt)
-!            stress_fun = 2*visc*strnrt
-!         end if
+         if (varvisc .eq. 0) then
+            ! If non-variable, stress equals 2 mu strnrt everywhere
+            stress_fun = 2*mu*strnrt
+         else
+            ! Calculate viscosity based on flow index value, use this to
+            ! find stress
+            visc = visc_fun(strnrt, lambda)
+            stress_fun = 2*visc*strnrt
+         end if
       end function stress_fun
 
       end module viscoplasticity_module

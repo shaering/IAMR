@@ -361,6 +361,7 @@ NavierStokes::variableSetUp ()
     //
     derive_lst.add("stress",IndexType::TheCellType(),1,FORT_DERSTRESS,grow_box_by_one);
     derive_lst.addComponent("stress",desc_lst,State_Type,Xvel,BL_SPACEDIM);
+    derive_lst.addComponent("stress",desc_lst,State_Type,Trac,1);
     //
     // divergence of velocity field
     //
