@@ -6,7 +6,7 @@
 
 # Maximum number of coarse grid timesteps to be taken, if stop_time is
 #  not reached first.
-max_step 				= 1000
+max_step 				= 1000000
 
 # Time at which calculation stops, if max_step is not reached first.
 stop_time 				= 25
@@ -18,7 +18,7 @@ ns.steady_tol 			= 1.0e-5
 #*******************************************************************************
 
 # Number of cells in each coordinate direction at the coarsest level
-amr.n_cell 				= 1920 64
+amr.n_cell 				= 1920 64 
 amr.max_grid_size		= 64
 
 #*******************************************************************************
@@ -137,6 +137,7 @@ ns.hi_bc             	= 2 5
 #*******************************************************************************
 
 # Write all derived quantities to plot files
-amr.derive_plot_vars    = ALL
+amr.plot_vars    = x_velocity tracer
+amr.derive_plot_vars    = mag_strainrate eff_visc stress avg_pressure gradpx
 
 #*******************************************************************************
