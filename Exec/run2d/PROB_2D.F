@@ -232,6 +232,11 @@ c ::: -----------------------------------------------------------
      &                  vel,scal,DIMS(state),
      &                      dx,xlo,xhi)
 
+      else if (probtype .eq. 14) then        
+        call initdambreak(lo,hi,nscal,
+     &                  vel,scal,DIMS(state),
+     &                      dx,xlo,xhi)
+
       else
          write(6,*) "INITDATA: bad probtype = ",probtype
          stop
@@ -899,6 +904,63 @@ c     ::::: local variables
       end do
       
       end
+c
+c ::: -----------------------------------------------------------
+c
+      subroutine initdambreak(level,time,lo,hi,nscal,
+     &	 	            vel,scal,DIMS(state),press,DIMS(press),
+     &                      dx,xlo,xhi)
+
+      integer    level, nscal
+      integer    lo(SDIM), hi(SDIM)
+      integer    DIMDEC(state)
+      integer    DIMDEC(press)
+      REAL_T     time, dx(SDIM)
+      REAL_T     xlo(SDIM), xhi(SDIM)
+      REAL_T     vel(DIMV(state),SDIM)
+      REAL_T    scal(DIMV(state),nscal)
+      REAL_T   press(DIMV(press))
+c
+c     ::::: local variables
+c
+      integer i, j, n
+      REAL_T  x, y
+      REAL_T  hx, hy
+      REAL_T  dist
+      REAL_T  x_vel, y_vel
+
+#include <probdata.H>
+
+      hx = dx(1)
+      hy = dx(2)
+
+      if (adv_dir .eq. 1) then
+         x_vel = adv_vel
+         y_vel = zero
+      else if (adv_dir .eq. 2) then
+         x_vel = zero
+         y_vel = adv_vel
+      else 
+         write(6,*) "initdambreak: adv_dir = ",adv_dir
+         stop
+      end if
+
+      do j = lo(2), hi(2)
+         y = xlo(2) + hy*(float(j-lo(2)) + half)
+         do i = lo(1), hi(1)
+            x = xlo(1) + hx*(float(i-lo(1)) + half)
+            dist = sqrt((x-xblob)**2 + (y-yblob)**2)
+            vel(i,j,1) = x_vel
+            vel(i,j,2) = y_vel
+            scal(i,j,1) = merge(two,one,dist.lt.radblob)
+            do n = 2,nscal-1
+               scal(i,j,n) = one
+            end do                  
+            scal(i,j,nscal) = merge(one,zero,dist.lt.radblob)
+         end do
+      end do
+
+      end
       
 c ::: -----------------------------------------------------------
 c ::: This routine will tag high error cells based on the 
@@ -1365,6 +1427,17 @@ c     probtype = RT
         stop
       end if
  
+c     probtype = DAMBREAK
+      else if (probtype .eq. 14) then
+
+        if (level .eq. 0) then
+          do j = lo(2), hi(2)
+             do i = lo(1), hi(1)
+                tag(i,j) = merge(set,tag(i,j),adv(i,j,1).gt.adverr)
+             end do
+          end do
+        end if
+
       end
       subroutine FORT_ADV2ERROR (tag,DIMS(tag),set,clear,
      &                          adv,DIMS(adv),lo,hi,nvar,
@@ -1459,6 +1532,17 @@ c     probtype = RT
               tag(i,j) = merge(set,tag(i,j),adv(i,j,1).gt.adverr)
            end do
         end do
+
+c     probtype = DAMBREAK
+      else if (probtype .eq. 14) then
+
+        if (level .eq. 0) then
+          do j = lo(2), hi(2)
+             do i = lo(1), hi(1)
+                tag(i,j) = merge(set,tag(i,j),adv(i,j,1).gt.adverr)
+             end do
+          end do
+        end if
 
       else
         print *,'DONT KNOW THIS PROBTYPE IN FORT_ADVERROR ',probtype
@@ -1659,6 +1743,15 @@ c     probtype = RT
         do j = lo(2), hi(2)
            do i = lo(1), hi(1)
               tag(i,j) = merge(set,tag(i,j),abs(vort(i,j,1)).gt.vorterr)
+           end do
+        end do
+
+c     probtype = DAMBREAK
+      else if (probtype .eq. 14) then
+
+        do j = lo(2), hi(2)
+           do i = lo(1), hi(1)
+              tag(i,j) = merge(set,tag(i,j),abs(vort(i,j,1)).gt.vorterr*2.d0**level)
            end do
         end do
 
