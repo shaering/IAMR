@@ -252,9 +252,9 @@ contains
      &                      dx,xlo,xhi)
 
       else if (probtype .eq. 14) then        
-        call initdambreak(lo,hi,nscal,
-     &                  vel,scal,DIMS(state),
-     &                      dx,xlo,xhi)
+         call initdambreak(level,time,lo,hi,nscal,
+     &                  vel,scal,DIMS(state),press,DIMS(press),
+     &                   dx,xlo,xhi)
 
       else
          write(6,*) "INITDATA: bad probtype = ",probtype
@@ -817,34 +817,6 @@ contains
       
       end subroutine initfromrest
       
-<<<<<<< HEAD:Exec/run2d/PROB_2D.F90
-!c ::: -----------------------------------------------------------
-!c ::: This routine will tag high error cells based on the 
-!c ::: magnitude of the density
-!c ::: 
-!c ::: INPUTS/OUTPUTS:
-!c ::: 
-!c ::: tag      <=  integer tag array
-!c ::: DIMS(tag) => index extent of tag array
-!c ::: set       => integer value to tag cell for refinement
-!c ::: clear     => integer value to untag cell
-!c ::: rho       => density array
-!c ::: DIMS(rho) => index extent of rho array
-!c ::: lo,hi     => index extent of grid
-!c ::: nvar      => number of components in rho array (should be 1)
-!c ::: domlo,hi  => index extent of problem domain
-!c ::: dx        => cell spacing
-!c ::: xlo       => physical location of lower left hand
-!c :::	           corner of tag array
-!c ::: problo    => phys loc of lower left corner of prob domain
-!c ::: time      => problem evolution time
-!c ::: -----------------------------------------------------------
-      subroutine FORT_DENERROR (tag,DIMS(tag),set,clear, &
-                               rho,DIMS(rho),lo,hi,nvar, &
-                               domlo,domhi,dx,xlo, &
-     			        problo,time,level) &
-                  bind(C, name="FORT_DENERROR")
-=======
 c
 c ::: -----------------------------------------------------------
 c ::: Initialise system from at steady-state for Poiseuille flow. 
@@ -1051,7 +1023,6 @@ c ::: -----------------------------------------------------------
      &                          rho,DIMS(rho),lo,hi,nvar,
      &                          domlo,domhi,dx,xlo,
      &			        problo,time,level)
->>>>>>> trying to initiate from a Poiseuille steady-state and sustain it. initialisation seems fine (plt0 ok) but get nans in New scalar 2 after first step...:Exec/run2d/PROB_2D.F
 
       integer   DIMDEC(rho)
       integer   DIMDEC(tag)
@@ -1475,6 +1446,7 @@ c ::: -----------------------------------------------------------
            end do
         end do
 
+<<<<<<< HEAD:Exec/run2d/PROB_2D.F90
       else
         print *,'DONT KNOW THIS PROBTYPE IN FORT_ADVERROR ',probtype
         stop
@@ -1490,6 +1462,8 @@ c ::: -----------------------------------------------------------
      			        problo,time,level) &
                   bind(C, name="FORT_ADV2ERROR")
 =======
+=======
+>>>>>>> working on getting bubble to fall:Exec/run2d/PROB_2D.F
 c     probtype = DAMBREAK
       else if (probtype .eq. 14) then
 
@@ -1501,6 +1475,11 @@ c     probtype = DAMBREAK
           end do
         end if
 
+      else
+        print *,'DONT KNOW THIS PROBTYPE IN FORT_ADVERROR ',probtype
+        stop
+      end if
+ 
       end
       subroutine FORT_ADV2ERROR (tag,DIMS(tag),set,clear,
      &                          adv,DIMS(adv),lo,hi,nvar,
