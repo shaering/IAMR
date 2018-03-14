@@ -483,7 +483,6 @@ NavierStokesBase::Initialize_specific ()
         phys_bc.setLo(i,lo_bc[i]);
         phys_bc.setHi(i,hi_bc[i]);
     }
-  
     read_geometry();
     //
     // Check phys_bc against possible periodic geometry
@@ -1363,7 +1362,7 @@ NavierStokesBase::estTimeStep ()
     // If this is the very beginning we haven't defined the viscosity yet -- need
     //    to do that here
     //
-    if (cur_time == 0.)
+    if (cur_time == 0. && variable_vel_visc)
     {
            Real dt_dummy = 1e20; 
            int iteration_dummy = -1;
