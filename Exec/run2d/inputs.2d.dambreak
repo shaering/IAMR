@@ -49,14 +49,14 @@ amr.v                   = 1
 #*******************************************************************************
 
 # Interval (in number of coarse timesteps) between checkpoint(restart) files
-amr.check_file 			= /home/knut/VisIt/IAMR/Dambreak/chk
-amr.check_int		= 10 
+amr.check_file 			= chk
+amr.check_int		= 1000
 
 #*******************************************************************************
 
 # Interval (in number of coarse timesteps) between plot files
-amr.plot_file 			= /home/knut/VisIt/IAMR/Dambreak/plt
-amr.plot_int		= 10
+amr.plot_file 			= plt
+amr.plot_int		= 1
 
 #*******************************************************************************
 

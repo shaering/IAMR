@@ -233,9 +233,9 @@ c ::: -----------------------------------------------------------
      &                      dx,xlo,xhi)
 
       else if (probtype .eq. 14) then        
-        call initdambreak(lo,hi,nscal,
-     &                  vel,scal,DIMS(state),
-     &                      dx,xlo,xhi)
+         call initdambreak(level,time,lo,hi,nscal,
+     &                  vel,scal,DIMS(state),press,DIMS(press),
+     &                   dx,xlo,xhi)
 
       else
          write(6,*) "INITDATA: bad probtype = ",probtype
@@ -1422,11 +1422,6 @@ c     probtype = RT
            end do
         end do
 
-      else
-        print *,'DONT KNOW THIS PROBTYPE IN FORT_ADVERROR ',probtype
-        stop
-      end if
- 
 c     probtype = DAMBREAK
       else if (probtype .eq. 14) then
 
@@ -1438,6 +1433,11 @@ c     probtype = DAMBREAK
           end do
         end if
 
+      else
+        print *,'DONT KNOW THIS PROBTYPE IN FORT_ADVERROR ',probtype
+        stop
+      end if
+ 
       end
       subroutine FORT_ADV2ERROR (tag,DIMS(tag),set,clear,
      &                          adv,DIMS(adv),lo,hi,nvar,
