@@ -482,6 +482,7 @@ NavierStokes::predict_velocity (Real  dt,
                bndry[1] = getBCArray(State_Type,i,1,1);,
                bndry[2] = getBCArray(State_Type,i,2,1);)
 
+
         godunov->Setup(grids[i], dx, dt, 1,
                        null_fab, bndry[0].dataPtr(),
                        null_fab, bndry[1].dataPtr(),
@@ -875,7 +876,7 @@ NavierStokes:: calcHerschelBulkley  (MultiFab& visc, Real time)
        FORT_HERSCHEL_BULKLEY(viscdat, ARLIM(visc_lo), ARLIM(visc_hi),
                	    		 fabdat,  ARLIM(dat_lo),  ARLIM(dat_hi),
                	    		 lo, hi, domlo, domhi, dx, 
-                             vel_bc.dataPtr());
+                                 vel_bc.dataPtr());
     }
 }
 
@@ -2040,9 +2041,6 @@ NavierStokes::getViscTerms (MultiFab& visc_terms,
       amrex::Error("must call NavierStokes::getViscTerms with all three velocity components");
     }
 #endif
-    // 
-    // Initialize all viscous terms to zero
-    //
     const int nGrow = visc_terms.nGrow();
 
     bool diffusive = false;
@@ -2051,6 +2049,9 @@ NavierStokes::getViscTerms (MultiFab& visc_terms,
     //
     if (src_comp == Xvel && !is_diffusive[Xvel])
     {
+        // 
+        // Initialize all viscous terms to zero if inviscid
+        //
 	visc_terms.setVal(0.0,0,ncomp,nGrow);
     }
     else if (src_comp == Xvel && is_diffusive[Xvel])
@@ -2186,11 +2187,11 @@ NavierStokes::calcViscosity (const Real time,
                 // 
                 // Compute apparent viscosity for regularised Herschel-Bulkley fluid
                 //
-				calcHerschelBulkley(*visc_cc,time);
-				//
-				// Fill the ghost cells for visc_cc
-				//
-				visc_cc->FillBoundary(geom.periodicity());
+		calcHerschelBulkley(*visc_cc,time);
+		//
+		// Fill the ghost cells for visc_cc
+		//
+		visc_cc->FillBoundary(geom.periodicity());
             }
             else 
             {
@@ -2198,7 +2199,7 @@ NavierStokes::calcViscosity (const Real time,
                 // Fluid is Newtonian
                 //
                 visc_cc->setVal(visc_coef[Xvel], 0, 1, nGrow);
-			}
+            }
         }
         else
         {
