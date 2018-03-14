@@ -627,6 +627,30 @@ c
          visc(i+1,j-1,1) = visc(i,j,1)
       end if
 
+      if (VLOX .eq. REFLECT_EVEN) then
+         do j = lo(2)-1, hi(2)+1
+            visc(lo(1)-1,j,1) = visc(lo(1),j,1)
+         end do
+      end if
+
+      if (VHIX .eq. REFLECT_EVEN) then
+         do j = lo(2)-1, hi(2)+1
+            visc(hi(1)+1,j,1) = visc(hi(1),j,1)
+         end do
+      end if
+
+      if (ULOY .eq. REFLECT_EVEN) then
+         do i = lo(1)-1, hi(1)+1
+            visc(i,lo(2)-1,1) = visc(i,lo(2),1)
+         end do
+      end if
+
+      if (UHIY .eq. REFLECT_EVEN) then
+         do i = lo(1)-1, hi(1)+1
+            visc(i,hi(2)+1,1) = visc(i,hi(2),1)
+         end do
+      end if
+
 #     undef U
 #     undef V      
 #     undef VLOX

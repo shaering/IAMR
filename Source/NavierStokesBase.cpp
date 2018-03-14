@@ -1359,11 +1359,23 @@ NavierStokesBase::estTimeStep ()
     MultiFab Gp(grids,dmap,BL_SPACEDIM,1);
     getGradP(Gp, cur_pres_time);
 
-	//
-	// Viscous forcing - necessary for viscoplastic flow. 
-	//
-	MultiFab visc_terms(grids,dmap,BL_SPACEDIM,1);
-	getViscTerms(visc_terms,Xvel,BL_SPACEDIM,cur_time);
+    //
+    // If this is the very beginning we haven't defined the viscosity yet -- need
+    //    to do that here
+    //
+    if (cur_time == 0.)
+    {
+           Real dt_dummy = 1e20; 
+           int iteration_dummy = -1;
+           int ncycle_dummy = -1;
+           calcViscosity(cur_time,dt_dummy,iteration_dummy,ncycle_dummy);
+    }
+
+    //
+    // Viscous forcing - necessary for viscoplastic flow. 
+    //
+    MultiFab visc_terms(grids,dmap,BL_SPACEDIM,1);
+    getViscTerms(visc_terms,Xvel,BL_SPACEDIM,cur_time);
 
     for (MFIter Rho_mfi(rho_ctime); Rho_mfi.isValid(); ++Rho_mfi)
     {

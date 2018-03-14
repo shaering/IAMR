@@ -791,7 +791,7 @@ NavierStokes:: calcHerschelBulkley  (MultiFab& visc, Real time)
        FORT_HERSCHEL_BULKLEY(viscdat, ARLIM(visc_lo), ARLIM(visc_hi),
                	    		 fabdat,  ARLIM(dat_lo),  ARLIM(dat_hi),
                	    		 lo, hi, domlo, domhi, dx, 
-                             vel_bc.dataPtr());
+                                 vel_bc.dataPtr());
     }
 }
 
@@ -1992,9 +1992,6 @@ NavierStokes::getViscTerms (MultiFab& visc_terms,
       Error("must call NavierStokes::getViscTerms with all three velocity components");
     }
 #endif
-    // 
-    // Initialize all viscous terms to zero
-    //
     const int nGrow = visc_terms.nGrow();
 
     bool diffusive = false;
@@ -2003,6 +2000,9 @@ NavierStokes::getViscTerms (MultiFab& visc_terms,
     //
     if (src_comp == Xvel && !is_diffusive[Xvel])
     {
+        // 
+        // Initialize all viscous terms to zero if inviscid
+        //
 	visc_terms.setVal(0.0,0,ncomp,nGrow);
     }
     else if (src_comp == Xvel && is_diffusive[Xvel])
@@ -2141,11 +2141,11 @@ NavierStokes::calcViscosity (const Real time,
                 //
                 visc_cc->setVal(visc_coef[Xvel]+0.5*yield_stress/reg_param, 0, 1, nGrow);
                 //
-				calcHerschelBulkley(*visc_cc,time);
-				//
-				// Fill the ghost cells for visc_cc
-				//
-				visc_cc->FillBoundary(geom.periodicity());
+		calcHerschelBulkley(*visc_cc,time);
+		//
+		// Fill the ghost cells for visc_cc
+		//
+		visc_cc->FillBoundary(geom.periodicity());
             }
             else 
             {
@@ -2153,7 +2153,7 @@ NavierStokes::calcViscosity (const Real time,
                 // Fluid is Newtonian
                 //
                 visc_cc->setVal(visc_coef[Xvel], 0, 1, nGrow);
-			}
+            }
         }
         else
         {
