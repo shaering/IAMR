@@ -6,10 +6,10 @@
 
 # Maximum number of coarse grid timesteps to be taken, if stop_time is
 #  not reached first.
-max_step 		= 50
+max_step 		= 10000
 
 # Time at which calculation stops, if max_step is not reached first.
-stop_time 		= 1.0
+stop_time 		= 0.5
 
 # Use the tracer for the refinement criterion
 ns.do_tracer_ref = 1
@@ -17,19 +17,18 @@ ns.do_tracer_ref = 1
 #*******************************************************************************
 
 # Number of cells in each coordinate direction at the coarsest level
-amr.n_cell 		= 16 32 
-amr.n_cell 		= 64 128
+amr.n_cell 		= 160 40
 amr.max_grid_size	= 16
 
 #*******************************************************************************
 
 # Maximum level (defaults to 0 for single level calculation)
-amr.max_level		= 1 # maximum number of levels of refinement
+amr.max_level		= 2 # maximum number of levels of refinement
 
 #*******************************************************************************
 
 # Interval (in number of level l timesteps) between regridding
-amr.regrid_int		= 2 
+amr.regrid_int		= 1 
 
 #*******************************************************************************
 
@@ -56,12 +55,12 @@ amr.check_int		= 1000
 
 # Interval (in number of coarse timesteps) between plot files
 amr.plot_file 			= plt
-amr.plot_int		= 1
+amr.plot_per		= 0.01
 
 #*******************************************************************************
 
 # CFL number to be used in calculating the time step : dt = dx / max(velocity)
-ns.cfl                  = 0.9  # CFL number used to set dt
+ns.cfl                  = 0.009  # CFL number used to set dt
 
 #*******************************************************************************
 
@@ -71,7 +70,7 @@ ns.init_shrink          = 0.3  # factor which multiplies the very first time ste
 #*******************************************************************************
 
 # Viscosity coefficient 
-ns.vel_visc_coef        = 0.001
+ns.vel_visc_coef        = 1.0
 
 #*******************************************************************************
 
@@ -99,7 +98,7 @@ geometry.coord_sys   =  1
 geometry.prob_lo     =  0. 0. 
 
 # Physical dimensions of the high end of the domain.
-geometry.prob_hi     =  1. 2. 
+geometry.prob_hi     =  5. 1.25
 
 #*******************************************************************************
 
