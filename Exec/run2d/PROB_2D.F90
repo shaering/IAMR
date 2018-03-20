@@ -976,7 +976,7 @@ c
             dist = sqrt((x-xblob)**2 + (y-yblob)**2)
             vel(i,j,1) = zero
             vel(i,j,2) = zero
-            if (x .lt. half .and. y. lt. one) then
+            if (x .lt. one .and. y. lt. one) then
                scal(i,j,1) = one
                scal(i,j,2) = one
             else
