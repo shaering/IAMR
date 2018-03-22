@@ -73,6 +73,7 @@ c
                tforce1  = max(tforce1,abs(tforces(i,j,k,1)*irho))
                tforce2  = max(tforce2,abs(tforces(i,j,k,2)*irho))
                tforce3  = max(tforce3,abs(tforces(i,j,k,3)*irho))
+c              TODO: find proper measure of viscoplastic impact on CFL
             end do
          end do
       end do

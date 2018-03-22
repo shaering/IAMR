@@ -5213,6 +5213,7 @@ c
 #     define U(i,j,k) dat(i,j,k,1)
 #     define V(i,j,k) dat(i,j,k,2)
 #     define W(i,j,k) dat(i,j,k,3)
+#     define L(i,j,k) dat(i,j,k,4)
 
 #     define ULOX bc(1,1,1)
 #     define UHIX bc(1,2,1)
@@ -5280,7 +5281,7 @@ c     ::::: If non-variable, viscosity coefficient equals mu everywhere
       do k = lo(3), hi(3)
          do j = lo(2), hi(2)
             do i = lo(1), hi(1)
-               visc(i,j,k,1) = mu
+               visc(i,j,k,1) = mu_in(1)
             end do 
          end do
       end do
@@ -5305,7 +5306,7 @@ c     ::::: Compute Bingham viscosity
                wy = wycen(i,j,k)
                wz = wzcen(i,j,k)
                strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-               visc(i,j,k,1) = visc_fun(strnrt)
+               visc(i,j,k,1) = visc_fun(strnrt,L(i,j,k))
             end do
          end do
       end do
@@ -5365,7 +5366,7 @@ c
                vz = vzcen(i,j,k)
                wz = wzcen(i,j,k)
                strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-               visc(i,j,k,1) = visc_fun(strnrt)
+               visc(i,j,k,1) = visc_fun(strnrt,L(i,j,k))
             end do
          end do
       end if
@@ -5384,7 +5385,7 @@ c
                vz = vzcen(i,j,k)
                wz = wzcen(i,j,k)
                strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-               visc(i,j,k,1) = visc_fun(strnrt)
+               visc(i,j,k,1) = visc_fun(strnrt,L(i,j,k))
             end do
          end do
       end if
@@ -5403,7 +5404,7 @@ c
                vz = vzcen(i,j,k)
                wz = wzcen(i,j,k)
                strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-               visc(i,j,k,1) = visc_fun(strnrt)
+               visc(i,j,k,1) = visc_fun(strnrt,L(i,j,k))
             end do
          end do
       end if
@@ -5422,7 +5423,7 @@ c
                vz = vzcen(i,j,k)
                wz = wzcen(i,j,k)
                strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-               visc(i,j,k,1) = visc_fun(strnrt)
+               visc(i,j,k,1) = visc_fun(strnrt,L(i,j,k))
             end do
          end do
       end if
@@ -5441,7 +5442,7 @@ c
                vz = merge(vzlo(i,j,k),vzcen(i,j,k),fixvlo_z)
                wz = merge(wzlo(i,j,k),wzcen(i,j,k),fixwlo_z)
                strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-               visc(i,j,k,1) = visc_fun(strnrt)
+               visc(i,j,k,1) = visc_fun(strnrt,L(i,j,k))
             end do
          end do
       end if
@@ -5460,7 +5461,7 @@ c
                vz = merge(vzhi(i,j,k),vzcen(i,j,k),fixvhi_z)
                wz = merge(wzhi(i,j,k),wzcen(i,j,k),fixwhi_z)
                strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-               visc(i,j,k,1) = visc_fun(strnrt)
+               visc(i,j,k,1) = visc_fun(strnrt,L(i,j,k))
             end do
          end do
       end if
@@ -5482,7 +5483,7 @@ c
             vz = vzcen(i,j,k)
             wz = wzcen(i,j,k)
             strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-            visc(i,j,k,1) = visc_fun(strnrt)
+            visc(i,j,k,1) = visc_fun(strnrt,L(i,j,k))
          end do
       end if
 
@@ -5501,7 +5502,7 @@ c
             vz = vzcen(i,j,k)
             wz = wzcen(i,j,k)
             strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-            visc(i,j,k,1) = visc_fun(strnrt)
+            visc(i,j,k,1) = visc_fun(strnrt,L(i,j,k))
          end do
       end if
 
@@ -5520,7 +5521,7 @@ c
             vz = vzcen(i,j,k)
             wz = wzcen(i,j,k)
             strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-            visc(i,j,k,1) = visc_fun(strnrt)
+            visc(i,j,k,1) = visc_fun(strnrt,L(i,j,k))
          end do
       end if
 
@@ -5539,7 +5540,7 @@ c
             vz = vzcen(i,j,k)
             wz = wzcen(i,j,k)
             strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-            visc(i,j,k,1) = visc_fun(strnrt)
+            visc(i,j,k,1) = visc_fun(strnrt,L(i,j,k))
          end do
       end if
 
@@ -5558,7 +5559,7 @@ c
             vz = merge(vzlo(i,j,k),vzcen(i,j,k),fixvlo_z)
             wz = merge(wzlo(i,j,k),wzcen(i,j,k),fixwlo_z)
             strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-            visc(i,j,k,1) = visc_fun(strnrt)
+            visc(i,j,k,1) = visc_fun(strnrt,L(i,j,k))
          end do
       end if
 
@@ -5577,7 +5578,7 @@ c
             vz = merge(vzlo(i,j,k),vzcen(i,j,k),fixvlo_z)
             wz = merge(wzlo(i,j,k),wzcen(i,j,k),fixwlo_z)
             strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-            visc(i,j,k,1) = visc_fun(strnrt)
+            visc(i,j,k,1) = visc_fun(strnrt,L(i,j,k))
          end do
       end if
 
@@ -5596,7 +5597,7 @@ c
             vz = merge(vzhi(i,j,k),vzcen(i,j,k),fixvhi_z)
             wz = merge(wzhi(i,j,k),wzcen(i,j,k),fixwhi_z)
             strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-            visc(i,j,k,1) = visc_fun(strnrt)
+            visc(i,j,k,1) = visc_fun(strnrt,L(i,j,k))
          end do
       end if
 
@@ -5615,7 +5616,7 @@ c
             vz = merge(vzhi(i,j,k),vzcen(i,j,k),fixvhi_z)
             wz = merge(wzhi(i,j,k),wzcen(i,j,k),fixwhi_z)
             strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-            visc(i,j,k,1) = visc_fun(strnrt)
+            visc(i,j,k,1) = visc_fun(strnrt,L(i,j,k))
          end do
       end if
 
@@ -5634,7 +5635,7 @@ c
             vz = merge(vzlo(i,j,k),vzcen(i,j,k),fixvlo_z)
             wz = merge(wzlo(i,j,k),wzcen(i,j,k),fixwlo_z)
             strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-            visc(i,j,k,1) = visc_fun(strnrt)
+            visc(i,j,k,1) = visc_fun(strnrt,L(i,j,k))
          end do
       end if
 
@@ -5653,7 +5654,7 @@ c
             vz = merge(vzlo(i,j,k),vzcen(i,j,k),fixvlo_z)
             wz = merge(wzlo(i,j,k),wzcen(i,j,k),fixwlo_z)
             strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-            visc(i,j,k,1) = visc_fun(strnrt)
+            visc(i,j,k,1) = visc_fun(strnrt,L(i,j,k))
          end do
       end if
 
@@ -5672,7 +5673,7 @@ c
             vz = merge(vzhi(i,j,k),vzcen(i,j,k),fixvhi_z)
             wz = merge(wzhi(i,j,k),wzcen(i,j,k),fixwhi_z)
             strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-            visc(i,j,k,1) = visc_fun(strnrt)
+            visc(i,j,k,1) = visc_fun(strnrt,L(i,j,k))
          end do
       end if
 
@@ -5691,7 +5692,7 @@ c
             vz = merge(vzhi(i,j,k),vzcen(i,j,k),fixvhi_z)
             wz = merge(wzhi(i,j,k),wzcen(i,j,k),fixwhi_z)
             strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-            visc(i,j,k,1) = visc_fun(strnrt)
+            visc(i,j,k,1) = visc_fun(strnrt,L(i,j,k))
          end do
       end if
 c
@@ -5713,7 +5714,7 @@ c
          vz = merge(vzlo(i,j,k),vzcen(i,j,k),fixvlo_z)
          wz = merge(wzlo(i,j,k),wzcen(i,j,k),fixwlo_z)
          strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-         visc(i,j,k,1) = visc_fun(strnrt)
+         visc(i,j,k,1) = visc_fun(strnrt,L(i,j,k))
       end if
 
       if ((fixuhi_x .or. fixvhi_x .or. fixwhi_x) .and. 
@@ -5732,7 +5733,7 @@ c
          vz = merge(vzlo(i,j,k),vzcen(i,j,k),fixvlo_z)
          wz = merge(wzlo(i,j,k),wzcen(i,j,k),fixwlo_z)
          strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-         visc(i,j,k,1) = visc_fun(strnrt)
+         visc(i,j,k,1) = visc_fun(strnrt,L(i,j,k))
       end if
 
       if ((fixulo_x .or. fixvlo_x .or. fixwlo_x) .and. 
@@ -5751,7 +5752,7 @@ c
          vz = merge(vzlo(i,j,k),vzcen(i,j,k),fixvlo_z)
          wz = merge(wzlo(i,j,k),wzcen(i,j,k),fixwlo_z)
          strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-         visc(i,j,k,1) = visc_fun(strnrt)
+         visc(i,j,k,1) = visc_fun(strnrt,L(i,j,k))
       end if
 
       if ((fixuhi_x .or. fixvhi_x .or. fixwhi_x) .and. 
@@ -5770,7 +5771,7 @@ c
          vz = merge(vzlo(i,j,k),vzcen(i,j,k),fixvlo_z)
          wz = merge(wzlo(i,j,k),wzcen(i,j,k),fixwlo_z)
          strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-         visc(i,j,k,1) = visc_fun(strnrt)
+         visc(i,j,k,1) = visc_fun(strnrt,L(i,j,k))
       end if
 
       if ((fixulo_x .or. fixvlo_x .or. fixwlo_x) .and. 
@@ -5789,7 +5790,7 @@ c
          vz = merge(vzhi(i,j,k),vzcen(i,j,k),fixvhi_z)
          wz = merge(wzhi(i,j,k),wzcen(i,j,k),fixwhi_z)
          strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-         visc(i,j,k,1) = visc_fun(strnrt)
+         visc(i,j,k,1) = visc_fun(strnrt,L(i,j,k))
       end if
 
       if ((fixuhi_x .or. fixvhi_x .or. fixwhi_x) .and. 
@@ -5808,7 +5809,7 @@ c
          vz = merge(vzhi(i,j,k),vzcen(i,j,k),fixvhi_z)
          wz = merge(wzhi(i,j,k),wzcen(i,j,k),fixwhi_z)
          strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-         visc(i,j,k,1) = visc_fun(strnrt)
+         visc(i,j,k,1) = visc_fun(strnrt,L(i,j,k))
       end if
 
       if ((fixvlo_x .or. fixwlo_x) .and. 
@@ -5827,7 +5828,7 @@ c
          vz = merge(vzhi(i,j,k),vzcen(i,j,k),fixvhi_z)
          wz = merge(wzhi(i,j,k),wzcen(i,j,k),fixwhi_z)
          strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-         visc(i,j,k,1) = visc_fun(strnrt)
+         visc(i,j,k,1) = visc_fun(strnrt,L(i,j,k))
       end if
 
       if ((fixuhi_x .or. fixvhi_x .or. fixwhi_x) .and. 
@@ -5846,7 +5847,7 @@ c
          vz = merge(vzhi(i,j,k),vzcen(i,j,k),fixvhi_z)
          wz = merge(wzhi(i,j,k),wzcen(i,j,k),fixwhi_z)
          strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-         visc(i,j,k,1) = visc_fun(strnrt)
+         visc(i,j,k,1) = visc_fun(strnrt,L(i,j,k))
       end if
 
       end if
@@ -5914,6 +5915,7 @@ c
 #     define U(i,j,k) dat(i,j,k,1)
 #     define V(i,j,k) dat(i,j,k,2)
 #     define W(i,j,k) dat(i,j,k,3)
+#     define L(i,j,k) dat(i,j,k,4)
 
 #     define ULOX bc(1,1,1)
 #     define UHIX bc(1,2,1)
@@ -5992,7 +5994,7 @@ c
                wy = wycen(i,j,k)
                wz = wzcen(i,j,k)
                strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-               stress(i,j,k,1) = stress_fun(strnrt)
+               stress(i,j,k,1) = stress_fun(strnrt,L(i,j,k))
             end do
          end do
       end do
@@ -6052,7 +6054,7 @@ c
                vz = vzcen(i,j,k)
                wz = wzcen(i,j,k)
                strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-               stress(i,j,k,1) = stress_fun(strnrt)
+               stress(i,j,k,1) = stress_fun(strnrt,L(i,j,k))
             end do
          end do
       end if
@@ -6071,7 +6073,7 @@ c
                vz = vzcen(i,j,k)
                wz = wzcen(i,j,k)
                strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-               stress(i,j,k,1) = stress_fun(strnrt)
+               stress(i,j,k,1) = stress_fun(strnrt,L(i,j,k))
             end do
          end do
       end if
@@ -6090,7 +6092,7 @@ c
                vz = vzcen(i,j,k)
                wz = wzcen(i,j,k)
                strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-               stress(i,j,k,1) = stress_fun(strnrt)
+               stress(i,j,k,1) = stress_fun(strnrt,L(i,j,k))
             end do
          end do
       end if
@@ -6109,7 +6111,7 @@ c
                vz = vzcen(i,j,k)
                wz = wzcen(i,j,k)
                strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-               stress(i,j,k,1) = stress_fun(strnrt)
+               stress(i,j,k,1) = stress_fun(strnrt,L(i,j,k))
             end do
          end do
       end if
@@ -6128,7 +6130,7 @@ c
                vz = merge(vzlo(i,j,k),vzcen(i,j,k),fixvlo_z)
                wz = merge(wzlo(i,j,k),wzcen(i,j,k),fixwlo_z)
                strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-               stress(i,j,k,1) = stress_fun(strnrt)
+               stress(i,j,k,1) = stress_fun(strnrt,L(i,j,k))
             end do
          end do
       end if
@@ -6147,7 +6149,7 @@ c
                vz = merge(vzhi(i,j,k),vzcen(i,j,k),fixvhi_z)
                wz = merge(wzhi(i,j,k),wzcen(i,j,k),fixwhi_z)
                strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-               stress(i,j,k,1) = stress_fun(strnrt)
+               stress(i,j,k,1) = stress_fun(strnrt,L(i,j,k))
             end do
          end do
       end if
@@ -6169,7 +6171,7 @@ c
             vz = vzcen(i,j,k)
             wz = wzcen(i,j,k)
             strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-            stress(i,j,k,1) = stress_fun(strnrt)
+            stress(i,j,k,1) = stress_fun(strnrt,L(i,j,k))
          end do
       end if
 
@@ -6188,7 +6190,7 @@ c
             vz = vzcen(i,j,k)
             wz = wzcen(i,j,k)
             strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-            stress(i,j,k,1) = stress_fun(strnrt)
+            stress(i,j,k,1) = stress_fun(strnrt,L(i,j,k))
          end do
       end if
 
@@ -6207,7 +6209,7 @@ c
             vz = vzcen(i,j,k)
             wz = wzcen(i,j,k)
             strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-            stress(i,j,k,1) = stress_fun(strnrt)
+            stress(i,j,k,1) = stress_fun(strnrt,L(i,j,k))
          end do
       end if
 
@@ -6226,7 +6228,7 @@ c
             vz = vzcen(i,j,k)
             wz = wzcen(i,j,k)
             strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-            stress(i,j,k,1) = stress_fun(strnrt)
+            stress(i,j,k,1) = stress_fun(strnrt,L(i,j,k))
          end do
       end if
 
@@ -6245,7 +6247,7 @@ c
             vz = merge(vzlo(i,j,k),vzcen(i,j,k),fixvlo_z)
             wz = merge(wzlo(i,j,k),wzcen(i,j,k),fixwlo_z)
             strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-            stress(i,j,k,1) = stress_fun(strnrt)
+            stress(i,j,k,1) = stress_fun(strnrt,L(i,j,k))
          end do
       end if
 
@@ -6264,7 +6266,7 @@ c
             vz = merge(vzlo(i,j,k),vzcen(i,j,k),fixvlo_z)
             wz = merge(wzlo(i,j,k),wzcen(i,j,k),fixwlo_z)
             strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-            stress(i,j,k,1) = stress_fun(strnrt)
+            stress(i,j,k,1) = stress_fun(strnrt,L(i,j,k))
          end do
       end if
 
@@ -6283,7 +6285,7 @@ c
             vz = merge(vzhi(i,j,k),vzcen(i,j,k),fixvhi_z)
             wz = merge(wzhi(i,j,k),wzcen(i,j,k),fixwhi_z)
             strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-            stress(i,j,k,1) = stress_fun(strnrt)
+            stress(i,j,k,1) = stress_fun(strnrt,L(i,j,k))
          end do
       end if
 
@@ -6302,7 +6304,7 @@ c
             vz = merge(vzhi(i,j,k),vzcen(i,j,k),fixvhi_z)
             wz = merge(wzhi(i,j,k),wzcen(i,j,k),fixwhi_z)
             strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-            stress(i,j,k,1) = stress_fun(strnrt)
+            stress(i,j,k,1) = stress_fun(strnrt,L(i,j,k))
          end do
       end if
 
@@ -6321,7 +6323,7 @@ c
             vz = merge(vzlo(i,j,k),vzcen(i,j,k),fixvlo_z)
             wz = merge(wzlo(i,j,k),wzcen(i,j,k),fixwlo_z)
             strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-            stress(i,j,k,1) = stress_fun(strnrt)
+            stress(i,j,k,1) = stress_fun(strnrt,L(i,j,k))
          end do
       end if
 
@@ -6340,7 +6342,7 @@ c
             vz = merge(vzlo(i,j,k),vzcen(i,j,k),fixvlo_z)
             wz = merge(wzlo(i,j,k),wzcen(i,j,k),fixwlo_z)
             strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-            stress(i,j,k,1) = stress_fun(strnrt)
+            stress(i,j,k,1) = stress_fun(strnrt,L(i,j,k))
          end do
       end if
 
@@ -6359,7 +6361,7 @@ c
             vz = merge(vzhi(i,j,k),vzcen(i,j,k),fixvhi_z)
             wz = merge(wzhi(i,j,k),wzcen(i,j,k),fixwhi_z)
             strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-            stress(i,j,k,1) = stress_fun(strnrt)
+            stress(i,j,k,1) = stress_fun(strnrt,L(i,j,k))
          end do
       end if
 
@@ -6378,7 +6380,7 @@ c
             vz = merge(vzhi(i,j,k),vzcen(i,j,k),fixvhi_z)
             wz = merge(wzhi(i,j,k),wzcen(i,j,k),fixwhi_z)
             strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-            stress(i,j,k,1) = stress_fun(strnrt)
+            stress(i,j,k,1) = stress_fun(strnrt,L(i,j,k))
          end do
       end if
 c
@@ -6400,7 +6402,7 @@ c
          vz = merge(vzlo(i,j,k),vzcen(i,j,k),fixvlo_z)
          wz = merge(wzlo(i,j,k),wzcen(i,j,k),fixwlo_z)
          strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-         stress(i,j,k,1) = stress_fun(strnrt)
+         stress(i,j,k,1) = stress_fun(strnrt,L(i,j,k))
       end if
 
       if ((fixuhi_x .or. fixvhi_x .or. fixwhi_x) .and. 
@@ -6419,7 +6421,7 @@ c
          vz = merge(vzlo(i,j,k),vzcen(i,j,k),fixvlo_z)
          wz = merge(wzlo(i,j,k),wzcen(i,j,k),fixwlo_z)
          strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-         stress(i,j,k,1) = stress_fun(strnrt)
+         stress(i,j,k,1) = stress_fun(strnrt,L(i,j,k))
       end if
 
       if ((fixulo_x .or. fixvlo_x .or. fixwlo_x) .and. 
@@ -6438,7 +6440,7 @@ c
          vz = merge(vzlo(i,j,k),vzcen(i,j,k),fixvlo_z)
          wz = merge(wzlo(i,j,k),wzcen(i,j,k),fixwlo_z)
          strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-         stress(i,j,k,1) = stress_fun(strnrt)
+         stress(i,j,k,1) = stress_fun(strnrt,L(i,j,k))
       end if
 
       if ((fixuhi_x .or. fixvhi_x .or. fixwhi_x) .and. 
@@ -6457,7 +6459,7 @@ c
          vz = merge(vzlo(i,j,k),vzcen(i,j,k),fixvlo_z)
          wz = merge(wzlo(i,j,k),wzcen(i,j,k),fixwlo_z)
          strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-         stress(i,j,k,1) = stress_fun(strnrt)
+         stress(i,j,k,1) = stress_fun(strnrt,L(i,j,k))
       end if
 
       if ((fixulo_x .or. fixvlo_x .or. fixwlo_x) .and. 
@@ -6476,7 +6478,7 @@ c
          vz = merge(vzhi(i,j,k),vzcen(i,j,k),fixvhi_z)
          wz = merge(wzhi(i,j,k),wzcen(i,j,k),fixwhi_z)
          strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-         stress(i,j,k,1) = stress_fun(strnrt)
+         stress(i,j,k,1) = stress_fun(strnrt,L(i,j,k))
       end if
 
       if ((fixuhi_x .or. fixvhi_x .or. fixwhi_x) .and. 
@@ -6495,7 +6497,7 @@ c
          vz = merge(vzhi(i,j,k),vzcen(i,j,k),fixvhi_z)
          wz = merge(wzhi(i,j,k),wzcen(i,j,k),fixwhi_z)
          strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-         stress(i,j,k,1) = stress_fun(strnrt)
+         stress(i,j,k,1) = stress_fun(strnrt,L(i,j,k))
       end if
 
       if ((fixvlo_x .or. fixwlo_x) .and. 
@@ -6514,7 +6516,7 @@ c
          vz = merge(vzhi(i,j,k),vzcen(i,j,k),fixvhi_z)
          wz = merge(wzhi(i,j,k),wzcen(i,j,k),fixwhi_z)
          strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-         stress(i,j,k,1) = stress_fun(strnrt)
+         stress(i,j,k,1) = stress_fun(strnrt,L(i,j,k))
       end if
 
       if ((fixuhi_x .or. fixvhi_x .or. fixwhi_x) .and. 
@@ -6533,7 +6535,7 @@ c
          vz = merge(vzhi(i,j,k),vzcen(i,j,k),fixvhi_z)
          wz = merge(wzhi(i,j,k),wzcen(i,j,k),fixwhi_z)
          strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-         stress(i,j,k,1) = stress_fun(strnrt)
+         stress(i,j,k,1) = stress_fun(strnrt,L(i,j,k))
       end if
 
 #     undef U

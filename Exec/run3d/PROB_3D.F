@@ -1115,6 +1115,11 @@ c      print *, 'INITDATA ', time, lo(1),hi(1), lo(2), hi(2), lo(3), hi(3)
      &        vel,scal,DIMS(state),press,DIMS(press),
      &        dx,xlo,xhi)
 
+      else if (probtype .eq. 32) then 
+         call initdambreak(level,time,lo,hi,nscal,
+     &        vel,scal,DIMS(state),press,DIMS(press),
+     &        dx,xlo,xhi)
+
       else
          write(6,*) "INITDATA: bad probtype = ",probtype
       end if
@@ -1135,6 +1140,59 @@ c     rad, over a width of trn
       else
          zblend1 = 0.5D0*(1.0D0 + TANH((x-rad)/trn))
       end if
+      end
+c
+c ::: -----------------------------------------------------------
+c
+      subroutine initdambreak(level,time,lo,hi,nscal,
+     &	 	            vel,scal,DIMS(state),press,DIMS(press),
+     &                      dx,xlo,xhi)
+      implicit none
+
+      integer    level, nscal
+      integer    lo(SDIM), hi(SDIM)
+      integer    DIMDEC(state)
+      integer    DIMDEC(press)
+      REAL_T     time, dx(SDIM)
+      REAL_T     xlo(SDIM), xhi(SDIM)
+      REAL_T     vel(DIMV(state),SDIM)
+      REAL_T    scal(DIMV(state),nscal)
+      REAL_T   press(DIMV(press))
+c
+c     ::::: local variables
+c
+      integer i, j, k
+      REAL_T  x, y, z
+      REAL_T  hx, hy, hz
+
+#include <probdata.H>
+
+      hx = dx(1)
+      hy = dx(2)
+      hz = dx(3)
+
+      do k = lo(3), hi(3)
+         z = xlo(3) + hz*(float(k-lo(3)) + half)
+         do j = lo(2), hi(2)
+            y = xlo(2) + hy*(float(j-lo(2)) + half)
+            do i = lo(1), hi(1)
+               x = xlo(1) + hx*(float(i-lo(1)) + half)
+               vel(i,j,k,1) = zero
+               vel(i,j,k,2) = zero
+               vel(i,j,k,3) = zero
+               scal(i,j,k,1) = one
+               scal(i,j,k,2) = zero
+               if (x .lt. one .and. y .lt. one .and. z .lt. one) then
+                  scal(i,j,k,1) = one
+                  scal(i,j,k,2) = one
+               else
+                  scal(i,j,k,1) = one / 1000.0d0
+                  scal(i,j,k,2) = zero
+               end if
+            end do
+         end do
+      end do
+
       end
 c
 c ::: -----------------------------------------------------------

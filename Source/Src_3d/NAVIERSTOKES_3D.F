@@ -1181,7 +1181,7 @@ c
 
 
 
-      subroutine FORT_HERSCHEL_BULKLEY(visc, DIMS(visc), vel, DIMS(vel),
+      subroutine FORT_HERSCHEL_BULKLEY(visc, DIMS(visc), dat, DIMS(dat),
      &                                 lo, hi, domlo, domhi, delta, vel_bc)
       use viscoplasticity_module
       implicit none
@@ -1192,12 +1192,12 @@ c ::: viscosity based on the velocity field
 c
       integer  lo(SDIM), hi(SDIM)
       integer  DIMDEC(visc)
-      integer  DIMDEC(vel)
+      integer  DIMDEC(dat)
       integer  domlo(SDIM), domhi(SDIM)
       integer  vel_bc(SDIM,2,SDIM)
       REAL_T   delta(SDIM)
       REAL_T   visc(DIMV(visc),1)
-      REAL_T   vel(DIMV(vel),SDIM)
+      REAL_T   dat(DIMV(dat),SDIM+2)
 
       integer i,j,k
       REAL_T  ux, uy, uz, vx, vy, vz, wx, wy, wz, dx, dy, dz
@@ -1212,9 +1212,10 @@ c
 c
 c     ::::: some useful macro definitions
 c
-#     define U(i,j,k) vel(i,j,k,1)
-#     define V(i,j,k) vel(i,j,k,2)
-#     define W(i,j,k) vel(i,j,k,3)
+#     define U(i,j,k) dat(i,j,k,1)
+#     define V(i,j,k) dat(i,j,k,2)
+#     define W(i,j,k) dat(i,j,k,3)
+#     define L(i,j,k) dat(i,j,k,5)
 
 #     define ULOX vel_bc(1,1,1)
 #     define UHIX vel_bc(1,2,1)
@@ -1293,7 +1294,7 @@ c
                wy = wycen(i,j,k)
                wz = wzcen(i,j,k)
                strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-               visc(i,j,k,1) = visc_fun(strnrt)
+               visc(i,j,k,1) = visc_fun(strnrt,L(i,j,k))
             end do
          end do
       end do
@@ -1353,7 +1354,7 @@ c
                vz = vzcen(i,j,k)
                wz = wzcen(i,j,k)
                strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-               visc(i,j,k,1) = visc_fun(strnrt)
+               visc(i,j,k,1) = visc_fun(strnrt,L(i,j,k))
                ! Linear extrapolation 
                visc(i-1,j,k,1) = visc(i,j,k,1)
             end do
@@ -1374,7 +1375,7 @@ c
                vz = vzcen(i,j,k)
                wz = wzcen(i,j,k)
                strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-               visc(i,j,k,1) = visc_fun(strnrt)
+               visc(i,j,k,1) = visc_fun(strnrt,L(i,j,k))
                ! Linear extrapolation 
                visc(i+1,j,k,1) = visc(i,j,k,1)
             end do
@@ -1395,7 +1396,7 @@ c
                vz = vzcen(i,j,k)
                wz = wzcen(i,j,k)
                strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-               visc(i,j,k,1) = visc_fun(strnrt)
+               visc(i,j,k,1) = visc_fun(strnrt,L(i,j,k))
                ! Linear extrapolation 
                visc(i,j-1,k,1) = visc(i,j,k,1)
             end do
@@ -1416,7 +1417,7 @@ c
                vz = vzcen(i,j,k)
                wz = wzcen(i,j,k)
                strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-               visc(i,j,k,1) = visc_fun(strnrt)
+               visc(i,j,k,1) = visc_fun(strnrt,L(i,j,k))
                ! Linear extrapolation 
                visc(i,j+1,k,1) = visc(i,j,k,1)
             end do
@@ -1437,7 +1438,7 @@ c
                vz = merge(vzlo(i,j,k),vzcen(i,j,k),fixvlo_z)
                wz = merge(wzlo(i,j,k),wzcen(i,j,k),fixwlo_z)
                strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-               visc(i,j,k,1) = visc_fun(strnrt)
+               visc(i,j,k,1) = visc_fun(strnrt,L(i,j,k))
                ! Linear extrapolation 
                visc(i,j,k-1,1) = visc(i,j,k,1)
             end do
@@ -1458,7 +1459,7 @@ c
                vz = merge(vzhi(i,j,k),vzcen(i,j,k),fixvhi_z)
                wz = merge(wzhi(i,j,k),wzcen(i,j,k),fixwhi_z)
                strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-               visc(i,j,k,1) = visc_fun(strnrt)
+               visc(i,j,k,1) = visc_fun(strnrt,L(i,j,k))
                ! Linear extrapolation 
                visc(i,j,k+1,1) = visc(i,j,k,1)
             end do
@@ -1482,7 +1483,7 @@ c
             vz = vzcen(i,j,k)
             wz = wzcen(i,j,k)
             strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-            visc(i,j,k,1) = visc_fun(strnrt)
+            visc(i,j,k,1) = visc_fun(strnrt,L(i,j,k))
             ! Linear extrapolation 
             visc(i-1,j-1,k,1) = visc(i,j,k,1)
          end do
@@ -1503,7 +1504,7 @@ c
             vz = vzcen(i,j,k)
             wz = wzcen(i,j,k)
             strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-            visc(i,j,k,1) = visc_fun(strnrt)
+            visc(i,j,k,1) = visc_fun(strnrt,L(i,j,k))
             ! Linear extrapolation 
             visc(i+1,j-1,k,1) = visc(i,j,k,1)
          end do
@@ -1524,7 +1525,7 @@ c
             vz = vzcen(i,j,k)
             wz = wzcen(i,j,k)
             strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-            visc(i,j,k,1) = visc_fun(strnrt)
+            visc(i,j,k,1) = visc_fun(strnrt,L(i,j,k))
             ! Linear extrapolation 
             visc(i-1,j+1,k,1) = visc(i,j,k,1)
          end do
@@ -1545,7 +1546,7 @@ c
             vz = vzcen(i,j,k)
             wz = wzcen(i,j,k)
             strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-            visc(i,j,k,1) = visc_fun(strnrt)
+            visc(i,j,k,1) = visc_fun(strnrt,L(i,j,k))
             ! Linear extrapolation 
             visc(i+1,j+1,k,1) = visc(i,j,k,1)
          end do
@@ -1566,7 +1567,7 @@ c
             vz = merge(vzlo(i,j,k),vzcen(i,j,k),fixvlo_z)
             wz = merge(wzlo(i,j,k),wzcen(i,j,k),fixwlo_z)
             strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-            visc(i,j,k,1) = visc_fun(strnrt)
+            visc(i,j,k,1) = visc_fun(strnrt,L(i,j,k))
             ! Linear extrapolation 
             visc(i-1,j,k-1,1) = visc(i,j,k,1)
          end do
@@ -1587,7 +1588,7 @@ c
             vz = merge(vzlo(i,j,k),vzcen(i,j,k),fixvlo_z)
             wz = merge(wzlo(i,j,k),wzcen(i,j,k),fixwlo_z)
             strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-            visc(i,j,k,1) = visc_fun(strnrt)
+            visc(i,j,k,1) = visc_fun(strnrt,L(i,j,k))
             ! Linear extrapolation 
             visc(i+1,j,k-1,1) = visc(i,j,k,1)
          end do
@@ -1608,7 +1609,7 @@ c
             vz = merge(vzhi(i,j,k),vzcen(i,j,k),fixvhi_z)
             wz = merge(wzhi(i,j,k),wzcen(i,j,k),fixwhi_z)
             strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-            visc(i,j,k,1) = visc_fun(strnrt)
+            visc(i,j,k,1) = visc_fun(strnrt,L(i,j,k))
             ! Linear extrapolation 
             visc(i-1,j,k+1,1) = visc(i,j,k,1)
          end do
@@ -1629,7 +1630,7 @@ c
             vz = merge(vzhi(i,j,k),vzcen(i,j,k),fixvhi_z)
             wz = merge(wzhi(i,j,k),wzcen(i,j,k),fixwhi_z)
             strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-            visc(i,j,k,1) = visc_fun(strnrt)
+            visc(i,j,k,1) = visc_fun(strnrt,L(i,j,k))
             ! Linear extrapolation 
             visc(i+1,j,k+1,1) = visc(i,j,k,1)
          end do
@@ -1650,7 +1651,7 @@ c
             vz = merge(vzlo(i,j,k),vzcen(i,j,k),fixvlo_z)
             wz = merge(wzlo(i,j,k),wzcen(i,j,k),fixwlo_z)
             strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-            visc(i,j,k,1) = visc_fun(strnrt)
+            visc(i,j,k,1) = visc_fun(strnrt,L(i,j,k))
             ! Linear extrapolation 
             visc(i,j-1,k-1,1) = visc(i,j,k,1)
          end do
@@ -1671,7 +1672,7 @@ c
             vz = merge(vzlo(i,j,k),vzcen(i,j,k),fixvlo_z)
             wz = merge(wzlo(i,j,k),wzcen(i,j,k),fixwlo_z)
             strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-            visc(i,j,k,1) = visc_fun(strnrt)
+            visc(i,j,k,1) = visc_fun(strnrt,L(i,j,k))
             ! Linear extrapolation 
             visc(i,j+1,k-1,1) = visc(i,j,k,1)
          end do
@@ -1692,7 +1693,7 @@ c
             vz = merge(vzhi(i,j,k),vzcen(i,j,k),fixvhi_z)
             wz = merge(wzhi(i,j,k),wzcen(i,j,k),fixwhi_z)
             strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-            visc(i,j,k,1) = visc_fun(strnrt)
+            visc(i,j,k,1) = visc_fun(strnrt,L(i,j,k))
             ! Linear extrapolation 
             visc(i,j-1,k+1,1) = visc(i,j,k,1)
          end do
@@ -1713,7 +1714,7 @@ c
             vz = merge(vzhi(i,j,k),vzcen(i,j,k),fixvhi_z)
             wz = merge(wzhi(i,j,k),wzcen(i,j,k),fixwhi_z)
             strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-            visc(i,j,k,1) = visc_fun(strnrt)
+            visc(i,j,k,1) = visc_fun(strnrt,L(i,j,k))
             ! Linear extrapolation 
             visc(i,j+1,k+1,1) = visc(i,j,k,1)
          end do
@@ -1737,7 +1738,7 @@ c
          vz = merge(vzlo(i,j,k),vzcen(i,j,k),fixvlo_z)
          wz = merge(wzlo(i,j,k),wzcen(i,j,k),fixwlo_z)
          strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-         visc(i,j,k,1) = visc_fun(strnrt)
+         visc(i,j,k,1) = visc_fun(strnrt,L(i,j,k))
          ! Linear extrapolation 
          visc(i-1,j-1,k-1,1) = visc(i,j,k,1)
       end if
@@ -1758,7 +1759,7 @@ c
          vz = merge(vzlo(i,j,k),vzcen(i,j,k),fixvlo_z)
          wz = merge(wzlo(i,j,k),wzcen(i,j,k),fixwlo_z)
          strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-         visc(i,j,k,1) = visc_fun(strnrt)
+         visc(i,j,k,1) = visc_fun(strnrt,L(i,j,k))
          ! Linear extrapolation 
          visc(i+1,j-1,k-1,1) = visc(i,j,k,1)
       end if
@@ -1779,7 +1780,7 @@ c
          vz = merge(vzlo(i,j,k),vzcen(i,j,k),fixvlo_z)
          wz = merge(wzlo(i,j,k),wzcen(i,j,k),fixwlo_z)
          strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-         visc(i,j,k,1) = visc_fun(strnrt)
+         visc(i,j,k,1) = visc_fun(strnrt,L(i,j,k))
          ! Linear extrapolation 
          visc(i-1,j+1,k-1,1) = visc(i,j,k,1)
       end if
@@ -1800,7 +1801,7 @@ c
          vz = merge(vzlo(i,j,k),vzcen(i,j,k),fixvlo_z)
          wz = merge(wzlo(i,j,k),wzcen(i,j,k),fixwlo_z)
          strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-         visc(i,j,k,1) = visc_fun(strnrt)
+         visc(i,j,k,1) = visc_fun(strnrt,L(i,j,k))
          ! Linear extrapolation 
          visc(i+1,j+1,k-1,1) = visc(i,j,k,1)
       end if
@@ -1821,7 +1822,7 @@ c
          vz = merge(vzhi(i,j,k),vzcen(i,j,k),fixvhi_z)
          wz = merge(wzhi(i,j,k),wzcen(i,j,k),fixwhi_z)
          strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-         visc(i,j,k,1) = visc_fun(strnrt)
+         visc(i,j,k,1) = visc_fun(strnrt,L(i,j,k))
          ! Linear extrapolation 
          visc(i-1,j-1,k+1,1) = visc(i,j,k,1)
       end if
@@ -1842,7 +1843,7 @@ c
          vz = merge(vzhi(i,j,k),vzcen(i,j,k),fixvhi_z)
          wz = merge(wzhi(i,j,k),wzcen(i,j,k),fixwhi_z)
          strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-         visc(i,j,k,1) = visc_fun(strnrt)
+         visc(i,j,k,1) = visc_fun(strnrt,L(i,j,k))
          ! Linear extrapolation 
          visc(i+1,j-1,k+1,1) = visc(i,j,k,1)
       end if
@@ -1863,7 +1864,7 @@ c
          vz = merge(vzhi(i,j,k),vzcen(i,j,k),fixvhi_z)
          wz = merge(wzhi(i,j,k),wzcen(i,j,k),fixwhi_z)
          strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-         visc(i,j,k,1) = visc_fun(strnrt)
+         visc(i,j,k,1) = visc_fun(strnrt,L(i,j,k))
          ! Linear extrapolation 
          visc(i-1,j+1,k+1,1) = visc(i,j,k,1)
       end if
@@ -1884,7 +1885,7 @@ c
          vz = merge(vzhi(i,j,k),vzcen(i,j,k),fixvhi_z)
          wz = merge(wzhi(i,j,k),wzcen(i,j,k),fixwhi_z)
          strnrt = strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
-         visc(i,j,k,1) = visc_fun(strnrt)
+         visc(i,j,k,1) = visc_fun(strnrt,L(i,j,k))
          ! Linear extrapolation 
          visc(i+1,j+1,k+1,1) = visc(i,j,k,1)
       end if
