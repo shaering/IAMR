@@ -148,16 +148,10 @@ contains
       namelist /fortin/ tInflowFact_l, tInflowFact_r, InflowFact_l, InflowFact_r
       namelist /fortin/ do_inlet_ref, inlet_ref_height
       namelist /fortin/ lid_vel
-<<<<<<< HEAD:Exec/run3d_HIT/PROB_3D.F90
-!c
-!c      Build "probin" filename -- the name of file containing fortin namelist.
-!c
-=======
       namelist /fortin/ scaling_level
 c
 c      Build "probin" filename -- the name of file containing fortin namelist.
 c
->>>>>>> made input and probin files for IAMR scaling study (advect blob of tracer 10 time steps, replicate initial domain for larger core counts and domain sizes):Exec/run3d/PROB_3D.F
       integer maxlen, isioproc, ierr
       parameter (maxlen=256)
 
@@ -1141,9 +1135,21 @@ c
              vel,scal,DIMS(state),press,DIMS(press), &
              dx,xlo,xhi)
       else if (probtype .eq. 31) then 
+<<<<<<< HEAD:Exec/run3d_HIT/PROB_3D.F90
          call initscalingstudy(level,time,lo,hi,nscal, &
               vel,scal,DIMS(state),press,DIMS(press), &
               dx,xlo,xhi)
+=======
+         call initscalingstudy(level,time,lo,hi,nscal,
+     &        vel,scal,DIMS(state),press,DIMS(press),
+     &        dx,xlo,xhi)
+
+      else if (probtype .eq. 32) then 
+         call initdambreak(level,time,lo,hi,nscal,
+     &        vel,scal,DIMS(state),press,DIMS(press),
+     &        dx,xlo,xhi)
+
+>>>>>>> extend two-fluid flow to 3d, try dambreak simulation:Exec/run3d/PROB_3D.F
       else
          write(6,*) "INITDATA: bad probtype = ",probtype
       end if
@@ -1175,6 +1181,59 @@ c
                              vel,scal,DIMS(state),press,DIMS(press), &
                                  dx,xlo,xhi)
 =======
+c
+c ::: -----------------------------------------------------------
+c
+      subroutine initdambreak(level,time,lo,hi,nscal,
+     &	 	            vel,scal,DIMS(state),press,DIMS(press),
+     &                      dx,xlo,xhi)
+      implicit none
+
+      integer    level, nscal
+      integer    lo(SDIM), hi(SDIM)
+      integer    DIMDEC(state)
+      integer    DIMDEC(press)
+      REAL_T     time, dx(SDIM)
+      REAL_T     xlo(SDIM), xhi(SDIM)
+      REAL_T     vel(DIMV(state),SDIM)
+      REAL_T    scal(DIMV(state),nscal)
+      REAL_T   press(DIMV(press))
+c
+c     ::::: local variables
+c
+      integer i, j, k
+      REAL_T  x, y, z
+      REAL_T  hx, hy, hz
+
+#include <probdata.H>
+
+      hx = dx(1)
+      hy = dx(2)
+      hz = dx(3)
+
+      do k = lo(3), hi(3)
+         z = xlo(3) + hz*(float(k-lo(3)) + half)
+         do j = lo(2), hi(2)
+            y = xlo(2) + hy*(float(j-lo(2)) + half)
+            do i = lo(1), hi(1)
+               x = xlo(1) + hx*(float(i-lo(1)) + half)
+               vel(i,j,k,1) = zero
+               vel(i,j,k,2) = zero
+               vel(i,j,k,3) = zero
+               scal(i,j,k,1) = one
+               scal(i,j,k,2) = zero
+               if (x .lt. one .and. y .lt. one .and. z .lt. one) then
+                  scal(i,j,k,1) = one
+                  scal(i,j,k,2) = one
+               else
+                  scal(i,j,k,1) = one / 1000.0d0
+                  scal(i,j,k,2) = zero
+               end if
+            end do
+         end do
+      end do
+
+      end
 c
 c ::: -----------------------------------------------------------
 c
