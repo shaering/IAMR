@@ -926,7 +926,6 @@ c
       integer i, j, n
       REAL_T  x, y
       REAL_T  hx, hy
-      REAL_T  dist
 
 #include <probdata.H>
 
@@ -937,7 +936,6 @@ c
          y = xlo(2) + hy*(float(j-lo(2)) + half)
          do i = lo(1), hi(1)
             x = xlo(1) + hx*(float(i-lo(1)) + half)
-            dist = sqrt((x-xblob)**2 + (y-yblob)**2)
             vel(i,j,1) = zero
             vel(i,j,2) = zero
             if (x .lt. one .and. y. lt. one) then
