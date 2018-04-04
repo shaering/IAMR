@@ -89,10 +89,6 @@ c
 
       end function visc_fun
 
-!   The stress can easily be computed from the viscosity and strain rate
-!   magnitude during post-processing. Don't worry about this being
-!   wrong.
-!
       REAL_T function stress_fun(strnrt, lambda)
       ! Regularised Herschel-Bulkley stress
          REAL_T, intent(in)  :: strnrt
