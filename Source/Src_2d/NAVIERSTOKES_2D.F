@@ -419,8 +419,10 @@ c     coarse face, leave the in-between faces alone.
 
       end
 
-      subroutine FORT_HERSCHEL_BULKLEY(visc, DIMS(visc), vel, DIMS(vel), 
-     &                                 lo, hi, domlo, domhi, delta, vel_bc)
+      subroutine FORT_HERSCHEL_BULKLEY(visc, DIMS(visc), 
+     &                                 dat, DIMS(dat),
+     &                                 lo, hi, domlo, domhi, delta,
+     &                                 vel_bc)
       use viscoplasticity_module
       implicit none
 c
@@ -429,12 +431,12 @@ c ::: viscosity based on the velocity field
 c
       integer    lo(2), hi(2)
       integer    DIMDEC(visc)
-      integer    DIMDEC(vel)
+      integer    DIMDEC(dat)
       integer    domlo(2), domhi(2)
       integer    vel_bc(2,2,2)
       REAL_T     delta(2)
       REAL_T     visc(DIMV(visc),1)
-      REAL_T     vel(DIMV(vel),2)
+      REAL_T     dat(DIMV(dat),4)
 
       integer   i,j
       REAL_T    ux, vx, uy, vy, dx, dy
@@ -445,8 +447,9 @@ c
 c
 c     ::::: some useful macro definitions
 c
-#     define U(i,j) vel(i,j,1)
-#     define V(i,j) vel(i,j,2)
+#     define U(i,j) dat(i,j,1)
+#     define V(i,j) dat(i,j,2)
+#     define L(i,j) dat(i,j,4)
 
 #     define ULOX vel_bc(1,1,1)
 #     define UHIX vel_bc(1,2,1)
@@ -489,7 +492,7 @@ c
             uy  = uycen(i,j)
             vy  = vycen(i,j)
             strnrt = strnrt_fun_2d(ux,vx,uy,vy)
-            visc(i,j,1) = visc_fun(strnrt)
+            visc(i,j,1) = visc_fun(strnrt, L(i,j))
          end do
       end do
 
@@ -517,7 +520,7 @@ c
             uy  = uycen(i,j) 
             vy  = vycen(i,j)
             strnrt = strnrt_fun_2d(ux,vx,uy,vy)
-            visc(i,j,1) = visc_fun(strnrt)
+            visc(i,j,1) = visc_fun(strnrt, L(i,j))
             ! Linear extrapolation
             visc(i-1,j,1) = visc(i,j,1)
          end do
@@ -533,7 +536,7 @@ c
             uy  = uycen(i,j)
             vy  = vycen(i,j)
             strnrt = strnrt_fun_2d(ux,vx,uy,vy)
-            visc(i,j,1) = visc_fun(strnrt)
+            visc(i,j,1) = visc_fun(strnrt, L(i,j))
             ! Linear extrapolation
             visc(i+1,j,1) = visc(i,j,1)
          end do
@@ -549,7 +552,7 @@ c
             uy  = uybot(i,j)
             vy  = vybot(i,j)
             strnrt = strnrt_fun_2d(ux,vx,uy,vy)
-            visc(i,j,1) = visc_fun(strnrt)
+            visc(i,j,1) = visc_fun(strnrt, L(i,j))
             ! Linear extrapolation
             visc(i,j-1,1) = visc(i,j,1)
          end do
@@ -565,7 +568,7 @@ c
             uy  = uytop(i,j)
             vy  = vytop(i,j)
             strnrt = strnrt_fun_2d(ux,vx,uy,vy)
-            visc(i,j,1) = visc_fun(strnrt)
+            visc(i,j,1) = visc_fun(strnrt, L(i,j))
             ! Linear extrapolation
             visc(i,j+1,1) = visc(i,j,1)
          end do
@@ -581,13 +584,12 @@ c
          uy = uybot(i,j)
          vy = vybot(i,j)
          strnrt = strnrt_fun_2d(ux,vx,uy,vy)
-         visc(i,j,1) = visc_fun(strnrt)
+         visc(i,j,1) = visc_fun(strnrt, L(i,j))
          ! Linear extrapolation
          visc(i-1,j-1,1) = visc(i,j,1)
       end if
 
       if (fixlft .and. fixtop) then
-
          i = lo(1)
          j = hi(2)
          ux = uxlft(i,j)
@@ -595,7 +597,7 @@ c
          uy = uytop(i,j)
          vy = vytop(i,j)
          strnrt = strnrt_fun_2d(ux,vx,uy,vy)
-         visc(i,j,1) = visc_fun(strnrt)
+         visc(i,j,1) = visc_fun(strnrt, L(i,j))
          ! Linear extrapolation
          visc(i-1,j+1,1) = visc(i,j,1)
       end if
@@ -608,7 +610,7 @@ c
          uy = uytop(i,j)
          vy = vytop(i,j)
          strnrt = strnrt_fun_2d(ux,vx,uy,vy)
-         visc(i,j,1) = visc_fun(strnrt)
+         visc(i,j,1) = visc_fun(strnrt, L(i,j))
          ! Linear extrapolation
          visc(i+1,j+1,1) = visc(i,j,1)
       end if
@@ -621,9 +623,33 @@ c
          uy = uybot(i,j)
          vy = vybot(i,j)
          strnrt = strnrt_fun_2d(ux,vx,uy,vy)
-         visc(i,j,1) = visc_fun(strnrt)
+         visc(i,j,1) = visc_fun(strnrt, L(i,j))
          ! Linear extrapolation
          visc(i+1,j-1,1) = visc(i,j,1)
+      end if
+
+      if (VLOX .eq. REFLECT_EVEN) then
+         do j = lo(2)-1, hi(2)+1
+            visc(lo(1)-1,j,1) = visc(lo(1),j,1)
+         end do
+      end if
+
+      if (VHIX .eq. REFLECT_EVEN) then
+         do j = lo(2)-1, hi(2)+1
+            visc(hi(1)+1,j,1) = visc(hi(1),j,1)
+         end do
+      end if
+
+      if (ULOY .eq. REFLECT_EVEN) then
+         do i = lo(1)-1, hi(1)+1
+            visc(i,lo(2)-1,1) = visc(i,lo(2),1)
+         end do
+      end if
+
+      if (UHIY .eq. REFLECT_EVEN) then
+         do i = lo(1)-1, hi(1)+1
+            visc(i,hi(2)+1,1) = visc(i,hi(2),1)
+         end do
       end if
 
 #     undef U

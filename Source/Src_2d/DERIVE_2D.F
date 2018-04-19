@@ -730,6 +730,7 @@ c     ::::: some useful macro definitions
 c
 #     define U(i,j) dat(i,j,1)
 #     define V(i,j) dat(i,j,2)
+#     define L(i,j) dat(i,j,3)
 
 #     define ULOX bc(1,1,1)
 #     define UHIX bc(1,2,1)
@@ -767,12 +768,12 @@ c
 
       do j = lo(2), hi(2)
          do i = lo(1), hi(1)
-            visc(i,j,1) = mu
+            visc(i,j,1) = mu_in(1)
          end do
       end do
 
       else 
-      ! Compute Herschel-Bulkley viscosity
+      ! Compute variable viscosity
 
       dx = delta(1)
       dy = delta(2)
@@ -784,7 +785,7 @@ c
             uy  = uycen(i,j)
             vy  = vycen(i,j)
             strnrt = strnrt_fun_2d(ux,vx,uy,vy)
-            visc(i,j,1) = visc_fun(strnrt)
+            visc(i,j,1) = visc_fun(strnrt,L(i,j))
          end do
       end do
 
@@ -812,7 +813,7 @@ c
             uy  = uycen(i,j)
             vy  = vycen(i,j)
             strnrt = strnrt_fun_2d(ux,vx,uy,vy)
-            visc(i,j,1) = visc_fun(strnrt)
+            visc(i,j,1) = visc_fun(strnrt,L(i,j))
          end do
       end if
 c
@@ -826,7 +827,7 @@ c
             uy  = uycen(i,j)
             vy  = vycen(i,j)
             strnrt = strnrt_fun_2d(ux,vx,uy,vy)
-            visc(i,j,1) = visc_fun(strnrt)
+            visc(i,j,1) = visc_fun(strnrt,L(i,j))
          end do
       end if
 c
@@ -840,7 +841,7 @@ c
             uy  = uybot(i,j)
             vy  = vybot(i,j)
             strnrt = strnrt_fun_2d(ux,vx,uy,vy)
-            visc(i,j,1) = visc_fun(strnrt)
+            visc(i,j,1) = visc_fun(strnrt,L(i,j))
          end do
       end if
 c
@@ -854,7 +855,7 @@ c
             uy  = uytop(i,j)
             vy  = vytop(i,j)
             strnrt = strnrt_fun_2d(ux,vx,uy,vy)
-            visc(i,j,1) = visc_fun(strnrt)
+            visc(i,j,1) = visc_fun(strnrt,L(i,j))
          end do
       end if
 c
@@ -868,7 +869,7 @@ c
          uy = uybot(i,j)
          vy = vybot(i,j)
          strnrt = strnrt_fun_2d(ux,vx,uy,vy)
-         visc(i,j,1) = visc_fun(strnrt)
+         visc(i,j,1) = visc_fun(strnrt,L(i,j))
       end if
       if (fixlft .and. fixtop) then
          i = lo(1)
@@ -878,7 +879,7 @@ c
          uy = uytop(i,j)
          vy = vytop(i,j)
          strnrt = strnrt_fun_2d(ux,vx,uy,vy)
-         visc(i,j,1) = visc_fun(strnrt)
+         visc(i,j,1) = visc_fun(strnrt,L(i,j))
       end if
       if (fixrgt .and. fixtop) then
          i = hi(1)
@@ -888,7 +889,7 @@ c
          uy = uytop(i,j)
          vy = vytop(i,j)
          strnrt = strnrt_fun_2d(ux,vx,uy,vy)
-         visc(i,j,1) = visc_fun(strnrt)
+         visc(i,j,1) = visc_fun(strnrt,L(i,j))
       end if
       if (fixrgt .and. fixbot) then
          i = hi(1)
@@ -898,7 +899,7 @@ c
          uy = uybot(i,j)
          vy = vybot(i,j)
          strnrt = strnrt_fun_2d(ux,vx,uy,vy)
-         visc(i,j,1) = visc_fun(strnrt)
+         visc(i,j,1) = visc_fun(strnrt,L(i,j))
       end if
 
       end if
@@ -912,16 +913,16 @@ c
 
       end
 
+c
+c ::: This routine will compute the 
+c ::: stress based on the velocity field
+c
       subroutine FORT_DERSTRESS (stress,DIMS(stress),nv,dat,DIMS(dat),ncomp,
      &                           lo,hi,domlo,domhi,delta,xlo,time,dt,
      $                           bc,level,grid_no)
       use viscoplasticity_module
       implicit none
 
-c
-c ::: This routine will compute the 
-c ::: stress based on the velocity field
-c
       integer    lo(2), hi(2)
       integer    DIMDEC(stress)
       integer    DIMDEC(dat)
@@ -944,6 +945,7 @@ c     ::::: some useful macro definitions
 c
 #     define U(i,j) dat(i,j,1)
 #     define V(i,j) dat(i,j,2)
+#     define L(i,j) dat(i,j,3)
 
 #     define ULOX bc(1,1,1)
 #     define UHIX bc(1,2,1)
@@ -986,7 +988,7 @@ c
             uy  = uycen(i,j)
             vy  = vycen(i,j)
             strnrt = strnrt_fun_2d(ux,vx,uy,vy)
-            stress(i,j,1) = stress_fun(strnrt)
+            stress(i,j,1) = stress_fun(strnrt,L(i,j))
          end do
       end do
 
@@ -1013,7 +1015,7 @@ c
             uy  = uycen(i,j)
             vy  = vycen(i,j)
             strnrt = strnrt_fun_2d(ux,vx,uy,vy)
-            stress(i,j,1) = stress_fun(strnrt)
+            stress(i,j,1) = stress_fun(strnrt,L(i,j))
          end do
       end if
 c
@@ -1027,7 +1029,7 @@ c
             uy  = uycen(i,j)
             vy  = vycen(i,j)
             strnrt = strnrt_fun_2d(ux,vx,uy,vy)
-            stress(i,j,1) = stress_fun(strnrt)
+            stress(i,j,1) = stress_fun(strnrt,L(i,j))
          end do
       end if
 c
@@ -1041,7 +1043,7 @@ c
             uy  = uybot(i,j)
             vy  = vybot(i,j)
             strnrt = strnrt_fun_2d(ux,vx,uy,vy)
-            stress(i,j,1) = stress_fun(strnrt)
+            stress(i,j,1) = stress_fun(strnrt,L(i,j))
          end do
       end if
 c
@@ -1055,7 +1057,7 @@ c
             uy  = uytop(i,j)
             vy  = vytop(i,j)
             strnrt = strnrt_fun_2d(ux,vx,uy,vy)
-            stress(i,j,1) = stress_fun(strnrt)
+            stress(i,j,1) = stress_fun(strnrt,L(i,j))
          end do
       end if
 c
@@ -1069,7 +1071,7 @@ c
          uy = uybot(i,j)
          vy = vybot(i,j)
          strnrt = strnrt_fun_2d(ux,vx,uy,vy)
-         stress(i,j,1) = stress_fun(strnrt)
+         stress(i,j,1) = stress_fun(strnrt,L(i,j))
       end if
       if (fixlft .and. fixtop) then
          i = lo(1)
@@ -1079,7 +1081,7 @@ c
          uy = uytop(i,j)
          vy = vytop(i,j)
          strnrt = strnrt_fun_2d(ux,vx,uy,vy)
-         stress(i,j,1) = stress_fun(strnrt)
+         stress(i,j,1) = stress_fun(strnrt,L(i,j))
       end if
       if (fixrgt .and. fixtop) then
          i = hi(1)
@@ -1089,7 +1091,7 @@ c
          uy = uytop(i,j)
          vy = vytop(i,j)
          strnrt = strnrt_fun_2d(ux,vx,uy,vy)
-         stress(i,j,1) = stress_fun(strnrt)
+         stress(i,j,1) = stress_fun(strnrt,L(i,j))
       end if
       if (fixrgt .and. fixbot) then
          i = hi(1)
@@ -1099,7 +1101,7 @@ c
          uy = uybot(i,j)
          vy = vybot(i,j)
          strnrt = strnrt_fun_2d(ux,vx,uy,vy)
-         stress(i,j,1) = stress_fun(strnrt)
+         stress(i,j,1) = stress_fun(strnrt,L(i,j))
       end if
 
 #     undef U

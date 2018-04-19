@@ -53,30 +53,46 @@ c
           end if
       end function regularisation
 
-      REAL_T function visc_fun(strnrt)
+      REAL_T function visc_fun(strnrt, lambda)
+
          ! Regularised Herschel-Bulkley viscosity 
          REAL_T, intent(in)  :: strnrt
-         REAL_T              :: reg
+         REAL_T, intent(in)  :: lambda
+         REAL_T              :: reg, mu, tau, n
+
          ! Calculate visc_fun based on flow index value
          reg = regularisation(strnrt)
+
+         if (numflds .eq. 1) then
+            mu = mu_in(1)
+            tau = tau_in(1)
+            n = n_in(1)
+         else
+            mu = lambda * mu_in(2) + (one - lambda) * mu_in(1)
+            tau = lambda * tau_in(2) + (one - lambda) * tau_in(1)
+            n = lambda * n_in(2) + (one - lambda) * n_in(1)
+         end if
+
          if (n .lt. one) then
             ! Pseudoplastic (shear-thinning)
             ! Regularise power-law term and yield stress term
             visc_fun = (mu*two**((n-one)/two)*strnrt**n+half*tau)*reg
-         else if (n .eq. one) then
-            ! Bingham fluid
-            ! Regularise yield stress term only
-            visc_fun = mu+half*tau*reg
-         else 
+         else if (n .gt. one) then
             ! Dilatant (shear-thickening)
             ! Regularise yield stress term only
             visc_fun = mu*two**((n-one)/two)*strnrt**(n-one)+half*tau*reg
+         else
+            ! Bingham fluid
+            ! Regularise yield stress term only
+            visc_fun = mu+half*tau*reg
          end if
+
       end function visc_fun
 
-      REAL_T function stress_fun(strnrt)
+      REAL_T function stress_fun(strnrt, lambda)
       ! Regularised Herschel-Bulkley stress
          REAL_T, intent(in)  :: strnrt
+         REAL_T, intent(in)  :: lambda
          REAL_T              :: visc
          if (varvisc .eq. 0) then
             ! If non-variable, stress equals 2 mu strnrt everywhere
@@ -84,7 +100,7 @@ c
          else
             ! Calculate viscosity based on flow index value, use this to
             ! find stress
-            visc = visc_fun(strnrt)
+            visc = visc_fun(strnrt, lambda)
             stress_fun = 2*visc*strnrt
          end if
       end function stress_fun

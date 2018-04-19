@@ -183,15 +183,16 @@ extern "C" {
                      const amrex::Real* dx ,const amrex::Real* xlo);
 
     void FORT_HERSCHEL_BULKLEY(amrex::Real* visc, ARLIM_P(visc_lo), ARLIM_P(visc_hi),
-		              const amrex::Real* vel, ARLIM_P(vel_lo), ARLIM_P(vel_hi),
+		              const amrex::Real* dat, ARLIM_P(dat_lo), ARLIM_P(dat_hi),
                       const int* lo, const int* hi, const int* domain_lo, const int* domain_hi,
 		              const amrex::Real* delta, const int* vel_bc);
 
-   void FORT_SET_NS_PARAMS(const amrex::Real& dyn_visc_coef,
-                        const amrex::Real& flow_index, 
-                        const amrex::Real& yield_stress, 
-                        const amrex::Real& reg_param, 
-						const int& variable_vel_visc);
+   void FORT_SET_NS_PARAMS(const int& n_fluids, 
+	   		   const amrex::Real* dyn_visc_coef,
+                           const amrex::Real* flow_index, 
+                           const amrex::Real* yield_stress, 
+                           const amrex::Real* reg_param, 
+			   int& variable_vel_visc);
 #ifdef __cplusplus
 }
 #endif
