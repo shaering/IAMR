@@ -6,7 +6,7 @@
 
 # Maximum number of coarse grid timesteps to be taken, if stop_time is
 #  not reached first.
-max_step 		= 500000
+max_step 		= 1000
 
 # Time at which calculation stops, if max_step is not reached first.
 stop_time 		= -1
@@ -17,13 +17,13 @@ ns.do_tracer_ref = 1
 #*******************************************************************************
 
 # Number of cells in each coordinate direction at the coarsest level
-amr.n_cell 		= 128 80
+amr.n_cell 		= 64 40
 amr.max_grid_size	= 16
 
 #*******************************************************************************
 
 # Maximum level (defaults to 0 for single level calculation)
-amr.max_level		= 0 # maximum number of levels of refinement
+amr.max_level		= 1 # maximum number of levels of refinement
 
 #*******************************************************************************
 
@@ -55,12 +55,12 @@ amr.check_int		= 10000
 
 # Interval (in number of coarse timesteps) between plot files
 amr.plot_file 			= plt
-amr.plot_per		= 0.5
+amr.plot_int			= 1
 
 #*******************************************************************************
 
 # CFL number to be used in calculating the time step : dt = dx / max(velocity)
-ns.cfl                  = 0.9  # CFL number used to set dt
+ns.cfl                  = 0.09  # CFL number used to set dt
 
 #*******************************************************************************
 
@@ -72,8 +72,8 @@ ns.init_shrink          = 0.3  # factor which multiplies the very first time ste
 # Viscosity coefficient 
 ns.vel_visc_coef        = 0.001
 ns.variable_vel_visc 	= 1
-ns.dyn_visc_coef 		= 0.001 0.01
-ns.yield_stress 	 	= 0.0 0.0005
+ns.dyn_visc_coef 		= 1.81e-5 8.9e-4
+ns.yield_stress 	 	= 0.0 0.0
 ns.flow_index 		 	= 1.0 1.0
 
 #*******************************************************************************
@@ -84,7 +84,7 @@ ns.scal_diff_coefs      = 0.0
 #*******************************************************************************
 
 # Forcing term defaults to  rho * abs(gravity) "down"
-ns.gravity              = -0.004
+ns.gravity              = -9.81
 
 #*******************************************************************************
 
@@ -102,7 +102,7 @@ geometry.coord_sys   =  0
 geometry.prob_lo     =  0. 0. 
 
 # Physical dimensions of the high end of the domain.
-geometry.prob_hi     =  2. 1.25
+geometry.prob_hi     =  0.2 0.125
 
 #*******************************************************************************
 
@@ -145,6 +145,6 @@ amr.derive_plot_vars    = mag_strainrate eff_visc stress avg_pressure gradpx gra
 #*******************************************************************************
 
 # Continue from checkpoint 
-amr.restart 			= chk100000
+# amr.restart 			= chk100000
 
 #*******************************************************************************
