@@ -974,11 +974,11 @@ c
             x = xlo(1) + hx*(float(i-lo(1)) + half)
             vel(i,j,1) = zero
             vel(i,j,2) = zero
-            if (x .lt. one .and. y. lt. one) then
-               scal(i,j,1) = one
+            if (x .lt. 0.1d0 .and. y. lt. 0.1d0) then
+               scal(i,j,1) = 997.0d0
                scal(i,j,2) = one
             else
-               scal(i,j,1) = one / 1000.0d0
+               scal(i,j,1) = 1.225d0
                scal(i,j,2) = zero
             endif
          end do
@@ -1437,11 +1437,43 @@ c ::: -----------------------------------------------------------
 c     probtype = DAMBREAK
       else if (probtype .eq. 14) then
 
+         hx = dx(1)
+         hy = dx(2)
+
          do j = lo(2), hi(2)
+            y = xlo(2) + hy*(float(j-lo(2)) + half)
             do i = lo(1), hi(1)
-               tag(i,j) = merge(set,tag(i,j),abs(adv(i,j,1)-half).lt.adverr)
+               x = xlo(1) + hx*(float(i-lo(1)) + half)
+                tag(i,j) = merge(set, tag(i,j),
+     &                           (x.gt.0.09).and.(x.lt.0.11))
+                tag(i,j) = merge(set, tag(i,j),
+     &                           (y.gt.0.09).and.(y.lt.0.11))
             end do
          end do
+
+         ! tag for refinement if |c| < 1-tol OR |c| > tol
+!         do j = lo(2), hi(2)
+!            do i = lo(1), hi(1)
+!               tag(i,j) = merge(set, tag(i,j),
+!     &                          abs(adv(i,j,1)-half).lt.(half-adverr))
+!            end do
+!         end do
+
+         ! Tag for refinement if nearest neighbours have different
+         ! c-value greater than tol. This allows us to tag even when
+         ! fluid interface passes directly between two adjacent cells. 
+!         do j = lo(2)+1, hi(2)-1
+!            do i = lo(1)+1, hi(1)-1
+!               tag(i,j) = merge(set, tag(i,j),
+!     &                          abs(adv(i,j,1)-adv(i-1,j,1)).gt.adverr)
+!               tag(i,j) = merge(set, tag(i,j),
+!     &                          abs(adv(i,j,1)-adv(i+1,j,1)).gt.adverr)
+!               tag(i,j) = merge(set, tag(i,j),
+!     &                          abs(adv(i,j,1)-adv(i,j-1,1)).gt.adverr)
+!               tag(i,j) = merge(set, tag(i,j),
+!     &                          abs(adv(i,j,1)-adv(i,j+1,1)).gt.adverr)
+!            end do
+!         end do
 
       else
         print *,'DONT KNOW THIS PROBTYPE IN FORT_ADVERROR ',probtype

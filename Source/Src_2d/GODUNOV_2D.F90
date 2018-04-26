@@ -453,8 +453,10 @@ c           TODO: find proper measure of viscoplastic impact on CFL
       end if
 
       if (varvisc .ne. 0) then
-        dt  = min(dt,two*dx(1)/tforce1)
-        dt  = min(dt,two*dx(2)/tforce2)
+        if (yield .gt. small) then
+           dt  = min(dt,two*dx(1)/tforce1)
+           dt  = min(dt,two*dx(2)/tforce2)
+        end if
       end if
 
       if (dt .eq. dt_start) dt = min(dx(1),dx(2))
