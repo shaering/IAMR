@@ -1440,11 +1440,11 @@ c     probtype = DISPLACE
          hx = dx(1)
          hy = dx(2)
 
-         ! tag for refinement at outlet boundary (x > 9.95)
+         ! tag for refinement in centre of domain (4 < x < 6)
          do j = lo(2), hi(2)
             do i = lo(1), hi(1)
                x = xlo(1) + hx*(float(i-lo(1)) + half)
-               tag(i,j) = merge(set, tag(i,j), (x.gt.9.5))
+               tag(i,j) = merge(set, tag(i,j), (x.gt.4).and.(x.lt.6))
             end do
          end do
 

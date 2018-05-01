@@ -795,6 +795,37 @@ NavierStokes:: calcHerschelBulkley  (MultiFab& visc, Real time)
     }
 }
 
+void 
+NavierStokes::printMF(MultiFab& mf, Real time)
+{
+    BL_PROFILE("NavierStokes::printMF()");
+
+    MultiFab& dat = get_new_data(State_Type);
+
+    const int *domlo   = geom.Domain().loVect();
+    const int *domhi   = geom.Domain().hiVect();
+
+    const Real* dx     = geom.CellSize();
+
+    Array<int> bc;
+
+    FillPatchIterator fpi(*this,dat,dat.nGrow(),time,State_Type,Xvel,BL_SPACEDIM+2);
+    for ( ; fpi.isValid(); ++fpi)
+    {
+       const int  i    = fpi.index();
+       const Box&  bx  = grids[i];
+       const int*  lo  = bx.loVect();
+       const int*  hi  = bx.hiVect();
+
+       Real *mfdat      = mf[i].dataPtr();
+       const int *mf_lo = mf[i].loVect();
+       const int *mf_hi = mf[i].hiVect();
+
+	   PRINT_MULTIFAB(mfdat, ARLIM(mf_lo), ARLIM(mf_hi), 
+					  lo, hi, domlo, domhi, dx);
+    }
+}
+
 void
 NavierStokes::velocity_diffusion_update (Real dt)
 {
@@ -2071,7 +2102,7 @@ NavierStokes::getViscTerms (MultiFab& visc_terms,
 
                 if (variable_scal_diff)
                 {
-		    cmp_diffn = fb.define(this);
+					cmp_diffn = fb.define(this);
                     getDiffusivity(cmp_diffn, time, icomp, 0, 1);
                 }
 
@@ -2092,6 +2123,26 @@ NavierStokes::getViscTerms (MultiFab& visc_terms,
 	visc_terms.FillBoundary(0, ncomp, geom.periodicity());
 	Extrapolater::FirstOrderExtrap(visc_terms, geom, 0, ncomp);
     }
+	if (visc_terms.contains_nan())
+	{
+	    amrex::Print() << "visc_terms contains NaNs at end of getViscTerms()!\n";
+
+		MultiFab* visc_cc = 0;
+		const TimeLevel whichTime = which_time(State_Type,time);
+		BL_ASSERT(whichTime == AmrOldTime || whichTime == AmrNewTime);
+		if (whichTime == AmrOldTime)               // time N
+			visc_cc = viscn_cc;
+		else if (whichTime == AmrNewTime)          // time N+1
+			visc_cc = viscnp1_cc;
+
+		amrex::Print() << "eff_visc:\n";
+		printMF(*visc_cc,time);
+
+		amrex::Print() << "visc_terms:\n";
+		printMF(visc_terms,time);
+
+		exit(0);
+	}
 }
 
 //

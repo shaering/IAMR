@@ -218,9 +218,9 @@ private:
     void calcHerschelBulkley (amrex::MultiFab& visc, amrex::Real time); 
 
     //
-    // Calculate Herschel-Bulkley viscosity from velocity distribution
+    // Print contents of multifab
     //
-    void calcHerschelBulkley (amrex::MultiFab& visc, amrex::Real time); 
+	void printMF(amrex::MultiFab& mf, amrex::Real time);
 
     //
     // Define error estimators

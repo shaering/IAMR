@@ -14,6 +14,7 @@
 #    define FORT_EDGE_INTERP edge_interp
 #    define FORT_PC_CF_EDGE_INTERP pc_edge_interp
 #    define FORT_HERSCHEL_BULKLEY 	 herschel_bulkley
+#    define PRINT_MULTIFAB 	 print_multifab
 #    define FORT_SET_NS_PARAMS  setnsparams
 #if (BL_SPACEDIM == 3)
 #    define FORT_SUMTURB     sumturb
@@ -35,6 +36,7 @@
 #    define FORT_PC_CF_EDGE_INTERP PC_EDGE_INTERP
 #    define FORT_HOEXTRAPTOCC HOEXTRAPTOCC
 #    define FORT_HERSCHEL_BULKLEY 	 HERSCHEL_BULKLEY
+#    define PRINT_MULTIFAB 	 PRINT_MULTIFAB
 #    define FORT_SET_NS_PARAMS  SETNSPARAMS
 #if (BL_SPACEDIM == 3)
 #    define FORT_SUMTURB     SUMTURB
@@ -55,6 +57,7 @@
 #    define FORT_PC_CF_EDGE_INTERP pc_edge_interp
 #    define FORT_HOEXTRAPTOCC hoextraptocc
 #    define FORT_HERSCHEL_BULKLEY 	 herschel_bulkley
+#    define PRINT_MULTIFAB 	 print_multifab
 #    define FORT_SET_NS_PARAMS  setnsparams
 #if (BL_SPACEDIM == 3)
 #    define FORT_SUMTURB     sumturb
@@ -75,6 +78,7 @@
 #    define FORT_PC_CF_EDGE_INTERP pc_edge_interp_
 #    define FORT_HOEXTRAPTOCC hoextraptocc_
 #    define FORT_HERSCHEL_BULKLEY 	 herschel_bulkley_
+#    define PRINT_MULTIFAB 	 print_multifab_
 #    define FORT_SET_NS_PARAMS  setnsparams_
 #if (BL_SPACEDIM == 3)
 #    define FORT_SUMTURB     sumturb_
@@ -189,6 +193,11 @@ extern "C" {
 		              const amrex::Real* dat, ARLIM_P(dat_lo), ARLIM_P(dat_hi),
                       const int* lo, const int* hi, const int* domain_lo, const int* domain_hi,
 		              const amrex::Real* delta, const int* vel_bc);
+
+    void PRINT_MULTIFAB(amrex::Real* dat, ARLIM_P(lo), ARLIM_P(hi),
+                      const int* lo, const int* hi, const int* domain_lo, const int* domain_hi,
+		              const amrex::Real* delta);
+
 
    void FORT_SET_NS_PARAMS(const int& n_fluids, 
 	   		   const amrex::Real* dyn_visc_coef,
