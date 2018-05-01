@@ -217,6 +217,11 @@ private:
     void calcHerschelBulkley (amrex::MultiFab& visc, amrex::Real time); 
 
     //
+    // Print contents of multifab
+    //
+	void printMF(amrex::MultiFab& mf, amrex::Real time);
+
+    //
     // Define error estimators
     //
     static void error_setup ();
