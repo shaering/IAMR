@@ -9,7 +9,7 @@ amr.probin_file 		= probin.2d.displacement
 # WHEN SHOULD THE SIMULATION STOP?
 #*******************************************************************************
 # Maximum number of timesteps to be taken, if stop_time is not reached first.
-max_step 			    = 2
+max_step 			    = 1
 # Time at which calculation stops, if max_step is not reached first.
 stop_time 				= 10
 # Stop simulation when we reach steady-state
@@ -49,15 +49,15 @@ ns.scal_diff_coefs   	= 0.0
 #*******************************************************************************
 
 # Number of cells in each coordinate direction at the coarsest level
-amr.n_cell 			   = 40 4
-amr.max_grid_size	   = 16
+amr.n_cell 			   = 8 4
+amr.max_grid_size	   = 8 
 
 # Set to 0 if x-y coordinate system, set to 1 if r-z.
 geometry.coord_sys   	=  0
 # Physical dimensions of the low end of the domain.
 geometry.prob_lo     	=  0. 0.
 # Physical dimensions of the high end of the domain.
-geometry.prob_hi     	=  10.0 1.0
+geometry.prob_hi     	=  2.0 1.0
 #Set to 1 if periodic in that direction
 geometry.is_periodic 	=  0 0
 
