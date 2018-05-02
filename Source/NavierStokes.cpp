@@ -2047,7 +2047,44 @@ NavierStokes::getViscTerms (MultiFab& visc_terms,
         {
             viscosity = fb.define(this);
             getViscosity(viscosity, time);
+
+			{
+				MultiFab* visc_cc = 0;
+				const TimeLevel whichTime = which_time(State_Type,time);
+				BL_ASSERT(whichTime == AmrOldTime || whichTime == AmrNewTime);
+				if (whichTime == AmrOldTime)               // time N
+					visc_cc = viscn_cc;
+				else if (whichTime == AmrNewTime)          // time N+1
+					visc_cc = viscnp1_cc;
+
+				amrex::Print() << "========== AFTER GETVISCOSITY ==========\n\n";
+
+				amrex::Print() << "eff_visc:\n";
+				printMF(*visc_cc,time);
+
+				amrex::Print() << "visc_terms:\n";
+				printMF(visc_terms,time);
+			}
+			
             diffusion->getTensorViscTerms(visc_terms,time,viscosity,0);
+
+			{
+				MultiFab* visc_cc = 0;
+				const TimeLevel whichTime = which_time(State_Type,time);
+				BL_ASSERT(whichTime == AmrOldTime || whichTime == AmrNewTime);
+				if (whichTime == AmrOldTime)               // time N
+					visc_cc = viscn_cc;
+				else if (whichTime == AmrNewTime)          // time N+1
+					visc_cc = viscnp1_cc;
+
+				amrex::Print() << "========== AFTER DIFFUSION->GETTENSORVISCTERMS ==========\n\n";
+
+				amrex::Print() << "eff_visc:\n";
+				printMF(*visc_cc,time);
+
+				amrex::Print() << "visc_terms:\n";
+				printMF(visc_terms,time);
+			}
         }
         else
         {
@@ -2120,26 +2157,50 @@ NavierStokes::getViscTerms (MultiFab& visc_terms,
     //    
     if (diffusive && nGrow > 0)
     {
-	visc_terms.FillBoundary(0, ncomp, geom.periodicity());
-	Extrapolater::FirstOrderExtrap(visc_terms, geom, 0, ncomp);
+		visc_terms.FillBoundary(0, ncomp, geom.periodicity());
+
+		{
+			MultiFab* visc_cc = 0;
+			const TimeLevel whichTime = which_time(State_Type,time);
+			BL_ASSERT(whichTime == AmrOldTime || whichTime == AmrNewTime);
+			if (whichTime == AmrOldTime)               // time N
+				visc_cc = viscn_cc;
+			else if (whichTime == AmrNewTime)          // time N+1
+				visc_cc = viscnp1_cc;
+
+			amrex::Print() << "========== AFTER FILLBOUNDARY ==========\n\n";
+
+			amrex::Print() << "eff_visc:\n";
+			printMF(*visc_cc,time);
+
+			amrex::Print() << "visc_terms:\n";
+			printMF(visc_terms,time);
+		}
+
+		Extrapolater::FirstOrderExtrap(visc_terms, geom, 0, ncomp);
+
+		{
+			MultiFab* visc_cc = 0;
+			const TimeLevel whichTime = which_time(State_Type,time);
+			BL_ASSERT(whichTime == AmrOldTime || whichTime == AmrNewTime);
+			if (whichTime == AmrOldTime)               // time N
+				visc_cc = viscn_cc;
+			else if (whichTime == AmrNewTime)          // time N+1
+				visc_cc = viscnp1_cc;
+
+			amrex::Print() << "========== AFTER FIRSTORDEREXTRAP ==========\n\n";
+
+			amrex::Print() << "eff_visc:\n";
+			printMF(*visc_cc,time);
+
+			amrex::Print() << "visc_terms:\n";
+			printMF(visc_terms,time);
+		}
+
     }
 	if (visc_terms.contains_nan())
 	{
 	    amrex::Print() << "visc_terms contains NaNs at end of getViscTerms()!\n";
-
-		MultiFab* visc_cc = 0;
-		const TimeLevel whichTime = which_time(State_Type,time);
-		BL_ASSERT(whichTime == AmrOldTime || whichTime == AmrNewTime);
-		if (whichTime == AmrOldTime)               // time N
-			visc_cc = viscn_cc;
-		else if (whichTime == AmrNewTime)          // time N+1
-			visc_cc = viscnp1_cc;
-
-		amrex::Print() << "eff_visc:\n";
-		printMF(*visc_cc,time);
-
-		amrex::Print() << "visc_terms:\n";
-		printMF(visc_terms,time);
 
 		exit(0);
 	}
