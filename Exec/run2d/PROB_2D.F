@@ -1420,7 +1420,7 @@ c     probtype = DISPLACE
          do j = lo(2), hi(2)
             do i = lo(1), hi(1)
                x = xlo(1) + hx*(float(i-lo(1)) + half)
-               tag(i,j) = merge(set, tag(i,j), (x.gt.4).and.(x.lt.6))
+               tag(i,j) = merge(set, tag(i,j), (x.gt.0.8).and.(x.lt.1.2))
             end do
          end do
 
