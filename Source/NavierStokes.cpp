@@ -767,8 +767,8 @@ NavierStokes:: calcHerschelBulkley  (MultiFab& visc, Real time)
     const Real* dx     = geom.CellSize();
     const int *bc      = phys_bc.vect();
 
-    Array<int> vel_bc;
-    Array<int> ind_bc;
+    Vector<int> vel_bc;
+    Vector<int> ind_bc;
 
     FillPatchIterator fpi(*this,dat,dat.nGrow(),time,State_Type,Xvel,BL_SPACEDIM+2);
     for ( ; fpi.isValid(); ++fpi)
@@ -807,7 +807,7 @@ NavierStokes::printMF(MultiFab& mf, Real time)
 
     const Real* dx     = geom.CellSize();
 
-    Array<int> bc;
+    Vector<int> bc;
 
     FillPatchIterator fpi(*this,dat,dat.nGrow(),time,State_Type,Xvel,BL_SPACEDIM+2);
     for ( ; fpi.isValid(); ++fpi)
