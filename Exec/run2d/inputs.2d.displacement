@@ -9,7 +9,7 @@ amr.probin_file 		= probin.2d.displacement
 # WHEN SHOULD THE SIMULATION STOP?
 #*******************************************************************************
 # Maximum number of timesteps to be taken, if stop_time is not reached first.
-max_step 			    = 1
+max_step 			    = 500
 # Time at which calculation stops, if max_step is not reached first.
 stop_time 				= 10
 # Stop simulation when we reach steady-state
@@ -50,7 +50,7 @@ ns.scal_diff_coefs   	= 0.0
 
 # Number of cells in each coordinate direction at the coarsest level
 amr.n_cell 			   = 8 4
-amr.max_grid_size	   = 8 
+amr.max_grid_size	   = 16
 
 # Set to 0 if x-y coordinate system, set to 1 if r-z.
 geometry.coord_sys   	=  0
@@ -79,7 +79,7 @@ ns.hi_bc   	         	= 2 5
 #*******************************************************************************
 
 # Maximum level (defaults to 0 for single level calculation)
-amr.max_level		 	= 0 # maximum number of levels of refinement
+amr.max_level		 	= 5 # maximum number of levels of refinement
 # Use the tracer for the refinement criterion
 ns.do_tracer_ref 		= 1
 # Interval (in number of level l timesteps) between regridding
@@ -101,25 +101,25 @@ amr.derive_plot_vars 	= mag_strainrate eff_visc stress avg_pressure gradpx gradp
 
 # Interval (in number of coarse timesteps) between plot files
 amr.plot_file 			= plt
-amr.plot_int			= 1
+amr.plot_int			= 10
 amr.plot_per			= 0.05
 
 # Interval (in number of coarse timesteps) between checkpoint(restart) files
 amr.check_file 			= chk
 amr.check_int			= 100000
 # Continue from checkpoint 
-# amr.restart 			= chk01000
+# amr.restart 			= chk00100
 
 #*******************************************************************************
 # VERBOSITY
 #*******************************************************************************
 
 amr.v 	            	= 1 	# AMR (top-level)
-ns.v  	            	= 1 	# NavierStokes
-diffuse.v 	        	= 1 	# Diffusion
-proj.v 	            	= 1 	# Projection
-cg.v  	            	= 1 	# ConjugateGradient
-mg.v  	            	= 1 	# MultiGrid
+ns.v  	            	= 0 	# NavierStokes
+diffuse.v 	        	= 0 	# Diffusion
+proj.v 	            	= 0 	# Projection
+cg.v  	            	= 0 	# ConjugateGradient
+mg.v  	            	= 0 	# MultiGrid
 
 #*******************************************************************************
 # LINEAR SOLVER SETTINGS
