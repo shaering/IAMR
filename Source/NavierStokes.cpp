@@ -2347,6 +2347,9 @@ NavierStokes::getViscosity (MultiFab* viscosity[BL_SPACEDIM],
     {
         visc_cc = viscnp1_cc;
     }
+
+    if (level > 0)  Extrapolater::FirstOrderExtrap(*visc_cc, geom, 0, visc_cc->nComp());
+
     //
     // Fill edge-centered viscosity
     //
