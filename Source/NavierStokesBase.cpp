@@ -115,7 +115,7 @@ namespace
     bool benchmarking = false;
 }
 
-#ifdef PARTICLES
+#ifdef AMREX_PARTICLES
 namespace
 {
     //
@@ -322,7 +322,7 @@ NavierStokesBase::variableCleanUp ()
     delete mac_projector;
     mac_projector = 0;
 
-#ifdef PARTICLES
+#ifdef AMREX_PARTICLES
     delete NSPC;
     NSPC = 0;
 #endif
@@ -582,7 +582,7 @@ NavierStokesBase::Initialize ()
 
     pp.query("harm_avg_cen2edge", def_harm_avg_cen2edge);
 
-#ifdef PARTICLES
+#ifdef AMREX_PARTICLES
     read_particle_params ();
 #endif
 
@@ -670,8 +670,10 @@ NavierStokesBase::advance_setup (Real time,
     
     umac_n_grow = 1;
     
+#ifdef AMREX_PARTICLES
     if (ncycle >= 1)
         umac_n_grow = ncycle;
+#endif
         
     mac_projector->setup(level);
     //
@@ -888,7 +890,7 @@ NavierStokesBase::checkPoint (const std::string& dir,
 {
     AmrLevel::checkPoint(dir, os, how, dump_old);
 
-#ifdef PARTICLES
+#ifdef AMREX_PARTICLES
     if (level == 0)
     {
         if (NSPC != 0)
@@ -1185,9 +1187,9 @@ NavierStokesBase::create_umac_grown (int nGrow)
         const int*  lo  = dm.loVect();
         const int*  hi  = dm.hiVect();
 
-		// call FillBoundary to make sure that fine/fine grow cells are valid 
-		// before FORT_HOEXTRAPTOCC is called
-		u_mac[n].FillBoundary(geom.periodicity());
+	// call FillBoundary to make sure that fine/fine grow cells are valid
+	// before FORT_HOEXTRAPTOCC is called 
+	u_mac[n].FillBoundary(geom.periodicity());
 
         //
         // HOEXTRAPTOCC isn't threaded.  OMP over calls to it.
@@ -2373,7 +2375,7 @@ NavierStokesBase::manual_tags_placement (TagBoxArray&    tags,
                     
                     /*** Calculate the required number of coarse cells ***/
                     
-                    N_coarse_cells = N_level_cells / bf_lev[i][oDir];
+                    N_coarse_cells = N_level_cells / bf_lev[j][oDir];
                     if (N_level_cells % bf_lev[j][oDir] != 0)
                         N_coarse_cells++;
                     
@@ -2595,7 +2597,7 @@ void
 NavierStokesBase::post_regrid (int lbase,
 			       int new_finest)
 {
-#ifdef PARTICLES
+#ifdef AMREX_PARTICLES
     if (NSPC && level == lbase)
     {
         NSPC->Redistribute(lbase);
@@ -2612,7 +2614,7 @@ NavierStokesBase::post_restart ()
     make_rho_prev_time();
     make_rho_curr_time();
 
-#ifdef PARTICLES
+#ifdef AMREX_PARTICLES
     post_restart_particle ();
 #endif
 }
@@ -2630,7 +2632,7 @@ NavierStokesBase::post_timestep (int crse_iteration)
 {
     const int finest_level = parent->finestLevel();
 
-#ifdef PARTICLES
+#ifdef AMREX_PARTICLES
     post_timestep_particle (crse_iteration);
 #endif
 
@@ -4186,7 +4188,7 @@ NavierStokesBase::sum_jet_quantities ()
 
 #endif  // (BL_SPACEDIM == 3)
 
-#ifdef PARTICLES
+#ifdef AMREX_PARTICLES
 
 void
 NavierStokesBase::read_particle_params ()
@@ -4225,7 +4227,7 @@ NavierStokesBase::read_particle_params ()
     ppp.query("particle_restart_file", particle_restart_file);
     //
     // This must be true the first time you try to restart from a checkpoint
-    // that was written with USE_PARTICLES=FALSE; i.e. one that doesn't have
+    // that was written with AMREX_PARTICLES=FALSE; i.e. one that doesn't have
     // the particle checkpoint stuff (even if there are no active particles).
     // Otherwise the code will fail when trying to read the checkpointed particles.
     //
@@ -4473,4 +4475,4 @@ NavierStokesBase::ParticleDerive (const std::string& name,
     }
 }
 
-#endif  // PARTICLES
+#endif  // AMREX_PARTICLES
