@@ -1437,32 +1437,21 @@ c ::: -----------------------------------------------------------
 c     probtype = DISPLACE
       else if (probtype .eq. 13) then
 
-         hx = dx(1)
-         hy = dx(2)
-
-         ! tag for refinement in centre of domain (4 < x < 6)
-         do j = lo(2), hi(2)
-            do i = lo(1), hi(1)
-               x = xlo(1) + hx*(float(i-lo(1)) + half)
-               tag(i,j) = merge(set, tag(i,j), (x.gt.0.8).and.(x.lt.1.2))
-            end do
-         end do
-
 ! Tag for refinement if nearest neighbours have different
 ! c-value greater than tol. This allows us to tag even when
 ! fluid interface passes directly between two adjacent cells. 
-!         do j = lo(2), hi(2)
-!            do i = lo(1), hi(1)
-!               tag(i,j) = merge(set, tag(i,j),
-!     &                          abs(adv(i,j,1)-adv(i-1,j,1)).gt.adverr)
-!               tag(i,j) = merge(set, tag(i,j),
-!     &                          abs(adv(i,j,1)-adv(i+1,j,1)).gt.adverr)
-!               tag(i,j) = merge(set, tag(i,j),
-!     &                          abs(adv(i,j,1)-adv(i,j-1,1)).gt.adverr)
-!               tag(i,j) = merge(set, tag(i,j),
-!     &                          abs(adv(i,j,1)-adv(i,j+1,1)).gt.adverr)
-!            end do
-!         end do
+         do j = lo(2), hi(2)
+            do i = lo(1), hi(1)
+               tag(i,j) = merge(set, tag(i,j),
+     &                          abs(adv(i,j,1)-adv(i-1,j,1)).gt.adverr)
+               tag(i,j) = merge(set, tag(i,j),
+     &                          abs(adv(i,j,1)-adv(i+1,j,1)).gt.adverr)
+               tag(i,j) = merge(set, tag(i,j),
+     &                          abs(adv(i,j,1)-adv(i,j-1,1)).gt.adverr)
+               tag(i,j) = merge(set, tag(i,j),
+     &                          abs(adv(i,j,1)-adv(i,j+1,1)).gt.adverr)
+            end do
+         end do
 
 c     probtype = DAMBREAK
       else if (probtype .eq. 14) then
