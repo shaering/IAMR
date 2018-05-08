@@ -2057,13 +2057,13 @@ NavierStokes::getViscTerms (MultiFab& visc_terms,
 				else if (whichTime == AmrNewTime)          // time N+1
 					visc_cc = viscnp1_cc;
 
-				amrex::Print() << "========== AFTER GETVISCOSITY ==========\n\n";
+/*				amrex::Print() << "========== AFTER GETVISCOSITY ==========\n\n";
 
 				amrex::Print() << "eff_visc:\n";
 				printMF(*visc_cc,time);
 
 				amrex::Print() << "visc_terms:\n";
-				printMF(visc_terms,time);
+				printMF(visc_terms,time);*/
 			}
 			
             diffusion->getTensorViscTerms(visc_terms,time,viscosity,0);
@@ -2077,13 +2077,13 @@ NavierStokes::getViscTerms (MultiFab& visc_terms,
 				else if (whichTime == AmrNewTime)          // time N+1
 					visc_cc = viscnp1_cc;
 
-				amrex::Print() << "========== AFTER DIFFUSION->GETTENSORVISCTERMS ==========\n\n";
+/*				amrex::Print() << "========== AFTER DIFFUSION->GETTENSORVISCTERMS ==========\n\n";
 
 				amrex::Print() << "eff_visc:\n";
 				printMF(*visc_cc,time);
 
 				amrex::Print() << "visc_terms:\n";
-				printMF(visc_terms,time);
+				printMF(visc_terms,time);*/
 			}
         }
         else
@@ -2168,13 +2168,13 @@ NavierStokes::getViscTerms (MultiFab& visc_terms,
 			else if (whichTime == AmrNewTime)          // time N+1
 				visc_cc = viscnp1_cc;
 
-			amrex::Print() << "========== AFTER FILLBOUNDARY ==========\n\n";
+/*			amrex::Print() << "========== AFTER FILLBOUNDARY ==========\n\n";
 
 			amrex::Print() << "eff_visc:\n";
 			printMF(*visc_cc,time);
 
 			amrex::Print() << "visc_terms:\n";
-			printMF(visc_terms,time);
+			printMF(visc_terms,time);*/
 		}
 
 		Extrapolater::FirstOrderExtrap(visc_terms, geom, 0, ncomp);

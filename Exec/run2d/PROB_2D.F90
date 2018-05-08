@@ -1448,9 +1448,9 @@ c     probtype = DISPLACE
             end do
          end do
 
-         ! Tag for refinement if nearest neighbours have different
-         ! c-value greater than tol. This allows us to tag even when
-         ! fluid interface passes directly between two adjacent cells. 
+! Tag for refinement if nearest neighbours have different
+! c-value greater than tol. This allows us to tag even when
+! fluid interface passes directly between two adjacent cells. 
 !         do j = lo(2), hi(2)
 !            do i = lo(1), hi(1)
 !               tag(i,j) = merge(set, tag(i,j),
@@ -1466,7 +1466,7 @@ c     probtype = DISPLACE
 
 c     probtype = DAMBREAK
       else if (probtype .eq. 14) then
-
+!
 !         hx = dx(1)
 !         hy = dx(2)
 !
@@ -1480,7 +1480,7 @@ c     probtype = DAMBREAK
 !     &                           (y.gt.0.09).and.(y.lt.0.11))
 !            end do
 !         end do
-
+!
 !         ! tag for refinement if |c| < 1-tol OR |c| > tol
 !         do j = lo(2), hi(2)
 !            do i = lo(1), hi(1)
@@ -1488,10 +1488,10 @@ c     probtype = DAMBREAK
 !     &                          abs(adv(i,j,1)-half).lt.(half-adverr))
 !            end do
 !         end do
-
-         ! Tag for refinement if nearest neighbours have different
-         ! c-value greater than tol. This allows us to tag even when
-         ! fluid interface passes directly between two adjacent cells. 
+!
+! Tag for refinement if nearest neighbours have different
+! c-value greater than tol. This allows us to tag even when
+! fluid interface passes directly between two adjacent cells. 
          do j = lo(2), hi(2)
             do i = lo(1), hi(1)
                tag(i,j) = merge(set, tag(i,j),
