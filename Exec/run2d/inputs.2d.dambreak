@@ -17,7 +17,7 @@ ns.do_tracer_ref = 1
 #*******************************************************************************
 
 # Number of cells in each coordinate direction at the coarsest level
-amr.n_cell 		= 64 40
+amr.n_cell 		= 32 20
 amr.max_grid_size	= 16
 
 #*******************************************************************************
@@ -28,7 +28,7 @@ amr.max_level		= 2 # maximum number of levels of refinement
 #*******************************************************************************
 
 # Interval (in number of level l timesteps) between regridding
-amr.regrid_int		= 1 
+amr.regrid_int		= 4
 
 #*******************************************************************************
 
@@ -134,7 +134,7 @@ cg.unstable_criterion 	= 1000000 # Not officially implemented in AMReX
 #*******************************************************************************
 
 # Factor by which grids must be coarsenable.
-amr.blocking_factor     = 8
+amr.blocking_factor     = 4
 
 #*******************************************************************************
 
