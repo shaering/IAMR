@@ -1870,13 +1870,8 @@ c     probtype = LID-DRIVEN CAVITY
       if (probtype .eq. 10) then
         do j = lo(2), hi(2)
            do i = lo(1), hi(1)
-c              tag(i,j) =
-c     &          merge(set,tag(i,j),abs(stress(i,j,1)-tau).lt.stresserr)
-              tag(i,j) =
-     &          merge(set,tag(i,j),abs(domhi(2)-j).lt.8)
-              tag(i,j) =
-     &          merge(set,tag(i,j),
-     &            ((abs(domhi(1)-i).lt.8) .or. (abs(domlo(1)-i).lt.8)) )
+              tag(i,j) = 1
+c     &          merge(set,tag(i,j),stress(i,j,1).lt.(1.1*tau))
            end do
         end do
 
