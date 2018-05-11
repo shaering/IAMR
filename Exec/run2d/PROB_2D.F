@@ -1413,11 +1413,15 @@ c     probtype = RT
 c     probtype = DISPLACE
       else if (probtype .eq. 13) then
 
-! Tag for refinement if nearest neighbours have different
-! c-value greater than tol. This allows us to tag even when
+! Tag for refinement if close to inlet, or if nearest neighbours have
+! different c-value greater than tol. This allows us to tag even when
 ! fluid interface passes directly between two adjacent cells. 
+         hx = dx(1)
          do j = lo(2), hi(2)
             do i = lo(1), hi(1)
+               x = xlo(1) + hx*(float(i-lo(1)) + half)
+               tag(i,j) = merge(set, tag(i,j),
+     &                           (x.lt.0.5))
                tag(i,j) = merge(set, tag(i,j),
      &                          abs(adv(i,j,1)-adv(i-1,j,1)).gt.adverr)
                tag(i,j) = merge(set, tag(i,j),

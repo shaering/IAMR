@@ -35,9 +35,9 @@ ns.vel_visc_coef     	= 1.0
 # Use variable viscosity? If so, dyn_visc_coef replaces viscosity coefficient 
 ns.variable_vel_visc 	= 1
 ns.dyn_visc_coef 		= 10.0 1.0
-ns.yield_stress 	 	= 0.0 0.0 	# Yield stress for viscoplastics
-ns.flow_index 		 	= 1.0 1.0 	# Flow index for power-law dependency
-ns.reg_param 		 	= 0.005 	# Regularisation parameter
+ns.yield_stress 	 	= 0.0 141.4213562373095 	# Yield stress for viscoplastics
+ns.flow_index 		 	= 1.0 1.0 	                # Flow index for power-law dependency
+ns.reg_param 		 	= 0.005 	                # Regularisation parameter
 
 # Forcing term defaults to  rho * abs(gravity) "down"
 ns.gravity           	= 0.0
