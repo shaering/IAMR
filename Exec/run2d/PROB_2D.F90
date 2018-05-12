@@ -1871,11 +1871,12 @@ c ::: -----------------------------------------------------------
 #include <NSCOMM_F.H>
 
 c     probtype = LID-DRIVEN CAVITY
+      tau = tau_in(numflds)
       if (probtype .eq. 10) then
         do j = lo(2), hi(2)
            do i = lo(1), hi(1)
-              tag(i,j) = 1
-c     &          merge(set,tag(i,j),stress(i,j,1).lt.(1.1*tau))
+              tag(i,j) = 
+     &          merge(set,tag(i,j),stress(i,j,1).le.(1.06*tau))
            end do
         end do
 
