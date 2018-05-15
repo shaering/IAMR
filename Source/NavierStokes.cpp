@@ -849,7 +849,7 @@ NavierStokes::velocity_diffusion_update (Real dt)
 
         MultiFab** loc_viscn   = 0;
         MultiFab** loc_viscnp1 = 0;
-	FluxBoxes fb_viscn, fb_viscnp1;
+        FluxBoxes fb_viscn, fb_viscnp1;
 
         if (variable_vel_visc)
         {
@@ -860,12 +860,37 @@ NavierStokes::velocity_diffusion_update (Real dt)
             viscTime = state[State_Type].curTime();
             loc_viscnp1 = fb_viscnp1.define(this);
             getViscosity(loc_viscnp1, viscTime);
+
+            diffuse_velocity_setup(dt, delta_rhs, loc_viscn, loc_viscnp1);
+
+            diffusion->diffuse_velocity(dt,be_cn_theta,get_rho_half_time(),rho_flag,
+                                        delta_rhs,loc_viscn,loc_viscnp1);
+
+            /* 
+            At this point, we have found an intermediate u* using an explicit computation of the
+            apparent viscosity based on u^n. In order to obtain a semi-implicit treatment of the
+            viscous coefficients, we re-calculate the curTime() viscosity and perform a second
+            viscous solve.
+            
+            For calcViscosity, we need: int iteration, int ncycle.  
+            Not available in velocity_update ==> need to pass down
+            TODO: implement:
+            calcViscosity(viscTime, dt, -1, -1);
+            getViscosity(loc_viscnp1, viscTime);
+ 
+            diffuse_velocity_setup(dt, delta_rhs, loc_viscn, loc_viscnp1);
+ 
+            diffusion->diffuse_velocity(dt,be_cn_theta,get_rho_half_time(),rho_flag,
+                                        delta_rhs,loc_viscn,loc_viscnp1);
+            */
         }
+        else
+        {
+            diffuse_velocity_setup(dt, delta_rhs, loc_viscn, loc_viscnp1);
 
-        diffuse_velocity_setup(dt, delta_rhs, loc_viscn, loc_viscnp1);
-
-        diffusion->diffuse_velocity(dt,be_cn_theta,get_rho_half_time(),rho_flag,
-                                    delta_rhs,loc_viscn,loc_viscnp1);
+            diffusion->diffuse_velocity(dt,be_cn_theta,get_rho_half_time(),rho_flag,
+                                        delta_rhs,loc_viscn,loc_viscnp1);
+        }
 
         delete delta_rhs;
     }
