@@ -211,7 +211,7 @@ NavierStokes::initData ()
     is_first_step_after_regrid = false;
     old_intersect_new          = grids;
 
-#ifdef PARTICLES
+#ifdef AMREX_PARTICLES
     initParticleData ();
 #endif
 }
@@ -364,8 +364,8 @@ NavierStokes::advance (Real time,
            p_avg.setVal(0);
     }
 
-#ifdef PARTICLES
-    if (theNSPC() != 0)
+#ifdef AMREX_PARTICLES
+    if (theNSPC() != 0 and NavierStokes::initial_iter != true)
     {
         theNSPC()->AdvectWithUmac(u_mac, level, dt);
     }
@@ -852,8 +852,8 @@ NavierStokes:: calcHerschelBulkley  (MultiFab& visc, Real time)
 
     const Real* dx     = geom.CellSize();
 
-    Array<int> vel_bc;
-    Array<int> ind_bc;
+    Vector<int> vel_bc;
+    Vector<int> ind_bc;
 
     FillPatchIterator fpi(*this,dat,dat.nGrow(),time,State_Type,Xvel,BL_SPACEDIM+2);
     for ( ; fpi.isValid(); ++fpi)
@@ -877,6 +877,37 @@ NavierStokes:: calcHerschelBulkley  (MultiFab& visc, Real time)
                	    		 fabdat,  ARLIM(dat_lo),  ARLIM(dat_hi),
                	    		 lo, hi, domlo, domhi, dx, 
                                  vel_bc.dataPtr());
+    }
+}
+
+void 
+NavierStokes::printMF(MultiFab& mf, Real time)
+{
+    BL_PROFILE("NavierStokes::printMF()");
+
+    MultiFab& dat = get_new_data(State_Type);
+
+    const int *domlo   = geom.Domain().loVect();
+    const int *domhi   = geom.Domain().hiVect();
+
+    const Real* dx     = geom.CellSize();
+
+    Vector<int> bc;
+
+    FillPatchIterator fpi(*this,dat,dat.nGrow(),time,State_Type,Xvel,BL_SPACEDIM+2);
+    for ( ; fpi.isValid(); ++fpi)
+    {
+       const int  i    = fpi.index();
+       const Box&  bx  = grids[i];
+       const int*  lo  = bx.loVect();
+       const int*  hi  = bx.hiVect();
+
+       Real *mfdat      = mf[i].dataPtr();
+       const int *mf_lo = mf[i].loVect();
+       const int *mf_hi = mf[i].hiVect();
+
+	   PRINT_MULTIFAB(mfdat, ARLIM(mf_lo), ARLIM(mf_hi), 
+					  lo, hi, domlo, domhi, dx);
     }
 }
 
@@ -1382,7 +1413,7 @@ NavierStokes::derive (const std::string& name,
                       Real               time,
                       int                ngrow)
 {
-#ifdef PARTICLES
+#ifdef AMREX_PARTICLES
     return ParticleDerive(name, time, ngrow);
 #else
     return AmrLevel::derive(name, time, ngrow);
@@ -1395,7 +1426,7 @@ NavierStokes::derive (const std::string& name,
                       MultiFab&          mf,
                       int                dcomp)
 {
-#ifdef PARTICLES
+#ifdef AMREX_PARTICLES
         ParticleDerive(name,time,mf,dcomp);
 #else
         AmrLevel::derive(name,time,mf,dcomp);
@@ -2065,7 +2096,9 @@ NavierStokes::getViscTerms (MultiFab& visc_terms,
         {
             viscosity = fb.define(this);
             getViscosity(viscosity, time);
+
             diffusion->getTensorViscTerms(visc_terms,time,viscosity,0);
+
         }
         else
         {
@@ -2120,7 +2153,7 @@ NavierStokes::getViscTerms (MultiFab& visc_terms,
 
                 if (variable_scal_diff)
                 {
-		    cmp_diffn = fb.define(this);
+					cmp_diffn = fb.define(this);
                     getDiffusivity(cmp_diffn, time, icomp, 0, 1);
                 }
 
@@ -2138,8 +2171,10 @@ NavierStokes::getViscTerms (MultiFab& visc_terms,
     //    
     if (diffusive && nGrow > 0)
     {
-	visc_terms.FillBoundary(0, ncomp, geom.periodicity());
-	Extrapolater::FirstOrderExtrap(visc_terms, geom, 0, ncomp);
+		visc_terms.FillBoundary(0, ncomp, geom.periodicity());
+
+		Extrapolater::FirstOrderExtrap(visc_terms, geom, 0, ncomp);
+
     }
 }
 
@@ -2281,6 +2316,9 @@ NavierStokes::getViscosity (MultiFab* viscosity[BL_SPACEDIM],
     {
         visc_cc = viscnp1_cc;
     }
+
+    if (level > 0)  Extrapolater::FirstOrderExtrap(*visc_cc, geom, 0, visc_cc->nComp());
+
     //
     // Fill edge-centered viscosity
     //

@@ -938,11 +938,11 @@ c
             x = xlo(1) + hx*(float(i-lo(1)) + half)
             vel(i,j,1) = zero
             vel(i,j,2) = zero
-            if (x .lt. one .and. y. lt. one) then
-               scal(i,j,1) = one
+            if (x .lt. 0.1d0 .and. y. lt. 0.1d0) then
+               scal(i,j,1) = 997.0d0
                scal(i,j,2) = one
             else
-               scal(i,j,1) = one / 1000.0d0
+               scal(i,j,1) = 1.225d0
                scal(i,j,2) = zero
             endif
          end do
@@ -1410,12 +1410,67 @@ c     probtype = RT
            end do
         end do
 
-c     probtype = DAMBREAK
-      else if (probtype .eq. 14) then
+c     probtype = DISPLACE
+      else if (probtype .eq. 13) then
 
+! Tag for refinement if close to inlet, or if nearest neighbours have
+! different c-value greater than tol. This allows us to tag even when
+! fluid interface passes directly between two adjacent cells. 
+         hx = dx(1)
          do j = lo(2), hi(2)
             do i = lo(1), hi(1)
-               tag(i,j) = merge(set,tag(i,j),abs(adv(i,j,1)-half).lt.adverr)
+               x = xlo(1) + hx*(float(i-lo(1)) + half)
+               tag(i,j) = merge(set, tag(i,j),
+     &                           (x.lt.0.5))
+               tag(i,j) = merge(set, tag(i,j),
+     &                          abs(adv(i,j,1)-adv(i-1,j,1)).gt.adverr)
+               tag(i,j) = merge(set, tag(i,j),
+     &                          abs(adv(i,j,1)-adv(i+1,j,1)).gt.adverr)
+               tag(i,j) = merge(set, tag(i,j),
+     &                          abs(adv(i,j,1)-adv(i,j-1,1)).gt.adverr)
+               tag(i,j) = merge(set, tag(i,j),
+     &                          abs(adv(i,j,1)-adv(i,j+1,1)).gt.adverr)
+            end do
+         end do
+
+c     probtype = DAMBREAK
+      else if (probtype .eq. 14) then
+!
+!         hx = dx(1)
+!         hy = dx(2)
+!
+!         do j = lo(2), hi(2)
+!            y = xlo(2) + hy*(float(j-lo(2)) + half)
+!            do i = lo(1), hi(1)
+!               x = xlo(1) + hx*(float(i-lo(1)) + half)
+!                tag(i,j) = merge(set, tag(i,j),
+!     &                           (x.gt.0.09).and.(x.lt.0.11))
+!                tag(i,j) = merge(set, tag(i,j),
+!     &                           (y.gt.0.09).and.(y.lt.0.11))
+!            end do
+!         end do
+!
+!         ! tag for refinement if |c| < 1-tol OR |c| > tol
+!         do j = lo(2), hi(2)
+!            do i = lo(1), hi(1)
+!               tag(i,j) = merge(set, tag(i,j),
+!     &                          abs(adv(i,j,1)-half).lt.(half-adverr))
+!            end do
+!         end do
+!
+! Tag for refinement if nearest neighbours have different
+! c-value greater than tol. This allows us to tag even when
+! fluid interface passes directly between two adjacent cells. 
+         do j = lo(2), hi(2)
+            do i = lo(1), hi(1)
+               tag(i,j) = merge(set, tag(i,j),
+     &                          abs(adv(i,j,1)-adv(i-1,j,1)).gt.adverr)
+               tag(i,j) = merge(set, tag(i,j),
+     &                          abs(adv(i,j,1)-adv(i+1,j,1)).gt.adverr)
+               tag(i,j) = merge(set, tag(i,j),
+     &                          abs(adv(i,j,1)-adv(i,j-1,1)).gt.adverr)
+               tag(i,j) = merge(set, tag(i,j),
+     &                          abs(adv(i,j,1)-adv(i,j+1,1)).gt.adverr)
             end do
          end do
 
@@ -1790,16 +1845,12 @@ c ::: -----------------------------------------------------------
 #include <NSCOMM_F.H>
 
 c     probtype = LID-DRIVEN CAVITY
+      tau = tau_in(numflds)
       if (probtype .eq. 10) then
         do j = lo(2), hi(2)
            do i = lo(1), hi(1)
-c              tag(i,j) =
-c     &          merge(set,tag(i,j),abs(stress(i,j,1)-tau).lt.stresserr)
-c              tag(i,j) =
-c     &          merge(set,tag(i,j),abs(domhi(2)-j).lt.16)
-c              tag(i,j) =
-c     &          merge(set,tag(i,j),
-c     &            ((abs(domhi(1)-i).lt.8) .or. (abs(domlo(1)-i).lt.8)) )
+              tag(i,j) = 
+     &          merge(set,tag(i,j),stress(i,j,1).le.((1.0d0+stresserr)*tau))
            end do
         end do
 

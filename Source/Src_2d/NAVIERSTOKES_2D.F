@@ -660,3 +660,41 @@ c
 #     undef UHIY
 
       end
+
+
+      subroutine PRINT_MULTIFAB(dat, DIMS(dat),
+     &                          lo, hi, domlo, domhi, delta)
+      implicit none
+c
+c ::: This routine will print the contents of a multifab in each cell of
+c ::: the domain.
+c
+      integer    lo(2), hi(2)
+      integer    DIMDEC(dat)
+      integer    domlo(2), domhi(2)
+      REAL_T     delta(2)
+      REAL_T     dat(DIMV(dat),1)
+
+      integer   i, j
+      REAL_T    x, y, dx, dy
+
+      dx = delta(1)
+      dy = delta(2)
+
+      print*,'x   y   mf'      
+      do j = lo(2)-1, hi(2)+1
+         do i = lo(1)-1, hi(1)+1
+            x = domlo(1) + dx * (float(i) + half)
+            y = domlo(2) + dy * (float(j) + half)
+            print*,x,y,dat(i,j,1)
+         end do
+      end do
+
+#     undef U
+#     undef V      
+#     undef VLOX
+#     undef VHIX
+#     undef ULOY
+#     undef UHIY
+
+      end

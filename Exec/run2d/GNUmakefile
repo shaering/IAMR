@@ -11,7 +11,7 @@ TOP = ../..
 PRECISION   = DOUBLE
 
 DIM         = 2
-COMP        = intel
+COMP        = gnu
 DEBUG       = FALSE
 USE_MPI     = TRUE
 USE_OMP     = FALSE
