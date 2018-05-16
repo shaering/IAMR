@@ -271,7 +271,18 @@ NavierStokes::advance (Real time,
 		     << " : starting time = "       << time
 		     << " with dt = "               << dt << '\n';
     }
+
     advance_setup(time,dt,iteration,ncycle);
+
+    MultiFab&  S_old     = get_old_data(State_Type);
+    MultiFab&  S_new     = get_new_data(State_Type);
+    int sigma = BL_SPACEDIM+1;
+    amrex::Print() << "At beginning of advance: \n";
+    amrex::Print() << "S_old comp " << sigma << " min = " << S_old.min(sigma) << "\n";
+    amrex::Print() << "S_old comp " << sigma << " max = " << S_old.max(sigma) << "\n";
+    amrex::Print() << "S_new comp " << sigma << " min = " << S_new.min(sigma) << "\n";
+    amrex::Print() << "S_new comp " << sigma << " max = " << S_new.max(sigma) << "\n";
+
     //
     // Compute traced states for normal comp of velocity at half time level.
     //
@@ -329,6 +340,13 @@ NavierStokes::advance (Real time,
 #else
     scalar_update(dt,first_scalar+1,last_scalar);
 #endif
+
+    amrex::Print() << "After scalar_update: \n";
+    amrex::Print() << "S_old comp " << sigma << " min = " << S_old.min(sigma) << "\n";
+    amrex::Print() << "S_old comp " << sigma << " max = " << S_old.max(sigma) << "\n";
+    amrex::Print() << "S_new comp " << sigma << " min = " << S_new.min(sigma) << "\n";
+    amrex::Print() << "S_new comp " << sigma << " max = " << S_new.max(sigma) << "\n";
+
     //
     // S appears in rhs of the velocity update, so we better do it now.
     //
@@ -375,6 +393,12 @@ NavierStokes::advance (Real time,
     // Estimate new timestep from umac cfl.
     //
     advance_cleanup(iteration,ncycle);
+
+    amrex::Print() << "At end of advance: \n";
+    amrex::Print() << "S_old comp " << sigma << " min = " << S_old.min(sigma) << "\n";
+    amrex::Print() << "S_old comp " << sigma << " max = " << S_old.max(sigma) << "\n";
+    amrex::Print() << "S_new comp " << sigma << " min = " << S_new.min(sigma) << "\n";
+    amrex::Print() << "S_new comp " << sigma << " max = " << S_new.max(sigma) << "\n";
 
     return dt_test;  // Return estimate of best new timestep.
 }

@@ -2992,6 +2992,7 @@ NavierStokesBase::scalar_advection_update (Real dt,
     //
     if ( do_scalminmax && (sComp <= last_scalar) )
     {
+        amrex::Print() << "Calling ScalMinMax at level " << level << ".\n";
         const int num_scalars = last_scalar - Density + 1;
         //
         // Must do FillPatch here instead of MF iterator because we need the

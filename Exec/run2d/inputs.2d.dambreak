@@ -9,7 +9,7 @@ amr.probin_file 		= probin.2d.dambreak
 # WHEN SHOULD THE SIMULATION STOP?
 #*******************************************************************************
 # Maximum number of timesteps to be taken, if stop_time is not reached first.
-max_step 			    = 1000
+max_step 			    = 3
 # Time at which calculation stops, if max_step is not reached first.
 stop_time 				= -1
 # Stop simulation when we reach steady-state
@@ -43,6 +43,8 @@ ns.reg_param 		 	= 0.0025	    # Regularisation parameter
 ns.gravity           	= -9.81
 # Diffusion coefficient for first scalar
 ns.scal_diff_coefs   	= 0.0
+# Avoid overshoots in scalars (default: 0)
+ns.do_scalminmax   	    = 1
 
 #*******************************************************************************
 # GRID AND GEOMETRY
@@ -79,7 +81,7 @@ ns.hi_bc   	         	= 5 5
 #*******************************************************************************
 
 # Maximum level (defaults to 0 for single level calculation)
-amr.max_level		 	= 0 # maximum number of levels of refinement
+amr.max_level		 	= 1 # maximum number of levels of refinement
 # Use the tracer for the refinement criterion
 ns.do_tracer_ref 		= 1
 # Interval (in number of level l timesteps) between regridding
@@ -100,8 +102,8 @@ amr.plot_vars    		= ALL
 amr.derive_plot_vars 	= mag_strainrate eff_visc stress avg_pressure gradpx gradpy
 
 # Interval (in number of coarse timesteps) between plot files
-amr.plot_file 			= plt
-#amr.plot_int			= 1
+#amr.plot_file 			= plt
+amr.plot_int			= 1
 amr.plot_per			= 0.01
 
 # Interval (in number of coarse timesteps) between checkpoint(restart) files

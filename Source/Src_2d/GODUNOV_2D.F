@@ -3935,6 +3935,17 @@ c
          end do
       end do
 
+c
+c     Restrict scalar to [0,1]
+c
+      do j = jmin-1, jmax+1         
+         do i = imin-1, imax+1
+            s(i,j) = max(s(i,j),0.0d0)
+            s(i,j) = min(s(i,j),1.0d0)
+            sn(i,j) = max(sn(i,j),0.0d0)
+            sn(i,j) = min(sn(i,j),1.0d0)
+         end do
+      end do
       end
 
       subroutine FORT_CONSSCALMINMAX(s,sn,rho,rhon,DIMS(s),lo,hi,bc)
