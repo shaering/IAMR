@@ -9,7 +9,7 @@ amr.probin_file 		= probin.2d.dambreak
 # WHEN SHOULD THE SIMULATION STOP?
 #*******************************************************************************
 # Maximum number of timesteps to be taken, if stop_time is not reached first.
-max_step 			    = 3
+max_step 			    = 1000
 # Time at which calculation stops, if max_step is not reached first.
 stop_time 				= -1
 # Stop simulation when we reach steady-state
@@ -20,7 +20,7 @@ ns.steady_tol 		    = 1.0e-5
 # CFL 
 #*******************************************************************************
 
-ns.cfl  		     	= 0.09 # CFL number used to set dt
+ns.cfl  		     	= 0.9 # CFL number used to set dt
 ns.init_shrink       	= 0.3  # factor which multiplies the very first time step
 ns.change_max 	      	= 1.1  # maximum change for dt (NOTE: does not seem to be implemented)
 ns.init_iter 	      	= 3    # number of initial iterations
@@ -44,6 +44,7 @@ ns.gravity           	= -9.81
 # Diffusion coefficient for first scalar
 ns.scal_diff_coefs   	= 0.0
 # Avoid overshoots in scalars (default: 0)
+ns.do_denminmax   	    = 1
 ns.do_scalminmax   	    = 1
 
 #*******************************************************************************
@@ -103,7 +104,7 @@ amr.derive_plot_vars 	= mag_strainrate eff_visc stress avg_pressure gradpx gradp
 
 # Interval (in number of coarse timesteps) between plot files
 #amr.plot_file 			= plt
-amr.plot_int			= 1
+#amr.plot_int			= 1
 amr.plot_per			= 0.01
 
 # Interval (in number of coarse timesteps) between checkpoint(restart) files
@@ -117,7 +118,7 @@ amr.check_int			= 10000
 #*******************************************************************************
 
 amr.v 	            	= 1 	# AMR (top-level)
-ns.v  	            	= 0 	# NavierStokes
+ns.v  	            	= 1 	# NavierStokes
 diffuse.v 	        	= 0 	# Diffusion
 proj.v 	            	= 0 	# Projection
 cg.v  	            	= 0 	# ConjugateGradient
