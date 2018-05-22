@@ -653,10 +653,15 @@ c
 
 #     undef U
 #     undef V      
+#     undef L
+#     undef ULOX
+#     undef UHIX
 #     undef VLOX
 #     undef VHIX
 #     undef ULOY
 #     undef UHIY
+#     undef VLOY
+#     undef VHIY
 
       end
 
@@ -688,12 +693,5 @@ c
             print*,x,y,dat(i,j,1)
          end do
       end do
-
-#     undef U
-#     undef V      
-#     undef VLOX
-#     undef VHIX
-#     undef ULOY
-#     undef UHIY
 
       end
