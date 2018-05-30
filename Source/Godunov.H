@@ -202,6 +202,10 @@ public:      // public access functions
                                int ind_old, int ind_new,
                                const int *bc, const amrex::Box &grd );
 
+    // restrict a scalar to the interval [0,1]
+    void ScalRestrict        ( amrex::FArrayBox &S, int ind, 
+                               const int *bc, const amrex::Box &grd );
+
     // =============================================================
     // Diagnostic functions follow
     // =============================================================

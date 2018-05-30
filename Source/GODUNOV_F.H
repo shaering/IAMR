@@ -15,6 +15,7 @@
 #    define FORT_SYNC_ADV_FORCING   syncadvforcing
 #    define FORT_CONSSCALMINMAX     consscalminmax
 #    define FORT_CONVSCALMINMAX     convscalminmax
+#    define FORT_SCALRESTRICT       scalrestrict
 #    define FORT_UPDATE_TF          updatetf
 #    define FORT_CORRECT_TF         correcttf
 #    define FORT_UPDATE_AOFS_TF     updateaofstf
@@ -38,6 +39,7 @@
 #    define FORT_SYNC_ADV_FORCING   SYNCADVFORCING   
 #    define FORT_CONSSCALMINMAX     CONSSCALMINMAX
 #    define FORT_CONVSCALMINMAX     CONVSCALMINMAX
+#    define FORT_SCALRESTRICT       SCALRESTRICT
 #    define FORT_UPDATE_TF          UPDATETF 
 #    define FORT_CORRECT_TF         CORRECTTF 
 #    define FORT_UPDATE_AOFS_TF     UPDATEAOFSTF 
@@ -60,6 +62,7 @@
 #    define FORT_SYNC_ADV_FORCING   syncadvforcing
 #    define FORT_CONSSCALMINMAX     consscalminmax
 #    define FORT_CONVSCALMINMAX     convscalminmax
+#    define FORT_SCALRESTRICT       scalrestrict
 #    define FORT_UPDATE_TF          updatetf
 #    define FORT_CORRECT_TF         correcttf
 #    define FORT_UPDATE_AOFS_TF     updateaofstf
@@ -82,6 +85,7 @@
 #    define FORT_SYNC_ADV_FORCING   syncadvforcing_
 #    define FORT_CONSSCALMINMAX     consscalminmax_
 #    define FORT_CONVSCALMINMAX     convscalminmax_
+#    define FORT_SCALRESTRICT       scalrestrict_
 #    define FORT_UPDATE_TF          updatetf_
 #    define FORT_CORRECT_TF         correcttf_
 #    define FORT_UPDATE_AOFS_TF     updateaofstf_
@@ -306,6 +310,14 @@ extern "C"
 
    void FORT_CONSSCALMINMAX (const amrex::Real* Sold_dat, const amrex::Real* Snew_dat, 
 			     const amrex::Real*  Rho_dat, const amrex::Real* Rhon_dat,
+                             ARLIM_P(slo), ARLIM_P(shi),
+#if (BL_SPACEDIM == 3)
+			     const amrex::Real* smin_dat, const amrex::Real* smax_dat,
+			     ARLIM_P(lo),ARLIM_P(hi),
+#endif
+			     const int* lo, const int* hi, const int* bc);
+
+   void FORT_SCALRESTRICT   (const amrex::Real* S_dat, 
                              ARLIM_P(slo), ARLIM_P(shi),
 #if (BL_SPACEDIM == 3)
 			     const amrex::Real* smin_dat, const amrex::Real* smax_dat,

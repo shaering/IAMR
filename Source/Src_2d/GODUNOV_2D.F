@@ -3934,18 +3934,6 @@ c
             sn(i,j) = min(sn(i,j),smax)
          end do
       end do
-
-c
-c     Restrict scalar to [0,1]
-c
-      do j = jmin-1, jmax+1         
-         do i = imin-1, imax+1
-            s(i,j) = max(s(i,j),0.0d0)
-            s(i,j) = min(s(i,j),1.0d0)
-            sn(i,j) = max(sn(i,j),0.0d0)
-            sn(i,j) = min(sn(i,j),1.0d0)
-         end do
-      end do
       end
 
       subroutine FORT_CONSSCALMINMAX(s,sn,rho,rhon,DIMS(s),lo,hi,bc)
@@ -4031,6 +4019,58 @@ c
          end do
       end do
 
+      end
+
+      subroutine FORT_SCALRESTRICT(s,DIMS(s),lo,hi,bc)
+c
+c     Restrict scalar to the interval [0,1]
+c
+      implicit none
+      integer DIMDEC(s)
+      integer lo(SDIM), hi(SDIM)
+      integer bc(SDIM,2)
+      REAL_T s(DIMV(s))
+      integer  i, j, imin, imax, jmin, jmax
+
+      imin = lo(1)
+      imax = hi(1)
+      jmin = lo(2)
+      jmax = hi(2)
+c
+c     set corner values for s
+c
+c     :: corner ilo, jlo
+c
+      if (bc(1,1).ne.INT_DIR .or. bc(2,1).ne.INT_DIR) then
+         s(imin-1,jmin-1) = s(imin,jmin)
+      end if
+c
+c     :: corner ihi, jlo
+c
+      if (bc(1,2).ne.INT_DIR .or. bc(2,1).ne.INT_DIR) then
+         s(imax+1,jmin-1) = s(imax,jmin)
+      end if
+c
+c     :: corner ilo, jhi
+c
+      if (bc(1,1).ne.INT_DIR .or. bc(2,2).ne.INT_DIR) then
+         s(imin-1,jmax+1) = s(imin,jmax)
+      end if
+c
+c     :: corner ihi, jhi
+c
+      if (bc(1,2).ne.INT_DIR .or. bc(2,2).ne.INT_DIR) then
+         s(imax+1,jmax+1) = s(imax,jmax)
+      end if
+c
+c     Restrict scalar to [0,1]
+c
+      do j = jmin-1, jmax+1         
+         do i = imin-1, imax+1
+            s(i,j) = max(s(i,j),0.0d0)
+            s(i,j) = min(s(i,j),1.0d0)
+         end do
+      end do
       end
 
       subroutine FORT_SUM_TF_GP(

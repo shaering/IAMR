@@ -274,14 +274,38 @@ NavierStokes::advance (Real time,
 
     advance_setup(time,dt,iteration,ncycle);
 
-    MultiFab&  S_old     = get_old_data(State_Type);
-    MultiFab&  S_new     = get_new_data(State_Type);
-    int sigma = BL_SPACEDIM+1;
-    amrex::Print() << "At beginning of advance: \n";
-    amrex::Print() << "S_old comp " << sigma << " min = " << S_old.min(sigma) << "\n";
-    amrex::Print() << "S_old comp " << sigma << " max = " << S_old.max(sigma) << "\n";
-    amrex::Print() << "S_new comp " << sigma << " min = " << S_new.min(sigma) << "\n";
-    amrex::Print() << "S_new comp " << sigma << " max = " << S_new.max(sigma) << "\n";
+    //
+    // Call ScalRestrict to ensure scalar is in the interval [0,1].
+    //
+    if ( do_scalrestrict )
+    {
+        amrex::Print() << "Calling ScalRestrict at level " << level << ".\n";
+
+	MultiFab&  S_old     = get_old_data(State_Type);
+	MultiFab&  S_new     = get_new_data(State_Type);
+	int sigma = BL_SPACEDIM+1;
+	const Real  prev_time      = state[State_Type].prevTime();
+
+        //
+        // Must do FillPatch here instead of MF iterator because we need the
+        // boundary values in the old data (especially at inflow).
+        //
+        for (FillPatchIterator S_fpi(*this,S_old,1,prev_time,State_Type,Density,NUM_SCALARS);
+             S_fpi.isValid();
+             ++S_fpi)
+        {
+            const int i = S_fpi.index();
+	    const int index_s   = sigma;
+	    Vector <int> state_bc = getBCArray(State_Type,i,sigma,1);
+	    godunov->ScalRestrict(S_fpi(),index_s,state_bc.dataPtr(),grids[i]);
+        }
+
+        amrex::Print() << "At beginning of advance: \n";
+        amrex::Print() << "S_old comp " << sigma << " min = " << S_old.min(sigma) << "\n";
+        amrex::Print() << "S_old comp " << sigma << " max = " << S_old.max(sigma) << "\n";
+        amrex::Print() << "S_new comp " << sigma << " min = " << S_new.min(sigma) << "\n";
+        amrex::Print() << "S_new comp " << sigma << " max = " << S_new.max(sigma) << "\n";
+    }
 
     //
     // Compute traced states for normal comp of velocity at half time level.
@@ -341,11 +365,36 @@ NavierStokes::advance (Real time,
     scalar_update(dt,first_scalar+1,last_scalar);
 #endif
 
-    amrex::Print() << "After scalar_update: \n";
-    amrex::Print() << "S_old comp " << sigma << " min = " << S_old.min(sigma) << "\n";
-    amrex::Print() << "S_old comp " << sigma << " max = " << S_old.max(sigma) << "\n";
-    amrex::Print() << "S_new comp " << sigma << " min = " << S_new.min(sigma) << "\n";
-    amrex::Print() << "S_new comp " << sigma << " max = " << S_new.max(sigma) << "\n";
+    //
+    // Call ScalRestrict to ensure scalar is in the interval [0,1].
+    //
+    if ( do_scalrestrict )
+    {
+        amrex::Print() << "Calling ScalRestrict at level " << level << ".\n";
+
+	MultiFab&  S_old     = get_old_data(State_Type);
+	MultiFab&  S_new     = get_new_data(State_Type);
+	int sigma = BL_SPACEDIM+1;
+	const Real  curr_time      = state[State_Type].curTime();
+        //
+        // Must do FillPatch here instead of MF iterator because we need the
+        // boundary values in the old data (especially at inflow).
+        //
+        for (FillPatchIterator S_fpi(*this,S_new,1,curr_time,State_Type,Density,NUM_SCALARS);
+             S_fpi.isValid();
+             ++S_fpi)
+        {
+            const int i = S_fpi.index();
+	    const int index_s   = sigma;
+	    Vector<int> state_bc = getBCArray(State_Type,i,sigma,1);
+	    godunov->ScalRestrict(S_fpi(),index_s,state_bc.dataPtr(),grids[i]);
+        }
+        amrex::Print() << "After scalar_update: \n";
+        amrex::Print() << "S_old comp " << sigma << " min = " << S_old.min(sigma) << "\n";
+        amrex::Print() << "S_old comp " << sigma << " max = " << S_old.max(sigma) << "\n";
+        amrex::Print() << "S_new comp " << sigma << " min = " << S_new.min(sigma) << "\n";
+        amrex::Print() << "S_new comp " << sigma << " max = " << S_new.max(sigma) << "\n";
+    }
 
     //
     // S appears in rhs of the velocity update, so we better do it now.
@@ -393,12 +442,6 @@ NavierStokes::advance (Real time,
     // Estimate new timestep from umac cfl.
     //
     advance_cleanup(iteration,ncycle);
-
-    amrex::Print() << "At end of advance: \n";
-    amrex::Print() << "S_old comp " << sigma << " min = " << S_old.min(sigma) << "\n";
-    amrex::Print() << "S_old comp " << sigma << " max = " << S_old.max(sigma) << "\n";
-    amrex::Print() << "S_new comp " << sigma << " min = " << S_new.min(sigma) << "\n";
-    amrex::Print() << "S_new comp " << sigma << " max = " << S_new.max(sigma) << "\n";
 
     return dt_test;  // Return estimate of best new timestep.
 }

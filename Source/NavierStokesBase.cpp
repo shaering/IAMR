@@ -72,6 +72,7 @@ int         NavierStokesBase::do_derefine_outflow       = 1;
 int         NavierStokesBase::Nbuf_outflow              = 1;  
 int         NavierStokesBase::do_denminmax              = 0;  
 int         NavierStokesBase::do_scalminmax             = 0; 
+int         NavierStokesBase::do_scalrestrict           = 0; 
 int         NavierStokesBase::do_density_ref            = 0;
 int         NavierStokesBase::do_tracer_ref             = 0;
 int         NavierStokesBase::do_tracer2_ref            = 0;
@@ -440,6 +441,7 @@ NavierStokesBase::Initialize ()
     pp.query("do_divu_sync",             do_divu_sync     );
     pp.query("do_denminmax",             do_denminmax     );
     pp.query("do_scalminmax",            do_scalminmax    );
+    pp.query("do_scalrestrict",          do_scalrestrict  );
     pp.query("do_density_ref",           do_density_ref   );
     pp.query("do_tracer_ref",            do_tracer_ref    );
     pp.query("do_tracer2_ref",           do_tracer2_ref   );
