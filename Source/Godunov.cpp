@@ -1177,22 +1177,8 @@ Godunov::ScalRestrict (FArrayBox& S,
     const int *hi         = grd.hiVect();
     const Real *S_dat  = S.dataPtr(ind);
 
-#if (BL_SPACEDIM == 3)
-    Box flatbox(grd);
-    int zlen = flatbox.length(BL_SPACEDIM-1);
-    flatbox.growHi(BL_SPACEDIM-1,3-zlen);
-    FArrayBox smin(flatbox,1);
-    FArrayBox smax(flatbox,1);
-    const Real *smin_dat = smin.dataPtr();
-    const Real *smax_dat = smax.dataPtr(); 
-#endif
-
     FORT_SCALRESTRICT   (S_dat, 
                          ARLIM(slo), ARLIM(shi),
-#if (BL_SPACEDIM == 3)
-                         smin_dat, smax_dat,
-                         ARLIM(lo), ARLIM(hi),
-#endif
                          lo, hi, bc);
 }
 

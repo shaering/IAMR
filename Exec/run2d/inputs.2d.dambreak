@@ -11,7 +11,7 @@ amr.probin_file 		= probin.2d.dambreak
 # Maximum number of timesteps to be taken, if stop_time is not reached first.
 max_step 			    = 1000
 # Time at which calculation stops, if max_step is not reached first.
-stop_time 				= -1
+stop_time 				= 0.1
 # Stop simulation when we reach steady-state
 ns.stop_when_steady  	= 0
 ns.steady_tol 		    = 1.0e-5
@@ -84,7 +84,7 @@ ns.hi_bc   	         	= 5 5
 #*******************************************************************************
 
 # Maximum level (defaults to 0 for single level calculation)
-amr.max_level		 	= 0 # maximum number of levels of refinement
+amr.max_level		 	= 1 # maximum number of levels of refinement
 # Use the tracer for the refinement criterion
 ns.do_tracer_ref 		= 1
 # Interval (in number of level l timesteps) between regridding
@@ -106,8 +106,8 @@ amr.derive_plot_vars 	= mag_strainrate eff_visc stress avg_pressure gradpx gradp
 
 # Interval (in number of coarse timesteps) between plot files
 #amr.plot_file 			= plt
-#amr.plot_int			= 1
-amr.plot_per			= 0.01
+amr.plot_int			= 1
+#amr.plot_per			= 0.01
 
 # Interval (in number of coarse timesteps) between checkpoint(restart) files
 amr.check_file 			= chk
