@@ -148,6 +148,8 @@ protected:
     //
     virtual void sum_integrated_quantities () override;
     //
+    virtual void compute_fctCount() override;
+    //
     virtual void velocity_diffusion_update (amrex::Real dt) override;
 
     ////////////////////////////////////////////////////////////////////////////

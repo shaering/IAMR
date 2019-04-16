@@ -491,6 +491,8 @@ protected:
     //
     virtual void sum_integrated_quantities () = 0;
 
+    virtual void compute_fctCount () = 0;
+
     virtual void velocity_diffusion_update (amrex::Real dt) = 0;
 
     ////////////////////////////////////////////////////////////////////////////
@@ -722,6 +724,8 @@ protected:
     static int  do_scalar_update_in_order;  // Flags to allow evaluation of source terms
     static amrex::Vector<int> scalarUpdateOrder;
     static int  getForceVerbose;            // Does exactly what it says on the tin
+
+    static int global_step;           // desired maximum cfl
     //
     // Member when pressure defined at points in time rather than interval
     //

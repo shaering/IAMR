@@ -934,6 +934,15 @@ NavierStokes::MaxVal (const std::string& name,
 }
 
 void
+NavierStokes::compute_fctCount ()
+{
+    Real time              = state[State_Type].curTime();
+    const Real cur_time    = state[State_Type].curTime();
+    amrex::Print() << "INFO= " << time
+	    << " Reevaluating FctCount with " << cur_time << '\n';
+}
+
+void
 NavierStokes::sum_integrated_quantities ()
 {
     const int finest_level = parent->finestLevel();

@@ -76,6 +76,7 @@ int         NavierStokesBase::do_temp_ref               = 0;
 int         NavierStokesBase::do_scalar_update_in_order = 0; 
 Vector<int>  NavierStokesBase::scalarUpdateOrder;
 int         NavierStokesBase::getForceVerbose           = 0;
+int         NavierStokesBase::global_step               = 0;
 
 int  NavierStokesBase::Dpdt_Type = -1;
 
@@ -2629,6 +2630,13 @@ NavierStokesBase::post_timestep (int crse_iteration)
     if (level==0 && sum_interval>0 && (parent->levelSteps(0)%sum_interval == 0))
     {
         sum_integrated_quantities();
+    }
+    // Recompute Fct Count ?
+    if (level==0) {
+        if (global_step % 10 == 0) {
+            compute_fctCount();
+        } 
+	global_step = global_step + 1;
     }
 #if (BL_SPACEDIM==3)
     //
