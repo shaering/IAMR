@@ -76,7 +76,7 @@ int         NavierStokesBase::do_temp_ref               = 0;
 int         NavierStokesBase::do_scalar_update_in_order = 0; 
 Vector<int>  NavierStokesBase::scalarUpdateOrder;
 int         NavierStokesBase::getForceVerbose           = 0;
-int         NavierStokesBase::global_step               = 0;
+int         NavierStokesBase::global_step               = 1;
 
 int  NavierStokesBase::Dpdt_Type = -1;
 
