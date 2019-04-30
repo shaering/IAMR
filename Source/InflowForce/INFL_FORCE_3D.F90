@@ -47,21 +47,23 @@
 ! :::        which FAB we are working on.  Seems like a moot point, but
 ! :::        it isn't when we do an integer shift to force points outside 
 ! :::        of the domain in periodic directions.
-! :::
+! :::        
 ! :::        For instance if we have a domain from 0->63 in a periodic 
 ! :::        direction and pass in a FAB to fill with indices from -1 to 5,
 ! :::        the -1 index is integer shifted over to an index of 63 to do
 ! :::        the interpolation for the forcing.
 ! :::
-      subroutine INTRP_DATA(time, dx, storePnt, fillComp, filePnt,
-     $     timePnt, dtFile, dxFile, xloFile, xhiFile, nCompStorDat, 
-     $     FF_DIMS(storDat), storDat,
-     $     DIMS(inflDat), inflDat, bc, probLo, probHi)
+      subroutine INTRP_DATA(time, dx, storePnt, fillComp, filePnt, &
+          timePnt, dtFile, dxFile, xloFile, xhiFile, nCompStorDat, &
+          FF_DIMS(storDat), storDat, &
+          DIMS(inflDat), inflDat, bc, probLo, probHi)
 
       implicit none
 
       integer storePnt, fillComp, filePnt, nCompStorDat
-      integer DIMDEC(inflDat), FF_DIMDEC(storDat), bc(SDIM,2)
+      integer DIMDEC(inflDat)
+      integer FF_DIMDEC(storDat)
+      integer bc(SDIM,2)
 
       REAL_T time, timePnt, dtFile
       REAL_T dx(SDIM), dxFile(3), xloFile(3), xhiFile(3)
@@ -74,11 +76,11 @@
       integer lo(SDIM), hi(SDIM), n_lev_cells(SDIM)
       integer loStorDim(3), hiStorDim(3)
 
-      REAL_T tm1, tp1, ctm1, ct0, ctp1, coff,
-     $       x, xm1, x0, xp1, cxm1, cx0, cxp1,
-     $       y, ym1, y0, yp1, cym1, cy0, cyp1,
-     $       z, zm1, z0, zp1, czm1, cz0, czp1,
-     $       valm1, val0, valp1
+      REAL_T tm1, tp1, ctm1, ct0, ctp1, coff, &
+            x, xm1, x0, xp1, cxm1, cx0, cxp1, &
+            y, ym1, y0, yp1, cym1, cy0, cyp1, &
+            z, zm1, z0, zp1, czm1, cz0, czp1, &
+            valm1, val0, valp1
 
 #include <INFL_FORCE_F.H>
 
@@ -145,8 +147,8 @@
           endif
           y = probLo(2) + dx(2)*(DBLE(jycalc) + half)
 
-          if ((xloFile(2) .le. y .and. y .le. xhiFile(2)) .and.
-     $        (xloFile(3) .le. z .and. z .le. xhiFile(3))) then
+          if ((xloFile(2) .le. y .and. y .le. xhiFile(2)) .and. &
+             (xloFile(3) .le. z .and. z .le. xhiFile(3))) then
             jloc = (y - xloFile(2) + half*dxFile(2))/dxFile(2) + 1
             jloc = MAX(jloc, loStorDim(2)+1)
             jloc = MIN(jloc, hiStorDim(2)-1)
@@ -157,35 +159,35 @@
             cy0  = (y - ym1) * (y - yp1) / (y0  - ym1) / (y0  - yp1)
             cyp1 = (y - ym1) * (y - y0)  / (yp1 - ym1) / (yp1 - y0)
 
-            val0 = cym1 * (ctm1 * storDat(storePnt-1,jloc-1,kloc,fillComp)
-     $                   +  ct0 * storDat(storePnt,  jloc-1,kloc,fillComp)
-     $                   + ctp1 * storDat(storePnt+1,jloc-1,kloc,fillComp))
-     $           +  cy0 * (ctm1 * storDat(storePnt-1,jloc,  kloc,fillComp)
-     $                   +  ct0 * storDat(storePnt,  jloc,  kloc,fillComp)
-     $                   + ctp1 * storDat(storePnt+1,jloc,  kloc,fillComp))
-     $           + cyp1 * (ctm1 * storDat(storePnt-1,jloc+1,kloc,fillComp)
-     $                   +  ct0 * storDat(storePnt,  jloc+1,kloc,fillComp)
-     $                   + ctp1 * storDat(storePnt+1,jloc+1,kloc,fillComp))
+       val0 = cym1 * (ctm1 * storDat(storePnt-1,jloc-1,kloc,fillComp) &
+                    +  ct0 * storDat(storePnt, jloc-1,kloc,fillComp)   &
+                    + ctp1 * storDat(storePnt+1,jloc-1,kloc,fillComp)) &
+            +  cy0 * (ctm1 * storDat(storePnt-1,jloc, kloc,fillComp)   &
+                   +  ct0 * storDat(storePnt,  jloc,  kloc,fillComp)   &
+                   + ctp1 * storDat(storePnt+1,jloc,  kloc,fillComp))  &
+            + cyp1 * (ctm1 * storDat(storePnt-1,jloc+1,kloc,fillComp)  &
+                    +  ct0 * storDat(storePnt,  jloc+1,kloc,fillComp)  &
+                    + ctp1 * storDat(storePnt+1,jloc+1,kloc,fillComp)) 
 
-            valm1 = cym1 * (ctm1 * storDat(storePnt-1,jloc-1,kloc-1,fillComp)
-     $                    +  ct0 * storDat(storePnt,  jloc-1,kloc-1,fillComp)
-     $                    + ctp1 * storDat(storePnt+1,jloc-1,kloc-1,fillComp))
-     $            +  cy0 * (ctm1 * storDat(storePnt-1,jloc,  kloc-1,fillComp)
-     $                    +  ct0 * storDat(storePnt,  jloc,  kloc-1,fillComp)
-     $                    + ctp1 * storDat(storePnt+1,jloc,  kloc-1,fillComp))
-     $            + cyp1 * (ctm1 * storDat(storePnt-1,jloc+1,kloc-1,fillComp)
-     $                    +  ct0 * storDat(storePnt,  jloc+1,kloc-1,fillComp)
-     $                    + ctp1 * storDat(storePnt+1,jloc+1,kloc-1,fillComp))
+       valm1 = cym1 * (ctm1 * storDat(storePnt-1,jloc-1,kloc-1,fillComp)&
+                    +  ct0 * storDat(storePnt,  jloc-1,kloc-1,fillComp) &
+                    + ctp1 * storDat(storePnt+1,jloc-1,kloc-1,fillComp))&
+            +  cy0 * (ctm1 * storDat(storePnt-1,jloc,  kloc-1,fillComp) &
+                    +  ct0 * storDat(storePnt,  jloc,  kloc-1,fillComp) &
+                    + ctp1 * storDat(storePnt+1,jloc,  kloc-1,fillComp))&
+            + cyp1 * (ctm1 * storDat(storePnt-1,jloc+1,kloc-1,fillComp) &
+                    +  ct0 * storDat(storePnt,  jloc+1,kloc-1,fillComp) &
+                    + ctp1 * storDat(storePnt+1,jloc+1,kloc-1,fillComp))
 
-            valp1 = cym1 * (ctm1 * storDat(storePnt-1,jloc-1,kloc+1,fillComp)
-     $                    +  ct0 * storDat(storePnt,  jloc-1,kloc+1,fillComp)
-     $                    + ctp1 * storDat(storePnt+1,jloc-1,kloc+1,fillComp))
-     $            +  cy0 * (ctm1 * storDat(storePnt-1,jloc,  kloc+1,fillComp)
-     $                    +  ct0 * storDat(storePnt,  jloc,  kloc+1,fillComp)
-     $                    + ctp1 * storDat(storePnt+1,jloc,  kloc+1,fillComp))
-     $            + cyp1 * (ctm1 * storDat(storePnt-1,jloc+1,kloc+1,fillComp)
-     $                    +  ct0 * storDat(storePnt,  jloc+1,kloc+1,fillComp)
-     $                    + ctp1 * storDat(storePnt+1,jloc+1,kloc+1,fillComp))
+       valp1 = cym1 * (ctm1 * storDat(storePnt-1,jloc-1,kloc+1,fillComp)&
+                     +  ct0 * storDat(storePnt,  jloc-1,kloc+1,fillComp)   &
+                     + ctp1 * storDat(storePnt+1,jloc-1,kloc+1,fillComp))  &
+           +  cy0 * (ctm1 * storDat(storePnt-1,jloc, kloc+1,fillComp)   &
+                   +  ct0 * storDat(storePnt,  jloc,  kloc+1,fillComp)  &
+                   + ctp1 * storDat(storePnt+1,jloc,  kloc+1,fillComp)) &
+           + cyp1 * (ctm1 * storDat(storePnt-1,jloc+1,kloc+1,fillComp)  &
+                   +  ct0 * storDat(storePnt,  jloc+1,kloc+1,fillComp)  &
+                   + ctp1 * storDat(storePnt+1,jloc+1,kloc+1,fillComp)) 
             val0 = czm1 * valm1 + cz0 * val0 + czp1 * valp1
           else
             val0 = zero
@@ -231,8 +233,8 @@
           endif
           x = probLo(1) + dx(1)*(DBLE(ixcalc) + half)
 
-          if ((xloFile(1) .le. x .and. x .le. xhiFile(1)) .and.
-     $        (xloFile(3) .le. z .and. z .le. xhiFile(3))) then
+          if ((xloFile(1) .le. x .and. x .le. xhiFile(1)) .and. &
+              (xloFile(3) .le. z .and. z .le. xhiFile(3))) then
             iloc = (x - xloFile(1) + half*dxFile(1))/dxFile(1) + 1
             iloc = MAX(iloc, loStorDim(1)+1)
             iloc = MIN(iloc, hiStorDim(1)-1)
@@ -243,36 +245,36 @@
             cx0  = (x - xm1) * (x - xp1) / (x0  - xm1) / (x0  - xp1)
             cxp1 = (x - xm1) * (x - x0)  / (xp1 - xm1) / (xp1 - x0)
 
-            val0 = cxm1 * (ctm1 * storDat(iloc-1,storePnt-1,kloc,fillComp)
-     $                   +  ct0 * storDat(iloc-1,storePnt,  kloc,fillComp)
-     $                   + ctp1 * storDat(iloc-1,storePnt+1,kloc,fillComp))
-     $           +  cx0 * (ctm1 * storDat(iloc,  storePnt-1,kloc,fillComp)
-     $                   +  ct0 * storDat(iloc,  storePnt,  kloc,fillComp)
-     $                   + ctp1 * storDat(iloc,  storePnt+1,kloc,fillComp))
-     $           + cxp1 * (ctm1 * storDat(iloc+1,storePnt-1,kloc,fillComp)
-     $                   +  ct0 * storDat(iloc+1,storePnt,  kloc,fillComp)
-     $                   + ctp1 * storDat(iloc+1,storePnt+1,kloc,fillComp))
+             val0 = cxm1 * (ctm1 * storDat(iloc-1,storePnt-1,kloc,fillComp) &
+                         +  ct0 * storDat(iloc-1,storePnt,  kloc,fillComp)  &
+                         + ctp1 * storDat(iloc-1,storePnt+1,kloc,fillComp)) &
+                 +  cx0 * (ctm1 * storDat(iloc,  storePnt-1,kloc,fillComp)  &
+                         +  ct0 * storDat(iloc,  storePnt,  kloc,fillComp)  &
+                         + ctp1 * storDat(iloc,  storePnt+1,kloc,fillComp)) &
+                 + cxp1 * (ctm1 * storDat(iloc+1,storePnt-1,kloc,fillComp)  &
+                         +  ct0 * storDat(iloc+1,storePnt,  kloc,fillComp)  &
+                         + ctp1 * storDat(iloc+1,storePnt+1,kloc,fillComp))
 
-            valm1 = cxm1 * (ctm1 * storDat(iloc-1,storePnt-1,kloc-1,fillComp)
-     $                    +  ct0 * storDat(iloc-1,storePnt,  kloc-1,fillComp)
-     $                    + ctp1 * storDat(iloc-1,storePnt+1,kloc-1,fillComp))
-     $            +  cx0 * (ctm1 * storDat(iloc,  storePnt-1,kloc-1,fillComp)
-     $                    +  ct0 * storDat(iloc,  storePnt,  kloc-1,fillComp)
-     $                    + ctp1 * storDat(iloc,  storePnt+1,kloc-1,fillComp))
-     $            + cxp1 * (ctm1 * storDat(iloc+1,storePnt-1,kloc-1,fillComp)
-     $                    +  ct0 * storDat(iloc+1,storePnt,  kloc-1,fillComp)
-     $                    + ctp1 * storDat(iloc+1,storePnt+1,kloc-1,fillComp))
+             valm1 = cxm1 * (ctm1 * storDat(iloc-1,storePnt-1,kloc-1,fillComp) &
+                      +  ct0 * storDat(iloc-1,storePnt,  kloc-1,fillComp)  &
+                      + ctp1 * storDat(iloc-1,storePnt+1,kloc-1,fillComp)) &
+              +  cx0 * (ctm1 * storDat(iloc,  storePnt-1,kloc-1,fillComp)  &
+                      +  ct0 * storDat(iloc,  storePnt,  kloc-1,fillComp)  &
+                      + ctp1 * storDat(iloc,  storePnt+1,kloc-1,fillComp)) &
+              + cxp1 * (ctm1 * storDat(iloc+1,storePnt-1,kloc-1,fillComp)  &
+                      +  ct0 * storDat(iloc+1,storePnt,  kloc-1,fillComp)  &
+                      + ctp1 * storDat(iloc+1,storePnt+1,kloc-1,fillComp))
 
-            valp1 = cxm1 * (ctm1 * storDat(iloc-1,storePnt-1,kloc+1,fillComp)
-     $                    +  ct0 * storDat(iloc-1,storePnt,  kloc+1,fillComp)
-     $                    + ctp1 * storDat(iloc-1,storePnt+1,kloc+1,fillComp))
-     $            +  cx0 * (ctm1 * storDat(iloc,  storePnt-1,kloc+1,fillComp)
-     $                    +  ct0 * storDat(iloc,  storePnt,  kloc+1,fillComp)
-     $                    + ctp1 * storDat(iloc,  storePnt+1,kloc+1,fillComp))
-     $            + cxp1 * (ctm1 * storDat(iloc+1,storePnt-1,kloc+1,fillComp)
-     $                    +  ct0 * storDat(iloc+1,storePnt,  kloc+1,fillComp)
-     $                    + ctp1 * storDat(iloc+1,storePnt+1,kloc+1,fillComp))
-            val0 = czm1 * valm1 + cz0 * val0 + czp1 * valp1
+             valp1 = cxm1 * (ctm1 * storDat(iloc-1,storePnt-1,kloc+1,fillComp) &
+                         +  ct0 * storDat(iloc-1,storePnt,  kloc+1,fillComp)  &
+                         + ctp1 * storDat(iloc-1,storePnt+1,kloc+1,fillComp)) &
+               +  cx0 * (ctm1 * storDat(iloc,  storePnt-1, kloc+1, fillComp)  &
+                        +  ct0 * storDat(iloc,  storePnt,  kloc+1,fillComp)  &
+                        + ctp1 * storDat(iloc,  storePnt+1,kloc+1,fillComp)) &
+                + cxp1 * (ctm1 * storDat(iloc+1,storePnt-1,kloc+1,fillComp)  &
+                        +  ct0 * storDat(iloc+1,storePnt,  kloc+1,fillComp)  &
+                        + ctp1 * storDat(iloc+1,storePnt+1,kloc+1,fillComp)) 
+             val0 = czm1 * valm1 + cz0 * val0 + czp1 * valp1
           else
             val0 = zero
           endif
@@ -341,8 +343,8 @@
           end do
 #endif
 
-          if ((xloFile(1) .le. x .and. x .le. xhiFile(1)) .and. 
-     $        (xloFile(2) .le. y .and. y .le. xhiFile(2))) then
+          if ((xloFile(1) .le. x .and. x .le. xhiFile(1)) .and.  &
+             (xloFile(2) .le. y .and. y .le. xhiFile(2))) then
             iloc = (x - xloFile(1) + half*dxFile(1))/dxFile(1) + 1
             iloc = MAX(iloc, loStorDim(1)+1)
             iloc = MIN(iloc, hiStorDim(1)-1)
@@ -353,35 +355,35 @@
             cx0  = (x - xm1) * (x - xp1) / (x0  - xm1) / (x0  - xp1)
             cxp1 = (x - xm1) * (x - x0)  / (xp1 - xm1) / (xp1 - x0)
 
-            val0 = cxm1 * (ctm1 * storDat(iloc-1,jloc,storePnt-1,fillComp)
-     $                   +  ct0 * storDat(iloc-1,jloc,storePnt,  fillComp)
-     $                   + ctp1 * storDat(iloc-1,jloc,storePnt+1,fillComp))
-     $           +  cx0 * (ctm1 * storDat(iloc,  jloc,storePnt-1,fillComp)
-     $                   +  ct0 * storDat(iloc,  jloc,storePnt,  fillComp)
-     $                   + ctp1 * storDat(iloc,  jloc,storePnt+1,fillComp))
-     $           + cxp1 * (ctm1 * storDat(iloc+1,jloc,storePnt-1,fillComp)
-     $                   +  ct0 * storDat(iloc+1,jloc,storePnt,  fillComp)
-     $                   + ctp1 * storDat(iloc+1,jloc,storePnt+1,fillComp))
+            val0 = cxm1 * (ctm1 * storDat(iloc-1,jloc,storePnt-1,fillComp)  &
+                         +  ct0 * storDat(iloc-1,jloc,storePnt,  fillComp)  &
+                         + ctp1 * storDat(iloc-1,jloc,storePnt+1,fillComp)) &
+                 +  cx0 * (ctm1 * storDat(iloc,  jloc,storePnt-1,fillComp)  &
+                         +  ct0 * storDat(iloc,  jloc,storePnt,  fillComp)  &
+                         + ctp1 * storDat(iloc,  jloc,storePnt+1,fillComp)) &
+                 + cxp1 * (ctm1 * storDat(iloc+1,jloc,storePnt-1,fillComp)  &
+                         +  ct0 * storDat(iloc+1,jloc,storePnt,  fillComp)  &
+                         + ctp1 * storDat(iloc+1,jloc,storePnt+1,fillComp)) 
 
-            valm1 = cxm1 * (ctm1 * storDat(iloc-1,jloc-1,storePnt-1,fillComp)
-     $                    +  ct0 * storDat(iloc-1,jloc-1,storePnt,  fillComp)
-     $                    + ctp1 * storDat(iloc-1,jloc-1,storePnt+1,fillComp))
-     $            +  cx0 * (ctm1 * storDat(iloc,  jloc-1,storePnt-1,fillComp)
-     $                    +  ct0 * storDat(iloc,  jloc-1,storePnt,  fillComp)
-     $                    + ctp1 * storDat(iloc,  jloc-1,storePnt+1,fillComp))
-     $            + cxp1 * (ctm1 * storDat(iloc+1,jloc-1,storePnt-1,fillComp)
-     $                    +  ct0 * storDat(iloc+1,jloc-1,storePnt,  fillComp)
-     $                    + ctp1 * storDat(iloc+1,jloc-1,storePnt+1,fillComp))
+            valm1 = cxm1 * (ctm1 * storDat(iloc-1,jloc-1,storePnt-1,fillComp)  &
+                          +  ct0 * storDat(iloc-1,jloc-1,storePnt,  fillComp)  &
+                          + ctp1 * storDat(iloc-1,jloc-1,storePnt+1,fillComp)) &
+                  +  cx0 * (ctm1 * storDat(iloc,  jloc-1,storePnt-1,fillComp)  &
+                          +  ct0 * storDat(iloc,  jloc-1,storePnt,  fillComp)  &
+                          + ctp1 * storDat(iloc,  jloc-1,storePnt+1,fillComp)) &
+                  + cxp1 * (ctm1 * storDat(iloc+1,jloc-1,storePnt-1,fillComp)  &
+                          +  ct0 * storDat(iloc+1,jloc-1,storePnt,  fillComp)  &
+                          + ctp1 * storDat(iloc+1,jloc-1,storePnt+1,fillComp))
 
-            valp1 = cxm1 * (ctm1 * storDat(iloc-1,jloc+1,storePnt-1,fillComp)
-     $                    +  ct0 * storDat(iloc-1,jloc+1,storePnt,  fillComp)
-     $                    + ctp1 * storDat(iloc-1,jloc+1,storePnt+1,fillComp))
-     $            +  cx0 * (ctm1 * storDat(iloc,  jloc+1,storePnt-1,fillComp)
-     $                    +  ct0 * storDat(iloc,  jloc+1,storePnt,  fillComp)
-     $                    + ctp1 * storDat(iloc,  jloc+1,storePnt+1,fillComp))
-     $            + cxp1 * (ctm1 * storDat(iloc+1,jloc+1,storePnt-1,fillComp)
-     $                    +  ct0 * storDat(iloc+1,jloc+1,storePnt,  fillComp)
-     $                    + ctp1 * storDat(iloc+1,jloc+1,storePnt+1,fillComp))
+            valp1 = cxm1 * (ctm1 * storDat(iloc-1,jloc+1,storePnt-1,fillComp) &
+                         +  ct0 * storDat(iloc-1,jloc+1,storePnt,  fillComp)  &
+                         + ctp1 * storDat(iloc-1,jloc+1,storePnt+1,fillComp)) &
+                 +  cx0 * (ctm1 * storDat(iloc,  jloc+1,storePnt-1,fillComp)  &
+                         +  ct0 * storDat(iloc,  jloc+1,storePnt,  fillComp)  &
+                         + ctp1 * storDat(iloc,  jloc+1,storePnt+1,fillComp)) &
+                 + cxp1 * (ctm1 * storDat(iloc+1,jloc+1,storePnt-1,fillComp)  &
+                         +  ct0 * storDat(iloc+1,jloc+1,storePnt,  fillComp)  &
+                         + ctp1 * storDat(iloc+1,jloc+1,storePnt+1,fillComp)) 
             val0 = cym1 * valm1 + cy0 * val0 + cyp1 * valp1
           else
             val0 = zero
