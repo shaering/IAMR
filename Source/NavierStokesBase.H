@@ -149,6 +149,12 @@ public:
     //
     virtual std::string thePlotFileType () const override;
 
+    //
+    // If run_mode != normal in inputs, initialize the amr hierarchy then
+    //   call this function
+    //
+    virtual void evaluate ();
+
     ////////////////////////////////////////////////////////////////////////////
     //    NavierStokesBase public functions                                   //
     ////////////////////////////////////////////////////////////////////////////
@@ -187,6 +193,8 @@ public:
     static amrex::Real getGravity () { return gravity; }
 
     static int DoTrac2();
+
+    static std::string inputs_name;
 
 protected:
 

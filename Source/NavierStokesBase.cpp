@@ -103,6 +103,8 @@ int  NavierStokesBase::do_mom_diff            = 0;
 int  NavierStokesBase::predict_mom_together   = 0;
 bool NavierStokesBase::def_harm_avg_cen2edge  = false;
 
+std::string NavierStokesBase::inputs_name = "";
+
 namespace
 {
     bool initialized = false;
@@ -3056,6 +3058,12 @@ NavierStokesBase::setTimeLevel (Real time,
         state[Press_Type].setTimeLevel(time-.5*dt_old,dt_old,dt_old);
         state[Dpdt_Type].setTimeLevel(time-dt_old,dt_old,dt_old);
     }
+}
+
+void
+NavierStokesBase::evaluate ()
+{
+    Print() << "NavierStokesBase::evaluate(): No work defined" << std::endl;
 }
 
 void

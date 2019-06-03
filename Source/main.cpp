@@ -8,6 +8,7 @@
 #include <AMReX_ParmParse.H>
 #include <AMReX_ParallelDescriptor.H>
 #include <AMReX_BLProfiler.H>
+#include <NavierStokesBase.H>
 
 using namespace amrex;
 
@@ -15,8 +16,10 @@ int
 main (int   argc,
       char* argv[])
 {
-    amrex::Initialize(argc,argv);
+    Initialize(argc,argv);
 
+    NavierStokesBase::inputs_name = argv[1];
+    
     BL_PROFILE_REGION_START("main()");
     BL_PROFILE_VAR("main()", pmain);
 
@@ -39,67 +42,80 @@ main (int   argc,
     pp.query("strt_time", strt_time);
     pp.query("stop_time", stop_time);
 
-    if (strt_time < 0.0)
-    {
-        amrex::Abort("MUST SPECIFY a non-negative strt_time");
-    }
-
-    if (max_step < 0 && stop_time < 0)
-    {
-        amrex::Abort("Exiting because neither max_step nor stop_time is non-negative.");
-    }
+    std::string run_mode = "normal";
+    pp.query("run_mode",run_mode);
+    AMREX_ALWAYS_ASSERT(run_mode == "normal" || run_mode == "evaluate");
 
     Amr* amrptr = new Amr;
 
-    amrptr->init(strt_time,stop_time);
-
-    if (num_steps > 0)
+    if (run_mode == "normal")
     {
+      if (strt_time < 0.0)
+      {
+        Abort("MUST SPECIFY a non-negative strt_time");
+      }
+
+      if (max_step < 0 && stop_time < 0)
+      {
+        Abort("Exiting because neither max_step nor stop_time is non-negative.");
+      }
+
+      amrptr->init(strt_time,stop_time);
+
+      if (num_steps > 0)
+      {
         if (max_step < 0)
         {
-            max_step = num_steps + amrptr->levelSteps(0);
+          max_step = num_steps + amrptr->levelSteps(0);
         }
         else
         {
-            max_step = std::min(max_step, num_steps + amrptr->levelSteps(0));
+          max_step = std::min(max_step, num_steps + amrptr->levelSteps(0));
         }
 
-	amrex::Print() << "Using effective max_step = " << max_step << '\n';
-    }
-    //
-    // If we set the regrid_on_restart flag and if we are *not* going to take
-    // a time step then we want to go ahead and regrid here.
-    //
-    if (amrptr->RegridOnRestart())
-    {
+	Print() << "Using effective max_step = " << max_step << '\n';
+      }
+      //
+      // If we set the regrid_on_restart flag and if we are *not* going to take
+      // a time step then we want to go ahead and regrid here.
+      //
+      if (amrptr->RegridOnRestart())
+      {
         if (    (amrptr->levelSteps(0) >= max_step ) ||
                 ( (stop_time >= 0.0) &&
                   (amrptr->cumTime() >= stop_time)  )    )
         {
-            //
-            // Regrid only!
-            //
-            amrptr->RegridOnly(amrptr->cumTime());
+          //
+          // Regrid only!
+          //
+          amrptr->RegridOnly(amrptr->cumTime());
         }
-    }
+      }
 
-    while ( amrptr->okToContinue()                            &&
-           (amrptr->levelSteps(0) < max_step || max_step < 0) &&
-           (amrptr->cumTime() < stop_time || stop_time < 0.0) )
-    {
+      while ( amrptr->okToContinue()                            &&
+              (amrptr->levelSteps(0) < max_step || max_step < 0) &&
+              (amrptr->cumTime() < stop_time || stop_time < 0.0) )
+      {
         amrptr->coarseTimeStep(stop_time);
-    }
-    //
-    // Write final checkpoint and plotfile.
-    //
-    if (amrptr->stepOfLastCheckPoint() < amrptr->levelSteps(0))
-    {
+      }
+      //
+      // Write final checkpoint and plotfile.
+      //
+      if (amrptr->stepOfLastCheckPoint() < amrptr->levelSteps(0))
+      {
         amrptr->checkPoint();
-    }
+      }
 
-    if (amrptr->stepOfLastPlotFile() < amrptr->levelSteps(0))
-    {
+      if (amrptr->stepOfLastPlotFile() < amrptr->levelSteps(0))
+      {
         amrptr->writePlotFile();
+      }
+    }
+    else
+    {
+      amrptr->init(strt_time,stop_time);
+
+      //dynamic_cast<NavierStokesBase&>(amrptr->getLevel(0)).evaluate();
     }
 
     delete amrptr;
@@ -109,7 +125,7 @@ main (int   argc,
 
     ParallelDescriptor::ReduceRealMax(run_stop,IOProc);
 
-    amrex::Print() << "Run time = " << run_stop << std::endl;
+    Print() << "Run time = " << run_stop << std::endl;
 
     BL_PROFILE_VAR_STOP(pmain);
     BL_PROFILE_REGION_STOP("main()");
@@ -117,7 +133,7 @@ main (int   argc,
     BL_PROFILE_FINALIZE();
 
 
-    amrex::Finalize();
+    Finalize();
 
     return 0;
 }
