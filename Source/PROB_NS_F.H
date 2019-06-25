@@ -82,19 +82,19 @@
 #else
 #ifdef MOREGENGETFORCE
 
-     void FORT_AVERAGE_EDGE_STATES(const amrex::Real* Vel,
-				   const amrex::Real* umacx,
-				   const amrex::Real* umacy,
+     void FORT_AVERAGE_EDGE_STATES (const amrex::Real* Vel,
+				const amrex::Real* umacx,
+				const amrex::Real* umacy,
 #if (BL_SPACEDIM==3)
-				   const amrex::Real* umacz,
+				const amrex::Real* umacz,
 #endif
-				   ARLIM_P(vel_lo),  ARLIM_P(vel_hi),
-				   ARLIM_P(umacx_lo), ARLIM_P(umacx_hi),
-				   ARLIM_P(umacy_lo), ARLIM_P(umacy_hi),
+				ARLIM_P(vel_lo),  ARLIM_P(vel_hi),
+				ARLIM_P(umacx_lo), ARLIM_P(umacx_hi),
+				ARLIM_P(umacy_lo), ARLIM_P(umacy_hi),
 #if (BL_SPACEDIM==3)
-				   ARLIM_P(umacz_lo), ARLIM_P(umacz_hi),
+				ARLIM_P(umacz_lo), ARLIM_P(umacz_hi),
 #endif
-				   const int* getForceVerbose);
+				const int* getForceVerbose);
 
      void FORT_MAKEFORCE (const amrex::Real* time,
 			  amrex::Real* force,
@@ -103,11 +103,42 @@
                           ARLIM_P(f_lo), ARLIM_P(f_hi),
                           ARLIM_P(v_lo), ARLIM_P(v_hi),
                           ARLIM_P(s_lo), ARLIM_P(s_hi),
-                          const amrex::Real* dx,
-                          const amrex::Real* xlo, const amrex::Real* xhi,
+        const amrex::Real* dx,
+        const amrex::Real* xlo, const amrex::Real* xhi,
 			  const amrex::Real* gravity,
 			  const int* scomp, const int* ncomp, const int* nscal,
 			  const int* getForceVerbose);
+#endif
+#ifdef LINEARFORCING
+
+     void FORT_AVERAGE_EDGE_STATES (const amrex::Real* Vel,
+        const amrex::Real* umacx,
+        const amrex::Real* umacy,
+#if (BL_SPACEDIM==3)
+        const amrex::Real* umacz,
+#endif
+        ARLIM_P(vel_lo),  ARLIM_P(vel_hi),
+        ARLIM_P(umacx_lo), ARLIM_P(umacx_hi),
+        ARLIM_P(umacy_lo), ARLIM_P(umacy_hi),
+#if (BL_SPACEDIM==3)
+        ARLIM_P(umacz_lo), ARLIM_P(umacz_hi),
+#endif
+        const int* getForceVerbose);
+
+     void FORT_MAKEFORCE (const amrex::Real* time,
+        amrex::Real* force,
+        const amrex::Real* vel,
+        const amrex::Real* scal,
+                          ARLIM_P(f_lo), ARLIM_P(f_hi),
+                          ARLIM_P(v_lo), ARLIM_P(v_hi),
+                          ARLIM_P(s_lo), ARLIM_P(s_hi),
+        const amrex::Real* Ubar,
+        const amrex::Real* TKEmean,
+        const amrex::Real* dx,
+        const amrex::Real* xlo, const amrex::Real* xhi,
+        const amrex::Real* gravity,
+        const int* scomp, const int* ncomp, const int* nscal,
+        const int* getForceVerbose);
 #endif
 #ifdef GENGETFORCE
      void FORT_MAKEFORCE (const amrex::Real* time, amrex::Real* force, const amrex::Real* rho,

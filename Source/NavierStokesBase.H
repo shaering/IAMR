@@ -245,6 +245,30 @@ protected:
                    const amrex::FArrayBox& Scal,
 		   int              scalScomp);
 #else
+#ifdef LINEARFORCING
+    void getForce (amrex::FArrayBox&       force,
+                   int              gridno,
+                   int              ngrow,
+                   int              strt_comp,
+                   int              num_comp,
+       const amrex::Real       time,
+                   const amrex::FArrayBox& Vel,
+                   const amrex::FArrayBox& Scal,
+       int              scalScomp,
+                   const amrex::Real* Ubar,
+                   const amrex::Real TKEmean);
+    void getForce (amrex::FArrayBox&       force,
+       const amrex::Box&      bx,
+                   int              ngrow,
+                   int              strt_comp,
+                   int              num_comp,
+       const amrex::Real       time,
+                   const amrex::FArrayBox& Vel,
+                   const amrex::FArrayBox& Scal,
+       int              scalScomp,
+                   const amrex::Real* Ubar,
+                   const amrex::Real TKEmean);
+#else
 #ifdef GENGETFORCE
   void getForce (amrex::FArrayBox&       force,
                    int              gridno,
@@ -279,6 +303,7 @@ protected:
                    int              RComp = 0);
 #endif		 
 #endif		 
+#endif
 #endif		 
     //
     amrex::FluxRegister& getAdvFluxReg () {
