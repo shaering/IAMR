@@ -44,7 +44,7 @@ bool MacProj::use_cg_solve;
 int  MacProj::do_outflow_bcs;
 int  MacProj::fix_mac_sync_rhs;
 int  MacProj::check_umac_periodicity;
-int  MacProj::use_mlmg_solver = 0;
+int  MacProj::use_mlmg_solver = 1;
 int  MacProj::anel_grow       = 1;
 
 namespace
@@ -410,12 +410,7 @@ MacProj::mac_project (int             level,
     // Initialize the rhs with divu.
     //
     const Real rhs_scale = 2.0/dt;
-    // fixme? RHS must need factory
-#ifdef AMREX_USE_EB
     MultiFab Rhs(grids,dmap,1,0, MFInfo(), LevelData[level]->Factory());
-#else
-    MultiFab Rhs(grids,dmap,1,0);
-#endif
 
     Rhs.copy(divu);
 
