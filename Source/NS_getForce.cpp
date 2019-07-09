@@ -560,7 +560,9 @@ NavierStokesBase::getForce (FArrayBox&       force,
 			    const FArrayBox& Scal,
 			    int              scalScomp,
 			    const Real* 	 Ubar,
-			    const Real       TKEmean)
+			    const Real       TKEmean,
+			    const Real*      Zmean,
+			    const Real*      Svarmean)
 {
     if (ParallelDescriptor::IOProcessor() && getForceVerbose) {
       amrex::Print() << "NavierStokesBase::getForce(): Entered..." << std::endl 
@@ -696,6 +698,8 @@ NavierStokesBase::getForce (FArrayBox&       force,
 		    ARLIM(s_lo), ARLIM(s_hi),
 		    Ubar,
 		    &TKEmean,
+		    Zmean,
+		    Svarmean,
 		    dx,
 		    gridloc.lo(),
 		    gridloc.hi(),
@@ -751,7 +755,9 @@ NavierStokesBase::getForce (FArrayBox&       force,
 			    const FArrayBox& Scal,
 			    int              scalScomp,
 			    const Real*      Ubar,
-			    const Real       TKEmean)
+			    const Real       TKEmean,
+			    const Real*      Zmean,
+			    const Real*      Svarmean)
 {
     if (ParallelDescriptor::IOProcessor() && getForceVerbose) {
       amrex::Print() << "NavierStokesBase::getForce(): Entered..." << std::endl 
@@ -887,6 +893,8 @@ NavierStokesBase::getForce (FArrayBox&       force,
 		    ARLIM(s_lo), ARLIM(s_hi),
 		    Ubar,
 		    &TKEmean,
+		    Zmean,
+		    Svarmean,
 		    dx,
 		    gridloc.lo(),
 		    gridloc.hi(),
@@ -930,6 +938,7 @@ NavierStokesBase::getForce (FArrayBox&       force,
 		       << std::endl << "---" << std::endl;
     }
 }
+
 #else
 void
 NavierStokesBase::getForce (FArrayBox&       force,

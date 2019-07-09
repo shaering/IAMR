@@ -256,7 +256,22 @@ protected:
                    const amrex::FArrayBox& Scal,
        int              scalScomp,
                    const amrex::Real* Ubar,
-                   const amrex::Real TKEmean);
+                   const amrex::Real TKEmean,
+                   const amrex::Real* Zmean,
+                   const amrex::Real* Svarmean);
+    void getForce (amrex::FArrayBox&       force,
+       const amrex::Box&      bx,
+                   int              ngrow,
+                   int              strt_comp,
+                   int              num_comp,
+       const amrex::Real       time,
+                   const amrex::FArrayBox& Vel,
+                   const amrex::FArrayBox& Scal,
+       int              scalScomp,
+                   const amrex::Real* Ubar,
+                   const amrex::Real TKEmean,
+                   const amrex::Real* Zmean,
+                   const amrex::Real* Svarmean);
     void getForce (amrex::FArrayBox&       force,
        const amrex::Box&      bx,
                    int              ngrow,

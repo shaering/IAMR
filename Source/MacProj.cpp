@@ -1009,18 +1009,31 @@ MacProj::mac_sync_compute (int                   level,
     FillPatchIterator U_fpi(ns_level,vel_visc_terms,Godunov::hypgrow(),prev_time,State_Type,Xvel,BL_SPACEDIM);
     MultiFab& Umf=U_fpi.get_mf();
     MultiFab Utmp(grids,dmap,BL_SPACEDIM,1);
-    MultiFab::Copy(Utmp,Umf,Xvel,0,3,0); // NTW: Avoid hard coding (use BL_SPACEDIM instead)
+    MultiFab::Copy(Utmp,Umf,Xvel,0,BL_SPACEDIM,0);
+    MultiFab Stmp(grids,dmap,numscal,1);
+    MultiFab::Copy(Stmp,Smf,0,0,numscal,0);
     Real Ubar[BL_SPACEDIM];
     Real TKEmean;
+    Real Svarmean[numscal];
+    Real Zmean[numscal];
     Ubar[Xvel] = Utmp.sum(Xvel) / grids.numPts();
     Ubar[Yvel] = Utmp.sum(Yvel) / grids.numPts();
     Ubar[Zvel] = Utmp.sum(Zvel) / grids.numPts();
     Utmp.plus(-Ubar[Xvel],0,1,0);
     Utmp.plus(-Ubar[Yvel],1,1,0);
     Utmp.plus(-Ubar[Zvel],2,1,0);
-    MultiFab::Multiply(Utmp,Utmp,Xvel,Xvel,3,0);
+    MultiFab::Multiply(Utmp,Utmp,Xvel,Xvel,BL_SPACEDIM,0);
     TKEmean = 0.5*(Utmp.sum(Xvel) + Utmp.sum(Yvel) + Utmp.sum(Zvel)) / grids.numPts();
-    Utmp.clear(); 
+    Utmp.clear();
+    for (int n=0; n<numscal; ++n) {
+      Zmean[n] = Stmp.sum(n) / grids.numPts();
+      Stmp.plus(-Zmean[n],n,1,0);
+    }
+    MultiFab::Multiply(Stmp,Stmp,0,0,numscal,0);
+      for (int n=0; n<numscal; ++n) {
+        Svarmean[n] = (Stmp.sum(n) / grids.numPts());
+      }
+    Stmp.clear();
 #endif
 
 #ifdef _OPENMP
@@ -1067,7 +1080,7 @@ MacProj::mac_sync_compute (int                   level,
 #elif MOREGENGETFORCE
         ns_level.getForce(tforces,bx,1,0,NUM_STATE,prev_time,Smf[Smfi],Smf[Smfi],Density);
 #elif LINEARFORCING
-        ns_level.getForce(tforces,bx,1,0,NUM_STATE,prev_time,Smf[Smfi],Smf[Smfi],Density,Ubar,TKEmean);
+        ns_level.getForce(tforces,bx,1,0,NUM_STATE,prev_time,Smf[Smfi],Smf[Smfi],Density,Ubar,TKEmean,Zmean,Svarmean);
 #else
         ns_level.getForce(tforces,bx,1,0,NUM_STATE,Rho);
 #endif		 
@@ -1088,7 +1101,7 @@ MacProj::mac_sync_compute (int                   level,
 #elif MOREGENGETFORCE
             ns_level.getForce(tvelforces,bx,1,Xvel,BL_SPACEDIM,prev_time,Smf[Smfi],Smf[Smfi],Density);
 #elif LINEARFORCING
-        ns_level.getForce(tforces,bx,1,0,NUM_STATE,prev_time,Smf[Smfi],Smf[Smfi],Density,Ubar,TKEmean);
+        ns_level.getForce(tforces,bx,1,0,NUM_STATE,prev_time,Smf[Smfi],Smf[Smfi],Density,Ubar,TKEmean,Zmean,Svarmean);
 #else
             ns_level.getForce(tvelforces,bx,1,Xvel,BL_SPACEDIM,Rho);
 #endif		 

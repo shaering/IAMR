@@ -134,6 +134,8 @@
                           ARLIM_P(s_lo), ARLIM_P(s_hi),
         const amrex::Real* Ubar,
         const amrex::Real* TKEmean,
+        const amrex::Real* Zmean,
+        const amrex::Real* Svarmean,
         const amrex::Real* dx,
         const amrex::Real* xlo, const amrex::Real* xhi,
         const amrex::Real* gravity,

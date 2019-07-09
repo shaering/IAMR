@@ -1257,20 +1257,34 @@ NavierStokesBase::estTimeStep ()
     getGradP(Gp, cur_pres_time);
 
 #ifdef LINEARFORCING
+    FillPatchIterator S_fpi(*this,get_new_data(State_Type),1,cur_pres_time,State_Type,Density,NUM_SCALARS);
+    MultiFab& Smf=S_fpi.get_mf();
     // Compute Ubar and TKEmean for linear forcing
     MultiFab Utmp(grids,dmap,BL_SPACEDIM,1);
-    MultiFab::Copy(Utmp,U_new,Xvel,0,3,0); // NTW: Use BL_SPACEDIM instead of 3
+    MultiFab::Copy(Utmp,U_new,Xvel,0,BL_SPACEDIM,0);
+    MultiFab Stmp(grids,dmap,NUM_SCALARS-BL_SPACEDIM-1,1);
+    MultiFab::Copy(Stmp,Smf,0,0,NUM_SCALARS-BL_SPACEDIM-1,0);
     Real Ubar[BL_SPACEDIM];
     Real TKEmean;
+    Real Svarmean[NUM_SCALARS-BL_SPACEDIM-1];
+    Real Zmean[NUM_SCALARS-BL_SPACEDIM-1];
     Ubar[Xvel] = Utmp.sum(Xvel) / grids.numPts();
     Ubar[Yvel] = Utmp.sum(Yvel) / grids.numPts();
     Ubar[Zvel] = Utmp.sum(Zvel) / grids.numPts();
     Utmp.plus(-Ubar[Xvel],0,1,0);
     Utmp.plus(-Ubar[Yvel],1,1,0);
     Utmp.plus(-Ubar[Zvel],2,1,0);
-    MultiFab::Multiply(Utmp,Utmp,Xvel,Xvel,3,0);
+    MultiFab::Multiply(Utmp,Utmp,Xvel,Xvel,BL_SPACEDIM,0);
     TKEmean = 0.5*(Utmp.sum(Xvel) + Utmp.sum(Yvel) + Utmp.sum(Zvel)) / grids.numPts();
     Utmp.clear();
+    for (int n=0; n<NUM_SCALARS-BL_SPACEDIM-1; ++n) {
+       Zmean[n] = Stmp.sum(n) / grids.numPts();
+    }
+    MultiFab::Multiply(Stmp,Stmp,0,0,NUM_SCALARS-BL_SPACEDIM-1,0);
+    for (int n=0; n<NUM_SCALARS-BL_SPACEDIM-1; ++n) {
+      Svarmean[n] = (Stmp.sum(n) / grids.numPts()) - Zmean[n]*Zmean[n];
+    }
+    Stmp.clear();
 #endif
 
     //FIXME? find a better solution for umax? gcc 5.4, OMP reduction does not take arrays
@@ -1308,7 +1322,7 @@ NavierStokesBase::estTimeStep ()
         getForce(tforces,bx,n_grow,Xvel,BL_SPACEDIM,cur_time,U_new[Rho_mfi],U_new[Rho_mfi],Density);
 #elif LINEARFORCING
         const Real cur_time = state[State_Type].curTime();
-        getForce(tforces,bx,n_grow,Xvel,BL_SPACEDIM,cur_time,U_new[Rho_mfi],U_new[Rho_mfi],Density,Ubar,TKEmean);
+        getForce(tforces,bx,n_grow,Xvel,BL_SPACEDIM,cur_time,U_new[Rho_mfi],U_new[Rho_mfi],Density,Ubar,TKEmean,Zmean,Svarmean);
 #else
         getForce(tforces,bx,n_grow,Xvel,BL_SPACEDIM,rho_ctime[Rho_mfi]);
 #endif		 
@@ -2927,20 +2941,34 @@ NavierStokesBase::scalar_advection_update (Real dt,
     {
 
 #ifdef LINEARFORCING
+        FillPatchIterator S_fpi(*this,S_old,1,prev_time,State_Type,Density,1);
+        MultiFab& Smf=S_fpi.get_mf();
         // Compute Ubar and TKEmean for linear forcing
         MultiFab Utmp(grids,dmap,BL_SPACEDIM,1);
-        MultiFab::Copy(Utmp,S_new,Xvel,0,3,0);
+        MultiFab::Copy(Utmp,S_new,Xvel,0,BL_SPACEDIM,0);
+        MultiFab Stmp(grids,dmap,NUM_SCALARS-BL_SPACEDIM-1,1);
+        MultiFab::Copy(Stmp,Smf,0,0,NUM_SCALARS-BL_SPACEDIM-1,0);
         Real Ubar[BL_SPACEDIM];
         Real TKEmean;
+        Real Svarmean[NUM_SCALARS-BL_SPACEDIM-1];
+        Real Zmean[NUM_SCALARS-BL_SPACEDIM-1];
         Ubar[Xvel] = Utmp.sum(Xvel) / grids.numPts();
         Ubar[Yvel] = Utmp.sum(Yvel) / grids.numPts();
         Ubar[Zvel] = Utmp.sum(Zvel) / grids.numPts();
         Utmp.plus(-Ubar[Xvel],0,1,0);
         Utmp.plus(-Ubar[Yvel],1,1,0);
         Utmp.plus(-Ubar[Zvel],2,1,0);
-        MultiFab::Multiply(Utmp,Utmp,Xvel,Xvel,3,0);
+        MultiFab::Multiply(Utmp,Utmp,Xvel,Xvel,BL_SPACEDIM,0);
         TKEmean = 0.5*(Utmp.sum(Xvel) + Utmp.sum(Yvel) + Utmp.sum(Zvel)) / grids.numPts();
         Utmp.clear();
+        for (int n=0; n<NUM_SCALARS-BL_SPACEDIM-1; ++n) {
+          Zmean[n] = Stmp.sum(n) / grids.numPts();
+        }
+        MultiFab::Multiply(Stmp,Stmp,0,0,NUM_SCALARS-BL_SPACEDIM-1,0);
+        for (int n=0; n<NUM_SCALARS-BL_SPACEDIM-1; ++n) {
+          Svarmean[n] = (Stmp.sum(n) / grids.numPts()) - Zmean[n]*Zmean[n];
+        }
+        Stmp.clear();
 #endif
 
         const MultiFab& rho_halftime = get_rho_half_time();
@@ -3050,7 +3078,7 @@ NavierStokesBase::scalar_advection_update (Real dt,
         Scal.mult(0.5,bx);
         
         if (getForceVerbose) amrex::Print() << "Calling getForce..." << '\n';
-                getForce(tforces,bx,0,sigma,1,halftime,Vel,Scal,0,Ubar,TKEmean);
+                getForce(tforces,bx,0,sigma,1,halftime,Vel,Scal,0,Ubar,TKEmean,Zmean,Svarmean);
 #else
                 getForce(tforces,bx,0,sigma,1,rho_halftime[Rho_mfi]);
 #endif		 
@@ -3569,18 +3597,30 @@ NavierStokesBase::velocity_advection (Real dt)
       FillPatchIterator S_fpi(*this,visc_terms,1,prev_time,State_Type,Density,NUM_SCALARS);
       MultiFab& Smf=S_fpi.get_mf();
       MultiFab Utmp(grids,dmap,BL_SPACEDIM,1);
-      MultiFab::Copy(Utmp,Umf,Xvel,0,3,0);
+      MultiFab::Copy(Utmp,Umf,Xvel,0,BL_SPACEDIM,0);
+      MultiFab Stmp(grids,dmap,NUM_SCALARS-BL_SPACEDIM-1,1);
+      MultiFab::Copy(Stmp,Smf,0,0,NUM_SCALARS-BL_SPACEDIM-1,0);
       Real Ubar[BL_SPACEDIM];
       Real TKEmean;
+      Real Svarmean[NUM_SCALARS-BL_SPACEDIM-1];
+      Real Zmean[NUM_SCALARS-BL_SPACEDIM-1];
       Ubar[Xvel] = Utmp.sum(Xvel) / grids.numPts();
       Ubar[Yvel] = Utmp.sum(Yvel) / grids.numPts();
       Ubar[Zvel] = Utmp.sum(Zvel) / grids.numPts();
       Utmp.plus(-Ubar[Xvel],0,1,0);
       Utmp.plus(-Ubar[Yvel],1,1,0);
       Utmp.plus(-Ubar[Zvel],2,1,0);
-      MultiFab::Multiply(Utmp,Utmp,Xvel,Xvel,3,0);
+      MultiFab::Multiply(Utmp,Utmp,Xvel,Xvel,BL_SPACEDIM,0);
       TKEmean = 0.5*(Utmp.sum(Xvel) + Utmp.sum(Yvel) + Utmp.sum(Zvel)) / grids.numPts();
       Utmp.clear();
+      for (int n=0; n<NUM_SCALARS-BL_SPACEDIM-1; ++n) {
+        Zmean[n] = Stmp.sum(n) / grids.numPts();
+      }
+      MultiFab::Multiply(Stmp,Stmp,0,0,NUM_SCALARS-BL_SPACEDIM-1,0);
+      for (int n=0; n<NUM_SCALARS-BL_SPACEDIM-1; ++n) {
+        Svarmean[n] = (Stmp.sum(n) / grids.numPts()) - Zmean[n]*Zmean[n];
+      }
+      Stmp.clear();
 #endif
 #endif
 
@@ -3611,7 +3651,7 @@ NavierStokesBase::velocity_advection (Real dt)
 	    }
       getForce(tforces,bx,1,Xvel,BL_SPACEDIM,prev_time,Umf[U_mfi],Smf[U_mfi],0);
 #elif LINEARFORCING
-      getForce(tforces,bx,1,Xvel,BL_SPACEDIM,prev_time,Umf[U_mfi],Smf[U_mfi],0,Ubar,TKEmean);
+      getForce(tforces,bx,1,Xvel,BL_SPACEDIM,prev_time,Umf[U_mfi],Smf[U_mfi],0,Ubar,TKEmean,Zmean,Svarmean);
 #else
       getForce(tforces,bx,1,Xvel,BL_SPACEDIM,rho_ptime[U_mfi]);
 #endif		 
@@ -3773,19 +3813,33 @@ NavierStokesBase::velocity_advection_update (Real dt)
 //    VisMF::Write(Gp,"Gp_before");	// NO
 
 #ifdef LINEARFORCING
+    FillPatchIterator S_fpi(*this,get_old_data(State_Type),1,state[State_Type].prevTime(),State_Type,Density,NUM_SCALARS);
+    MultiFab& Smf=S_fpi.get_mf();
     MultiFab Utmp(grids,dmap,BL_SPACEDIM,1);
-    MultiFab::Copy(Utmp,U_new,Xvel,0,3,0);
+    MultiFab::Copy(Utmp,U_new,Xvel,0,BL_SPACEDIM,0);
+    MultiFab Stmp(grids,dmap,NUM_SCALARS-BL_SPACEDIM-1,1);
+    MultiFab::Copy(Stmp,Smf,0,0,NUM_SCALARS-BL_SPACEDIM-1,0);
     Real Ubar[BL_SPACEDIM];
     Real TKEmean;
+    Real Svarmean[NUM_SCALARS-BL_SPACEDIM-1];
+    Real Zmean[NUM_SCALARS-BL_SPACEDIM-1];
     Ubar[Xvel] = Utmp.sum(Xvel) / grids.numPts();
     Ubar[Yvel] = Utmp.sum(Yvel) / grids.numPts();
     Ubar[Zvel] = Utmp.sum(Zvel) / grids.numPts();
     Utmp.plus(-Ubar[Xvel],0,1,0);
     Utmp.plus(-Ubar[Yvel],1,1,0);
     Utmp.plus(-Ubar[Zvel],2,1,0);
-    MultiFab::Multiply(Utmp,Utmp,Xvel,Xvel,3,0);
+    MultiFab::Multiply(Utmp,Utmp,Xvel,Xvel,BL_SPACEDIM,0);
     TKEmean = 0.5*(Utmp.sum(Xvel) + Utmp.sum(Yvel) + Utmp.sum(Zvel)) / grids.numPts();
     Utmp.clear();
+    for (int n=0; n<NUM_SCALARS-BL_SPACEDIM-1; ++n) {
+      Zmean[n] = Stmp.sum(n) / grids.numPts();
+    }
+    MultiFab::Multiply(Stmp,Stmp,0,0,NUM_SCALARS-BL_SPACEDIM-1,0);
+    for (int n=0; n<NUM_SCALARS-BL_SPACEDIM-1; ++n) {
+      Svarmean[n] = (Stmp.sum(n) / grids.numPts()) - Zmean[n]*Zmean[n];
+    }
+    Stmp.clear();
 #endif
     
     MultiFab& halftime = get_rho_half_time();
@@ -3901,7 +3955,7 @@ NavierStokesBase::velocity_advection_update (Real dt)
     
     if (getForceVerbose) amrex::Print() << "Calling getForce..." << '\n';
         const Real half_time = 0.5*(state[State_Type].prevTime()+state[State_Type].curTime());
-        getForce(tforces,bx,0,Xvel,BL_SPACEDIM,half_time,Vel,Scal,0,Ubar,TKEmean);
+        getForce(tforces,bx,0,Xvel,BL_SPACEDIM,half_time,Vel,Scal,0,Ubar,TKEmean,Zmean,Svarmean);
 #else
         getForce(tforces,bx,0,Xvel,BL_SPACEDIM,halftime[i]);
 #endif		 
@@ -3990,19 +4044,33 @@ NavierStokesBase::initial_velocity_diffusion_update (Real dt)
 	}
 
 #ifdef LINEARFORCING
+    FillPatchIterator S_fpi(*this,visc_terms,1,prev_time,State_Type,Density,NUM_SCALARS);
+    MultiFab& Smf=S_fpi.get_mf();
     MultiFab Utmp(grids,dmap,BL_SPACEDIM,1);
-    MultiFab::Copy(Utmp,U_new,Xvel,0,3,0);
+    MultiFab::Copy(Utmp,U_new,Xvel,0,BL_SPACEDIM,0);
+    MultiFab Stmp(grids,dmap,NUM_SCALARS-BL_SPACEDIM-1,1);
+    MultiFab::Copy(Stmp,Smf,0,0,NUM_SCALARS-BL_SPACEDIM-1,0);
     Real Ubar[BL_SPACEDIM];
     Real TKEmean;
+    Real Svarmean[NUM_SCALARS-BL_SPACEDIM-1];
+    Real Zmean[NUM_SCALARS-BL_SPACEDIM-1];
     Ubar[Xvel] = Utmp.sum(Xvel) / grids.numPts();
     Ubar[Yvel] = Utmp.sum(Yvel) / grids.numPts();
     Ubar[Zvel] = Utmp.sum(Zvel) / grids.numPts();
     Utmp.plus(-Ubar[Xvel],0,1,0);
     Utmp.plus(-Ubar[Yvel],1,1,0);
     Utmp.plus(-Ubar[Zvel],2,1,0);
-    MultiFab::Multiply(Utmp,Utmp,Xvel,Xvel,3,0);
+    MultiFab::Multiply(Utmp,Utmp,Xvel,Xvel,BL_SPACEDIM,0);
     TKEmean = 0.5*(Utmp.sum(Xvel) + Utmp.sum(Yvel) + Utmp.sum(Zvel)) / grids.numPts();
     Utmp.clear();
+    for (int n=0; n<NUM_SCALARS-BL_SPACEDIM-1; ++n) {
+      Zmean[n] = Stmp.sum(n) / grids.numPts();
+    }
+    MultiFab::Multiply(Stmp,Stmp,0,0,NUM_SCALARS-BL_SPACEDIM-1,0);
+    for (int n=0; n<NUM_SCALARS-BL_SPACEDIM-1; ++n) {
+      Svarmean[n] = (Stmp.sum(n) / grids.numPts()) - Zmean[n]*Zmean[n];
+    }
+    Stmp.clear();
 #endif
 
         
@@ -4040,7 +4108,7 @@ NavierStokesBase::initial_velocity_diffusion_update (Real dt)
 	    }
             getForce(tforces,bx,0,Xvel,BL_SPACEDIM,prev_time,U_old[mfi],U_old[mfi],Density);
 #elif LINEARFORCING
-            getForce(tforces,bx,0,Xvel,BL_SPACEDIM,prev_time,U_old[mfi],U_old[mfi],Density,Ubar,TKEmean);
+            getForce(tforces,bx,0,Xvel,BL_SPACEDIM,prev_time,U_old[mfi],U_old[mfi],Density,Ubar,TKEmean,Zmean,Svarmean);
 #else
             getForce(tforces,bx,0,Xvel,BL_SPACEDIM,rho_ptime[mfi]);
 #endif		 
