@@ -602,73 +602,73 @@ Diffusion::diffuse_scalar (Real                   dt,
    
     // My visc op matches development
         // fixme: check fluxes
-    static int count=0; count++;
-    std::string name2;    
-    {
-    // Diff local MF and MF from unaltered code 
-    name2="/home/candace/CCSE/clean_checkout/IAMR/Exec/run2d/fluxx_"+std::to_string(count);	    
-    MultiFab mf2(fluxn[0]->boxArray(),dmap,fluxn[0]->nComp(),fluxn[0]->nGrow());
-    MultiFab mfdiff(mf2.boxArray(), dmap, mf2.nComp(), mf2.nGrow());
-    std::cout << "Reading " << name2 << std::endl;
-    VisMF::Read(mf2, name2);
-    MultiFab::Copy(mfdiff, *fluxn[0], 0, 0, mfdiff.nComp(),mfdiff.nGrow());
-    mfdiff.minus(mf2, 0, mfdiff.nComp(), mfdiff.nGrow());
-    
-    for (int icomp = 0; icomp < mfdiff.nComp(); ++icomp) {
-      std::cout << "Min and max of the diff are " << mfdiff.min(icomp,mf2.nGrow()) 
-    		<< " and " << mfdiff.max(icomp,mf2.nGrow());
-      if (mfdiff.nComp() > 1) {
-    	std::cout << " for component " << icomp;
-      }
-      std::cout << "." << std::endl;
-    }
-    for (int icomp = 0; icomp < mfdiff.nComp(); ++icomp) {
-      std::cout << "Min and max of the diff are wo ghosts " << mfdiff.min(icomp,0) 
-    		<< " and " << mfdiff.max(icomp,0);
-      if (mfdiff.nComp() > 1) {
-    	std::cout << " for component " << icomp;
-      }
-      std::cout << "." << std::endl;
-    }
-        // write out difference MF for viewing: amrvis -mf 
-    std::cout << "Writing mfdiff" << std::endl;
-    VisMF::Write(mfdiff, "xdiff"+std::to_string(count));
-
-    }
-    {
-    // Diff local MF and MF from unaltered code 
-    name2="/home/candace/CCSE/clean_checkout/IAMR/Exec/run2d/fluxy_"+std::to_string(count);	    
-    MultiFab mf2(fluxn[1]->boxArray(),dmap,fluxn[1]->nComp(),fluxn[1]->nGrow());
-    MultiFab mfdiff(mf2.boxArray(), dmap, mf2.nComp(), mf2.nGrow());
-    std::cout << "Reading " << name2 << std::endl;
-    VisMF::Read(mf2, name2);
-    MultiFab::Copy(mfdiff, *fluxn[1], 0, 0, mfdiff.nComp(),mfdiff.nGrow());
-    mfdiff.minus(mf2, 0, mfdiff.nComp(), mfdiff.nGrow());
-    
-    for (int icomp = 0; icomp < mfdiff.nComp(); ++icomp) {
-      std::cout << "Min and max of the diff are " << mfdiff.min(icomp,mf2.nGrow()) 
-    		<< " and " << mfdiff.max(icomp,mf2.nGrow());
-      if (mfdiff.nComp() > 1) {
-    	std::cout << " for component " << icomp;
-      }
-      std::cout << "." << std::endl;
-    }
-    for (int icomp = 0; icomp < mfdiff.nComp(); ++icomp) {
-      std::cout << "Min and max of the diff are wo ghosts " << mfdiff.min(icomp,0) 
-    		<< " and " << mfdiff.max(icomp,0);
-      if (mfdiff.nComp() > 1) {
-    	std::cout << " for component " << icomp;
-      }
-      std::cout << "." << std::endl;
-    }
-        // write out difference MF for viewing: amrvis -mf 
-    std::cout << "Writing mfdiff" << std::endl;
-    VisMF::Write(mfdiff, "ydiff"+std::to_string(count));
-
-    }
+    // static int count=0; count++;
+    // std::string name2;    
     // {
     // // Diff local MF and MF from unaltered code 
-    // name2="/home/candace/CCSE/clean_checkout/IAMR/Exec/run3d/fluxz_"+std::to_string(count);	    
+    // name2="/home/candace/CCSE/IAMR_RZfix/IAMR/Exec/run2d/fluxx_"+std::to_string(count);	    
+    // MultiFab mf2(fluxn[0]->boxArray(),dmap,fluxn[0]->nComp(),fluxn[0]->nGrow());
+    // MultiFab mfdiff(mf2.boxArray(), dmap, mf2.nComp(), mf2.nGrow());
+    // std::cout << "Reading " << name2 << std::endl;
+    // VisMF::Read(mf2, name2);
+    // MultiFab::Copy(mfdiff, *fluxn[0], 0, 0, mfdiff.nComp(),mfdiff.nGrow());
+    // mfdiff.minus(mf2, 0, mfdiff.nComp(), mfdiff.nGrow());
+    
+    // for (int icomp = 0; icomp < mfdiff.nComp(); ++icomp) {
+    //   std::cout << "Min and max of the diff are " << mfdiff.min(icomp,mf2.nGrow()) 
+    // 		<< " and " << mfdiff.max(icomp,mf2.nGrow());
+    //   if (mfdiff.nComp() > 1) {
+    // 	std::cout << " for component " << icomp;
+    //   }
+    //   std::cout << "." << std::endl;
+    // }
+    // for (int icomp = 0; icomp < mfdiff.nComp(); ++icomp) {
+    //   std::cout << "Min and max of the diff are wo ghosts " << mfdiff.min(icomp,0) 
+    // 		<< " and " << mfdiff.max(icomp,0);
+    //   if (mfdiff.nComp() > 1) {
+    // 	std::cout << " for component " << icomp;
+    //   }
+    //   std::cout << "." << std::endl;
+    // }
+    //     // write out difference MF for viewing: amrvis -mf 
+    // std::cout << "Writing mfdiff" << std::endl;
+    // VisMF::Write(mfdiff, "xdiff"+std::to_string(count));
+
+    // }
+    // {
+    // // Diff local MF and MF from unaltered code 
+    // name2="/home/candace/CCSE/IAMR_RZfix/IAMR/Exec/run2d/fluxy_"+std::to_string(count);	    
+    // MultiFab mf2(fluxn[1]->boxArray(),dmap,fluxn[1]->nComp(),fluxn[1]->nGrow());
+    // MultiFab mfdiff(mf2.boxArray(), dmap, mf2.nComp(), mf2.nGrow());
+    // std::cout << "Reading " << name2 << std::endl;
+    // VisMF::Read(mf2, name2);
+    // MultiFab::Copy(mfdiff, *fluxn[1], 0, 0, mfdiff.nComp(),mfdiff.nGrow());
+    // mfdiff.minus(mf2, 0, mfdiff.nComp(), mfdiff.nGrow());
+    
+    // for (int icomp = 0; icomp < mfdiff.nComp(); ++icomp) {
+    //   std::cout << "Min and max of the diff are " << mfdiff.min(icomp,mf2.nGrow()) 
+    // 		<< " and " << mfdiff.max(icomp,mf2.nGrow());
+    //   if (mfdiff.nComp() > 1) {
+    // 	std::cout << " for component " << icomp;
+    //   }
+    //   std::cout << "." << std::endl;
+    // }
+    // for (int icomp = 0; icomp < mfdiff.nComp(); ++icomp) {
+    //   std::cout << "Min and max of the diff are wo ghosts " << mfdiff.min(icomp,0) 
+    // 		<< " and " << mfdiff.max(icomp,0);
+    //   if (mfdiff.nComp() > 1) {
+    // 	std::cout << " for component " << icomp;
+    //   }
+    //   std::cout << "." << std::endl;
+    // }
+    //     // write out difference MF for viewing: amrvis -mf 
+    // std::cout << "Writing mfdiff" << std::endl;
+    // VisMF::Write(mfdiff, "ydiff"+std::to_string(count));
+
+    // }
+    // {
+    // // Diff local MF and MF from unaltered code 
+    // name2="/home/candace/CCSE/IAMR_RZfix/IAMR/Exec/run3d/fluxz_"+std::to_string(count);	    
     // MultiFab mf2(f_old[2].boxArray(),dmap,f_old[2].nComp(),f_old[2].nGrow());
     // MultiFab mfdiff(mf2.boxArray(), dmap, mf2.nComp(), mf2.nGrow());
     // std::cout << "Reading " << name2 << std::endl;
@@ -707,6 +707,88 @@ Diffusion::diffuse_scalar (Real                   dt,
     //VisMF::Write(f_old[2],"fluxz_"+std::to_string(count));
     //
     //amrex::Abort("Check old time diff fluxes \n ");
+
+    
+
+    //  ///////////////////////////////////////
+    // fixme --- RZ not working yet. Something's wrong related to hoop stress
+    //   or a/alpha.
+    //   With a = 0, Rhs out of mlmg.apply() matches dev
+    //   BUT, comments below say hoop stess is missing and must be added 
+    //   so, it appears that IAMR and MLMG disagree on the computation of
+    //      b del dot (beta grad S_old) 
+    //
+    //   Still need to add hoop stress to match dev.
+    //   This is done multiple places - here in diffuse_scalar
+    //     getViscTerms, computeAlpha, perhaps others...
+    //
+    //     // Add hoop stress for x-velocity in r-z coordinates
+//     // Note: we have to add hoop stress explicitly because the hoop
+//     // stress which is added through the operator in getViscOp
+//     // is eliminated by setting a = 0.
+//     //
+#if (BL_SPACEDIM == 2) 
+    if (sigma == Xvel && parent->Geom(0).IsRZ())
+    {
+      //amrex::Abort("r-z still under development. \n");
+
+      // this should not be needed if using MLMG metric terms, right?
+      // but what I'm seeing is it's needed to match dev
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+	{
+	    Vector<Real> rcen;
+
+	    for (MFIter Rhsmfi(Rhs,true); Rhsmfi.isValid(); ++Rhsmfi)
+	    {
+		const Box& bx   = Rhsmfi.tilebox();
+		
+		const Box& rbx  = Rhsmfi.validbox();
+		const Box& sbx  = S_old[Rhsmfi].box();
+		//const Box& vbox = volume[Rhsmfi].box();
+		FArrayBox tmp;
+		tmp.resize(bx,1);
+		tmp.setVal(1.0);
+		const Box& vbox = tmp.box();
+
+		rcen.resize(bx.length(0));
+		navier_stokes->Geom().GetCellLoc(rcen, bx, 0);
+		
+		const int*  lo      = bx.loVect();
+		const int*  hi      = bx.hiVect();
+		const int*  rlo     = rbx.loVect();
+		const int*  rhi     = rbx.hiVect();
+		const int*  slo     = sbx.loVect();
+		const int*  shi     = sbx.hiVect();
+		Real*       rhs     = Rhs[Rhsmfi].dataPtr();
+		const Real* sdat    = S_old[Rhsmfi].dataPtr(sigma);
+		const Real* rcendat = rcen.dataPtr();
+		const Real  coeff   = (1.0-be_cn_theta)*visc_coef[sigma]*dt;
+		//const Real* voli    = volume[Rhsmfi].dataPtr();
+		const Real* voli    = tmp.dataPtr();
+		const int*  vlo     = vbox.loVect();
+		const int*  vhi     = vbox.hiVect();
+
+		hooprhs(ARLIM(lo),ARLIM(hi),
+			rhs, ARLIM(rlo), ARLIM(rhi), 
+			sdat, ARLIM(slo), ARLIM(shi),
+			rcendat, &coeff, voli, ARLIM(vlo),ARLIM(vhi));
+	    }
+	}
+     }
+ #endif
+    /////////////////////    
+
+    //fixme
+    // check input
+    //MultiFab::Multiply(Rhs,volume,0,0,1,0);
+    // Print()<<"solve mode "<< (solve_mode==PREDICTOR)<<"\n";
+    // Print()<<"delta rhs "<< (delta_rhs !=0 )<<"\n";
+    // amrex::WriteSingleLevelPlotfile("rhsA_"+std::to_string(count), Rhs, {"rhs"},navier_stokes->Geom(), 0.0, 0);
+    //  amrex::Abort("check rhsA");
+    //
+
     
     //
     // If this is a predictor step, put "explicit" updates passed via S_new
@@ -767,76 +849,6 @@ Diffusion::diffuse_scalar (Real                   dt,
         }
     }
     }
-    //fixme
-    // check input
-    //MultiFab::Multiply(Rhs,volume,0,0,1,0);
-    Print()<<"solve mode "<< (solve_mode==PREDICTOR)<<"\n";
-    Print()<<"delta rhs "<< (delta_rhs !=0 )<<"\n";
-    amrex::WriteSingleLevelPlotfile("rhsA_"+std::to_string(count), Rhs, {"rhs"},navier_stokes->Geom(), 0.0, 0);
-    //  amrex::Abort("check rhsA");
-    //
-
-
-    //  ///////////////////////////////////////
-    // fixme --- RZ not working yet. Something's wrong related to hoop stress.
-    //   With a = 0, Soln out of mlmg.solve() matches dev
-    //   BUT, comments below say hoop stess is missing and must be added 
-    //   so, it appears that IAMR and MLMG disagree on the computation of
-    //      b del dot (beta grad S_old) 
-    //
-    //     // Add hoop stress for x-velocity in r-z coordinates
-//     // Note: we have to add hoop stress explicitly because the hoop
-//     // stress which is added through the operator in getViscOp
-//     // is eliminated by setting a = 0.
-//     //
-#if (BL_SPACEDIM == 2) 
-    if (sigma == Xvel && parent->Geom(0).IsRZ())
-    {
-      //amrex::Abort("r-z still under development. \n");
-
-      // this should not be needed if using MLMG metric terms, right?
-// #ifdef _OPENMP
-// #pragma omp parallel
-// #endif
-// 	{
-// 	    Vector<Real> rcen;
-
-// 	    for (MFIter Rhsmfi(Rhs,true); Rhsmfi.isValid(); ++Rhsmfi)
-// 	    {
-// 		const Box& bx   = Rhsmfi.tilebox();
-		
-// 		const Box& rbx  = Rhsmfi.validbox();
-// 		const Box& sbx  = S_old[Rhsmfi].box();
-// 		const Box& vbox = volume[Rhsmfi].box();
-		
-// 		rcen.resize(bx.length(0));
-// 		navier_stokes->Geom().GetCellLoc(rcen, bx, 0);
-		
-// 		const int*  lo      = bx.loVect();
-// 		const int*  hi      = bx.hiVect();
-// 		const int*  rlo     = rbx.loVect();
-// 		const int*  rhi     = rbx.hiVect();
-// 		const int*  slo     = sbx.loVect();
-// 		const int*  shi     = sbx.hiVect();
-// 		Real*       rhs     = Rhs[Rhsmfi].dataPtr();
-// 		const Real* sdat    = S_old[Rhsmfi].dataPtr(sigma);
-// 		const Real* rcendat = rcen.dataPtr();
-// 		const Real  coeff   = (1.0-be_cn_theta)*visc_coef[sigma]*dt;
-// 		const Real* voli    = volume[Rhsmfi].dataPtr();
-// 		const int*  vlo     = vbox.loVect();
-// 		const int*  vhi     = vbox.hiVect();
-
-// 		hooprhs(ARLIM(lo),ARLIM(hi),
-// 			rhs, ARLIM(rlo), ARLIM(rhi), 
-// 			sdat, ARLIM(slo), ARLIM(shi),
-// 			rcendat, &coeff, voli, ARLIM(vlo),ARLIM(vhi));
-// 	    }
-// 	}
-     }
- #endif
-    /////////////////////
-
-    
     //
     // Increment Rhs with S_old*V (or S_old*V*rho_half if rho_flag==1
     //                             or S_old*V*rho_old  if rho_flag==3)
@@ -988,8 +1000,8 @@ Diffusion::diffuse_scalar (Real                   dt,
     // check input
     // MultiFab::Multiply(Rhs,volume,0,0,1,0);
     // MultiFab::Multiply(Soln,volume,0,0,1,0);
-    amrex::WriteSingleLevelPlotfile("soln2", Soln, {"soln"},navier_stokes->Geom(), 0.0, 0);
-    amrex::WriteSingleLevelPlotfile("rhs2", Rhs, {"rhs"},navier_stokes->Geom(), 0.0, 0);
+    // amrex::WriteSingleLevelPlotfile("soln2", Soln, {"soln"},navier_stokes->Geom(), 0.0, 0);
+    // amrex::WriteSingleLevelPlotfile("rhs2", Rhs, {"rhs"},navier_stokes->Geom(), 0.0, 0);
     //
 
 
@@ -1065,78 +1077,78 @@ Diffusion::diffuse_scalar (Real                   dt,
     }
 #endif
 
-    VisMF::Write(*fluxnp1[0],"f1_"+std::to_string(count));
-    {
-      //fixme
-      name2="/home/candace/CCSE/clean_checkout/IAMR/Exec/run2d/flux0_"+std::to_string(count);
+    // VisMF::Write(*fluxnp1[0],"f1_"+std::to_string(count));
+    // {
+    //   //fixme
+    //   name2="/home/candace/CCSE/IAMR_RZfix/IAMR/Exec/run2d/flux0_"+std::to_string(count);
 	    
-    std::cout << "Reading " << name2 << std::endl;
-    MultiFab mf2(fluxnp1[0]->boxArray(),dmap,fluxnp1[0]->nComp(),fluxnp1[0]->nGrow());
-    VisMF::Read(mf2, name2);
-    MultiFab mfdiff(mf2.boxArray(), dmap, mf2.nComp(), mf2.nGrow());
-    // Diff local MF and MF from unaltered code 
-    MultiFab::Copy(mfdiff, *fluxnp1[0], 0, 0, mfdiff.nComp(),mfdiff.nGrow());
-    mfdiff.minus(mf2, 0, mfdiff.nComp(), mfdiff.nGrow());
+    // std::cout << "Reading " << name2 << std::endl;
+    // MultiFab mf2(fluxnp1[0]->boxArray(),dmap,fluxnp1[0]->nComp(),fluxnp1[0]->nGrow());
+    // VisMF::Read(mf2, name2);
+    // MultiFab mfdiff(mf2.boxArray(), dmap, mf2.nComp(), mf2.nGrow());
+    // // Diff local MF and MF from unaltered code 
+    // MultiFab::Copy(mfdiff, *fluxnp1[0], 0, 0, mfdiff.nComp(),mfdiff.nGrow());
+    // mfdiff.minus(mf2, 0, mfdiff.nComp(), mfdiff.nGrow());
     
-    for (int icomp = 0; icomp < mfdiff.nComp(); ++icomp) {
-      std::cout << "Min and max of the diff are " << mfdiff.min(icomp,mf2.nGrow()) 
-    		<< " and " << mfdiff.max(icomp,mf2.nGrow());
-      if (mfdiff.nComp() > 1) {
-    	std::cout << " for component " << icomp;
-      }
-      std::cout << "." << std::endl;
-    }
-    for (int icomp = 0; icomp < mfdiff.nComp(); ++icomp) {
-      std::cout << "Min and max of the diff are wo ghosts " << mfdiff.min(icomp,0) 
-    		<< " and " << mfdiff.max(icomp,0);
-      if (mfdiff.nComp() > 1) {
-    	std::cout << " for component " << icomp;
-      }
-      std::cout << "." << std::endl;
-    }
-    // write out difference MF for viewing: amrvis -mf 
-    std::cout << "Writing mfdiff" << std::endl;
-    mf2.plus(1.e-55,0,1,0);
-    MultiFab::Divide(mfdiff,mf2,0,0,1,0);
-    VisMF::Write(mfdiff, "fdiff0_"+std::to_string(count));
-    }
+    // for (int icomp = 0; icomp < mfdiff.nComp(); ++icomp) {
+    //   std::cout << "Min and max of the diff are " << mfdiff.min(icomp,mf2.nGrow()) 
+    // 		<< " and " << mfdiff.max(icomp,mf2.nGrow());
+    //   if (mfdiff.nComp() > 1) {
+    // 	std::cout << " for component " << icomp;
+    //   }
+    //   std::cout << "." << std::endl;
+    // }
+    // for (int icomp = 0; icomp < mfdiff.nComp(); ++icomp) {
+    //   std::cout << "Min and max of the diff are wo ghosts " << mfdiff.min(icomp,0) 
+    // 		<< " and " << mfdiff.max(icomp,0);
+    //   if (mfdiff.nComp() > 1) {
+    // 	std::cout << " for component " << icomp;
+    //   }
+    //   std::cout << "." << std::endl;
+    // }
+    // // write out difference MF for viewing: amrvis -mf 
+    // std::cout << "Writing mfdiff" << std::endl;
+    // mf2.plus(1.e-55,0,1,0);
+    // MultiFab::Divide(mfdiff,mf2,0,0,1,0);
+    // VisMF::Write(mfdiff, "fdiff0_"+std::to_string(count));
+    // }
 
-    {
-      //fixme
-      name2="/home/candace/CCSE/clean_checkout/IAMR/Exec/run2d/flux1_"+std::to_string(count);
+    // {
+    //   //fixme
+    //   name2="/home/candace/CCSE/IAMR_RZfix/IAMR/Exec/run2d/flux1_"+std::to_string(count);
 	    
-    std::cout << "Reading " << name2 << std::endl;
-    MultiFab mf2(fluxnp1[1]->boxArray(),dmap,fluxnp1[1]->nComp(),fluxnp1[1]->nGrow());
-    VisMF::Read(mf2, name2);
-    MultiFab mfdiff(mf2.boxArray(), dmap, mf2.nComp(), mf2.nGrow());
-    // Diff local MF and MF from unaltered code 
-    MultiFab::Copy(mfdiff, *fluxnp1[1], 0, 0, mfdiff.nComp(),mfdiff.nGrow());
-    mfdiff.minus(mf2, 0, mfdiff.nComp(), mfdiff.nGrow());
+    // std::cout << "Reading " << name2 << std::endl;
+    // MultiFab mf2(fluxnp1[1]->boxArray(),dmap,fluxnp1[1]->nComp(),fluxnp1[1]->nGrow());
+    // VisMF::Read(mf2, name2);
+    // MultiFab mfdiff(mf2.boxArray(), dmap, mf2.nComp(), mf2.nGrow());
+    // // Diff local MF and MF from unaltered code 
+    // MultiFab::Copy(mfdiff, *fluxnp1[1], 0, 0, mfdiff.nComp(),mfdiff.nGrow());
+    // mfdiff.minus(mf2, 0, mfdiff.nComp(), mfdiff.nGrow());
     
-    for (int icomp = 0; icomp < mfdiff.nComp(); ++icomp) {
-      std::cout << "Min and max of the diff are " << mfdiff.min(icomp,mf2.nGrow()) 
-    		<< " and " << mfdiff.max(icomp,mf2.nGrow());
-      if (mfdiff.nComp() > 1) {
-    	std::cout << " for component " << icomp;
-      }
-      std::cout << "." << std::endl;
-    }
-    for (int icomp = 0; icomp < mfdiff.nComp(); ++icomp) {
-      std::cout << "Min and max of the diff are wo ghosts " << mfdiff.min(icomp,0) 
-    		<< " and " << mfdiff.max(icomp,0);
-      if (mfdiff.nComp() > 1) {
-    	std::cout << " for component " << icomp;
-      }
-      std::cout << "." << std::endl;
-    }
-    // write out difference MF for viewing: amrvis -mf 
-    std::cout << "Writing mfdiff" << std::endl;
-    mf2.plus(1.e-55,0,1,0);
-    MultiFab::Divide(mfdiff,mf2,0,0,1,0);
-    VisMF::Write(mfdiff, "fdiff1_"+std::to_string(count));
-    }
-    // if (sigma==Xvel)
-    //   amrex::Abort("check inputs");
+    // for (int icomp = 0; icomp < mfdiff.nComp(); ++icomp) {
+    //   std::cout << "Min and max of the diff are " << mfdiff.min(icomp,mf2.nGrow()) 
+    // 		<< " and " << mfdiff.max(icomp,mf2.nGrow());
+    //   if (mfdiff.nComp() > 1) {
+    // 	std::cout << " for component " << icomp;
+    //   }
+    //   std::cout << "." << std::endl;
+    // }
+    // for (int icomp = 0; icomp < mfdiff.nComp(); ++icomp) {
+    //   std::cout << "Min and max of the diff are wo ghosts " << mfdiff.min(icomp,0) 
+    // 		<< " and " << mfdiff.max(icomp,0);
+    //   if (mfdiff.nComp() > 1) {
+    // 	std::cout << " for component " << icomp;
+    //   }
+    //   std::cout << "." << std::endl;
+    // }
+    // // write out difference MF for viewing: amrvis -mf 
+    // std::cout << "Writing mfdiff" << std::endl;
+    // mf2.plus(1.e-55,0,1,0);
+    // MultiFab::Divide(mfdiff,mf2,0,0,1,0);
+    // VisMF::Write(mfdiff, "fdiff1_"+std::to_string(count));
+    // }
+     // if (sigma==Xvel)
+     //   amrex::Abort("check inputs");
     //amrex::Abort("check \n");
 
 
@@ -2869,8 +2881,10 @@ Diffusion::computeAlpha (MultiFab&       alpha,
 
     alpha.define(grids, dmap, 1, ng, MFInfo(), navier_stokes->Factory());
 
-    const MultiFab& volume = navier_stokes->Volume(); 
-
+    //const MultiFab& volume = navier_stokes->Volume(); 
+    MultiFab volume (grids, dmap, 1, ng);
+    volume.setVal(1.0);
+    
     int usehoop = (comp == Xvel && (parent->Geom(0).IsRZ()));
     int useden  = (rho_flag == 1);
 
@@ -3106,8 +3120,12 @@ Diffusion::getViscTerms (MultiFab&              visc_terms,
     // LinOp classes cannot handle multcomponent MultiFabs yet,
     // construct the components one at a time and copy to visc_terms.
     //
-#if 0
-    // old way with volume weighted beta
+#if 1
+    //
+    // FIXME -- Compute visc terms with old LinOp and comapare to MLMG soln
+    //  Cartesian works ( diff). RZ does not for Xvel
+    //
+    //  start with old way with volume weighted beta
     if (is_diffusive[comp])
     {
         MultiFab visc_tmp(grids,dmap,1,1), s_tmp(grids,dmap,1,1);
@@ -3199,8 +3217,10 @@ Diffusion::getViscTerms (MultiFab&              visc_terms,
     {
       // fixme for EB? again guessing 
         int ng = 1;
+	//fixme -- can probably remove visc_tmp and just use viscterms
 	// should try visc_tmp.nGrow = 0
-        MultiFab visc_tmp(grids,dmap,1,ng), s_tmp(grids,dmap,1,ng);
+        MultiFab visc_tmp(grids,dmap,1,ng, MFInfo(), navier_stokes->Factory()),
+	  s_tmp(grids,dmap,1,ng, MFInfo(), navier_stokes->Factory());
         //
         // Set up operator and apply to compute viscous terms.
         //
@@ -3289,18 +3309,36 @@ Diffusion::getViscTerms (MultiFab&              visc_terms,
 	mgn.apply({&visc_tmp},{&s_tmp});
 
 	//fixme
-	// // compare to old method...
-	// VisMF::Write(visc_terms,"VT");
-	// VisMF::Write(visc_tmp,"VTtmp");
-        // MultiFab diff(grids,dmap,1,1);
-	// MultiFab::Copy(diff,visc_tmp,0,0,1,0);
-	// MultiFab::Subtract(diff,visc_terms,comp-src_comp,0,1,0);
-	// VisMF::Write(diff,"VTdiff");
-	// std::cout << "Min and max of the diff are " << diff.min(0,0) <<" "
-	// 	  <<diff.max(0,0)<<"\n";
-	// MultiFab::Copy(diff,visc_tmp,0,0,1,0);
-	// MultiFab::Divide(diff,visc_terms,comp-src_comp,0,1,0);
-	// VisMF::Write(diff,"VTdiff2");
+	if (comp == Xvel)
+	{
+	  Print()<<"\nXvel :";
+	}
+	if (comp == Yvel)
+	{
+	  Print()<<"\nYvel :";
+	}
+	// compare to old method...
+	VisMF::Write(visc_terms,"VT");
+	VisMF::Write(visc_tmp,"VTtmp");
+        MultiFab diff(grids,dmap,1,1);
+	MultiFab::Copy(diff,visc_tmp,0,0,1,0);
+	MultiFab::Subtract(diff,visc_terms,comp-src_comp,0,1,0);
+	VisMF::Write(diff,"VTdiff");
+	Print()<<"\n";
+	std::cout << "Absolute diff min and max: " << diff.min(0,0) <<" "
+		  <<diff.max(0,0)<<"\n";
+	//Print()<<"\n";
+	MultiFab::Copy(diff,visc_tmp,0,0,1,0);
+	MultiFab::Subtract(diff,visc_terms,comp-src_comp,0,1,0);
+	MultiFab::Divide(diff,visc_terms,comp-src_comp,0,1,0);
+	VisMF::Write(diff,"VTdiff2");
+	std::cout << "Relative diff min and max: " << diff.min(0,0) <<" "
+		  <<diff.max(0,0)<<"\n";
+	Print()<<"\n";
+	if (comp == Yvel)
+	{
+	  amrex::Abort("Check visc terms");
+	}
 	///
 	MultiFab::Copy(visc_terms,visc_tmp,0,comp-src_comp,1,0);
     }
@@ -3338,6 +3376,10 @@ Diffusion::getTensorViscTerms (MultiFab&              visc_terms,
     //
     const Real* dx   = navier_stokes->Geom().CellSize();
     MultiFab&   S    = navier_stokes->get_data(State_Type,time);
+
+
+    // Old way... FIXME, remove once new way tested
+
     //
     // FIXME
     // LinOp classes cannot handle multcomponent MultiFabs yet,
@@ -3445,6 +3487,148 @@ Diffusion::getTensorViscTerms (MultiFab&              visc_terms,
         int ngrow = visc_terms.nGrow();
         visc_terms.setVal(0.0,src_comp,BL_SPACEDIM,ngrow);
     }
+
+
+#if 0
+    // MLMG way ...
+
+    if (is_diffusive[comp])
+    {
+        // fixme for EB? again guessing 
+        int ng = 1;
+	//fixme -- can probably remove visc_tmp and just use viscterms
+	// should try visc_tmp.nGrow = 0
+        MultiFab visc_tmp(grids,dmap,AMREX_SPACEDIM,ng, MFInfo(), navier_stokes->Factory()),
+	  s_tmp(grids,dmap,AMREX_SPACEDIM,ng, MFInfo(), navier_stokes->Factory());
+
+	//
+        // Set up operator and apply to compute viscous terms.
+        //
+        const Real a = 0.0;
+        const Real b = -1.0;
+
+	LPInfo info;
+	info.setAgglomeration(agglomeration);
+	info.setConsolidation(consolidation);
+	info.setMaxCoarseningLevel(0);
+	// let MLMG take care of r-z 
+	//info.setMetricTerm(false);
+
+#ifdef AMREX_USE_EB
+	// create the right data holder for passing to MLEBABecLap
+	amrex::Vector<const amrex::EBFArrayBoxFactory*> ebf(1);
+	//ebf.resize(1);
+	ebf[0] = &(dynamic_cast<EBFArrayBoxFactory const&>(navier_stokes->Factory()));
+	
+	MLEBTensorOp mlabec({navier_stokes->Geom()}, {grids}, {dmap}, info, ebf);
+#else	  
+	MLTensorOp mlabec({navier_stokes->Geom()},{grids},{dmap},info);
+#endif
+	// default max_order=2
+	// mfix says:
+	// It is essential that we set MaxOrder of the solver to 2
+	// if we want to use the standard sol(i)-sol(i-1) approximation
+	// for the gradient at Dirichlet boundaries.
+	// The solver's default order is 3 and this uses three points for the
+	// gradient at a Dirichlet boundary.
+	mlabec.setMaxOrder(max_order);
+	
+	{
+	  // set BCs
+	  // FIXME pick up here
+	  // need for multicomponent arrays for BC for all Dims at once
+	  std::array<LinOpBCType,AMREX_SPACEDIM> mlmg_lobc;
+	  std::array<LinOpBCType,AMREX_SPACEDIM> mlmg_hibc;
+	  setDomainBC(mlmg_lobc, mlmg_hibc, comp);
+	  
+	  mlabec.setDomainBC(mlmg_lobc, mlmg_hibc);
+  
+	  MultiFab crsedata;
+	    
+	  if (level > 0) {
+	    auto& crse_ns = *(coarser->navier_stokes);
+	    crsedata.define(crse_ns.boxArray(), crse_ns.DistributionMap(), 1, ng);
+	    AmrLevel::FillPatch(crse_ns,crsedata,ng,time,State_Type,comp,1);
+	    if (rho_flag == 2) {
+	      // We want to evaluate (div beta grad) S, not rho*S.
+	      const MultiFab& rhotime = crse_ns.get_rho(time);
+	      MultiFab::Divide(crsedata,rhotime,0,0,1,ng);
+	    }
+	    mlabec.setCoarseFineBC(&crsedata, crse_ratio[0]);
+	  }
+	  
+	  AmrLevel::FillPatch(*navier_stokes,s_tmp,ng,time,State_Type,comp,1);
+	  if (rho_flag == 2) {
+	    const MultiFab& rhotime = navier_stokes->get_rho(time);
+	    MultiFab::Divide(s_tmp,rhotime,0,0,1,ng);
+	  }
+	  // fixme? Do we need/want this???
+	  // mfix does this
+	  //EB_set_covered(s_tmp, 0, 1, ng, covered_val);
+	  //s_tmp.FillBoundary (geom.periodicity());
+	  mlabec.setLevelBC(0, &s_tmp);
+	}
+	
+	mlabec.setScalars(a,b);
+	// mlabec.setACoeffs() not needed since a = 0.0 
+
+	{
+	  std::array<MultiFab,BL_SPACEDIM> bcoeffs;
+	  computeBeta(bcoeffs, beta, betaComp);
+	  mlabec.setBCoeffs(0, amrex::GetArrOfConstPtrs(bcoeffs));
+	}
+
+	// Do we need something like this cribbed from mfix???
+	// This sets the coefficient on the wall and defines it as a homogeneous
+	// Dirichlet bc for the solve. mu_g is the viscosity at cc in mfix
+	// matches what's in bcoeff
+	//mlabec.setEBHomogDirichlet ( 0, (*mu_g[lev]) );
+
+	MLMG mgn(mlabec);
+	mgn.setVerbose(verbose);
+
+	mgn.apply({&visc_tmp},{&s_tmp});
+
+	//fixme
+	if (comp == Xvel)
+	{
+	  Print()<<"\nXvel :";
+	}
+	if (comp == Yvel)
+	{
+	  Print()<<"\nYvel :";
+	}
+	// compare to old method...
+	VisMF::Write(visc_terms,"VT");
+	VisMF::Write(visc_tmp,"VTtmp");
+        MultiFab diff(grids,dmap,1,1);
+	MultiFab::Copy(diff,visc_tmp,0,0,1,0);
+	MultiFab::Subtract(diff,visc_terms,comp-src_comp,0,1,0);
+	VisMF::Write(diff,"VTdiff");
+	Print()<<"\n";
+	std::cout << "Absolute diff min and max: " << diff.min(0,0) <<" "
+		  <<diff.max(0,0)<<"\n";
+	//Print()<<"\n";
+	MultiFab::Copy(diff,visc_tmp,0,0,1,0);
+	MultiFab::Subtract(diff,visc_terms,comp-src_comp,0,1,0);
+	MultiFab::Divide(diff,visc_terms,comp-src_comp,0,1,0);
+	VisMF::Write(diff,"VTdiff2");
+	std::cout << "Relative diff min and max: " << diff.min(0,0) <<" "
+		  <<diff.max(0,0)<<"\n";
+	Print()<<"\n";
+	if (comp == Yvel)
+	{
+	  amrex::Abort("Check visc terms");
+	}
+	///
+	MultiFab::Copy(visc_terms,visc_tmp,0,comp-src_comp,1,0);
+    }
+    else {
+      int ngrow = visc_terms.nGrow();
+      visc_terms.setVal(0.0,comp-src_comp,1,ngrow);
+    }
+#endif
+    
 }
 
 #include <AMReX_Utility.H>
@@ -3681,8 +3865,11 @@ Diffusion::checkBeta (const MultiFab* const* beta,
 //
 // This routine computes the vector div mu SI, where I is the identity 
 // tensor, S = div U, and mu is constant.
+// 
+// CEG - Ultimately it seems this uses S the constraint (which for IAMR is
+//       (del dot lambda grad T)/(rho cp T) ) and not
+//       a finite difference computation of divergence.
 //
-
 void
 Diffusion::compute_divmusi (Real      time,
                             Real      mu,

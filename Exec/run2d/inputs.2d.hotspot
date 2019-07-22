@@ -27,14 +27,13 @@ ns.do_temp_ref = 1
 
 # Number of cells in each coordinate direction at the coarsest level
 amr.n_cell 		= 16 32 
-amr.n_cell 		= 64 128
+#amr.n_cell 		= 64 128
 amr.max_grid_size	= 32
 
 #*******************************************************************************
 
 # Maximum level (defaults to 0 for single level calculation)
-#amr.max_level		= 4 # maximum number of levels of refinement
-amr.max_level		= 1 # maximum number of levels of refinement
+amr.max_level		= 0 # maximum number of levels of refinement
 
 #*******************************************************************************
 
@@ -79,14 +78,14 @@ ns.init_shrink          = 0.3  # factor which multiplies the very first time ste
 #*******************************************************************************
 
 # Viscosity coefficient 
-#ns.vel_visc_coef        = 0.001
-ns.vel_visc_coef        = 0
+ns.vel_visc_coef        = 0.001
+#ns.vel_visc_coef        = 0
 
 #*******************************************************************************
 
 # Diffusion coefficient for first scalar
-#ns.scal_diff_coefs      = 0.001
-ns.scal_diff_coefs      = 0.0
+ns.scal_diff_coefs      = 0.001
+#ns.scal_diff_coefs      = 0.0
 
 #*******************************************************************************
 
