@@ -14,7 +14,7 @@ nu=1e-4;
 
 %%%%  User input parameters  %%%%
 % Number of solution
-nb_solutfile = '01072'
+nb_solutfile = '04287'
 
 % Retrieving the time of the simulation
 cmd_stringcat = strcat("./ftime.gnu.ex plt",nb_solutfile)
