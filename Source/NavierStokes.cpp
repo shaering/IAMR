@@ -788,7 +788,7 @@ NavierStokes:: calcHerschelBulkley  (MultiFab& visc, Real time)
        const int *dat_hi  = fab.hiVect();
        vel_bc = getBCArray(State_Type,i,Xvel,BL_SPACEDIM);
 
-       FORT_HERSCHEL_BULKLEY(viscdat, ARLIM(visc_lo), ARLIM(visc_hi),
+       herschel_bulkley(viscdat, ARLIM(visc_lo), ARLIM(visc_hi),
                	    		 fabdat,  ARLIM(dat_lo),  ARLIM(dat_hi),
                	    		 lo, hi, domlo, domhi, dx, 
                                  vel_bc.dataPtr());
@@ -821,7 +821,7 @@ NavierStokes::printMF(MultiFab& mf, Real time)
        const int *mf_lo = mf[i].loVect();
        const int *mf_hi = mf[i].hiVect();
 
-	   PRINT_MULTIFAB(mfdat, ARLIM(mf_lo), ARLIM(mf_hi), 
+	   print_multifab(mfdat, ARLIM(mf_lo), ARLIM(mf_hi), 
 					  lo, hi, domlo, domhi, dx);
     }
 }
@@ -2197,15 +2197,11 @@ NavierStokes::calcViscosity (const Real time,
             {
                 // 
                 // Compute apparent viscosity for regularised Herschel-Bulkley fluid
-                // Ensure visc_cc is initialised
+                calcHerschelBulkley(*visc_cc,time);
+                
+                // Fill the ghost cells for visc_cc
                 //
-                visc_cc->setVal(visc_coef[Xvel]+0.5*yield_stress/reg_param, 0, 1, nGrow);
-                //
-		calcHerschelBulkley(*visc_cc,time);
-		//
-		// Fill the ghost cells for visc_cc
-		//
-		visc_cc->FillBoundary(geom.periodicity());
+                visc_cc->FillBoundary(geom.periodicity());
             }
             else 
             {

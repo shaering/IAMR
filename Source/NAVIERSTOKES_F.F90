@@ -9,14 +9,14 @@
 #include <NAVIERSTOKES_F.H>
 #include <AMReX_ArrayLim.H>
 
-c=========================================================
+!=========================================================
 
-      subroutine FORT_SET_NS_PARAMS(n_fluids, 
-     &                              dyn_visc_coef,
-     &                              yield_stress,
-     &                              flow_index, 
-     &                              reg_param,
-     &                              variable_vel_visc)
+      subroutine FORT_SET_NS_PARAMS(n_fluids,            &
+                                    dyn_visc_coef,       &
+                                    yield_stress,        &
+                                    flow_index,          &
+                                    reg_param,           &
+                                    variable_vel_visc) bind(C,name="set_ns_params")
       implicit none
       integer  i
       integer  n_fluids

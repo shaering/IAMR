@@ -666,7 +666,7 @@ NavierStokesBase::Initialize_specific ()
 		pp.getarr("flow_index",flow_index,0,n_fluids);
 		pp.query("reg_param",reg_param);
 
-		FORT_SET_NS_PARAMS(n_fluids, 
+		set_ns_params(n_fluids, 
                                    dyn_visc_coef.dataPtr(), yield_stress.dataPtr(), 
                                    flow_index.dataPtr(), &reg_param, 
                                    variable_vel_visc);
@@ -681,7 +681,7 @@ NavierStokesBase::Initialize_specific ()
                 yield_stress[0] = 0.0;
                 flow_index[0] = 1.0;
                 reg_param = 0.0025;
-		FORT_SET_NS_PARAMS(n_fluids, 
+		set_ns_params(n_fluids, 
                                    dyn_visc_coef.dataPtr(), yield_stress.dataPtr(), 
                                    flow_index.dataPtr(), &reg_param, 
                                    variable_vel_visc);
@@ -1355,8 +1355,9 @@ NavierStokesBase::estTimeStep ()
     const Real  cur_pres_time = state[Press_Type].curTime();
     MultiFab&   U_new         = get_new_data(State_Type);
 
-    Real u_max[BL_SPACEDIM] = {0};
+    Real gr_max[BL_SPACEDIM], u_max[BL_SPACEDIM] = {0};
 
+    FArrayBox tforces; 
     MultiFab Gp(grids,dmap,BL_SPACEDIM,1);
     getGradP(Gp, cur_pres_time);
 
@@ -1380,35 +1381,25 @@ NavierStokesBase::estTimeStep ()
 
     for (MFIter Rho_mfi(rho_ctime); Rho_mfi.isValid(); ++Rho_mfi)
     {
-        const int i = Rho_mfi.index();
-        //
+        const Box& bx = Rho_mfi.tilebox();
+        
         // Get the velocity forcing.  For some reason no viscous forcing.
         //
-#ifdef BOUSSINESQ
-        // HACK HACK HACK 
-        // THIS CALL IS BROKEN 
-        // getForce(tforces,i,n_grow,Xvel,BL_SPACEDIM,cur_time,U_new[i]);
-        tforces.resize(amrex::grow(grids[i],n_grow),BL_SPACEDIM);
-        tforces.setVal(0.);
-#else
-#ifdef GENGETFORCE
-        getForce(tforces,i,n_grow,Xvel,BL_SPACEDIM,cur_time,rho_ctime[Rho_mfi]);
-#elif MOREGENGETFORCE
-	if (getForceVerbose)
-	  amrex::Print() << "---" << '\n' 
-			 << "H - est Time Step:" << '\n' 
-			 << "Calling getForce..." << '\n';
-        getForce(tforces,i,n_grow,Xvel,BL_SPACEDIM,cur_time,U_new[Rho_mfi],U_new[Rho_mfi],Density);
-#else
-        getForce(tforces,i,n_grow,Xvel,BL_SPACEDIM,rho_ctime[Rho_mfi]);
-#endif		 
-#endif		 
+        if (getForceVerbose)
+        {
+            amrex::Print() << "---" << '\n' 
+                << "H - est Time Step:" << '\n' 
+                << "Calling getForce..." << '\n';
+        }
+        getForce(tforces,bx,n_grow,Xvel,BL_SPACEDIM,cur_time,U_new[Rho_mfi],U_new[Rho_mfi],Density);
+
         tforces.minus(Gp[Rho_mfi],0,0,BL_SPACEDIM);
+
 		if (variable_vel_visc)
 		{
 		  tforces.minus(visc_terms[Rho_mfi],0,0,BL_SPACEDIM);
 		}
-        //
+        
         // Estimate the maximum allowable timestep from the Godunov box.
         //
         Real dt = godunov->estdt(U_new[Rho_mfi],tforces,rho_ctime[Rho_mfi],bx,
@@ -1420,7 +1411,6 @@ NavierStokesBase::estTimeStep ()
 		}
 		estdt = std::min(estdt,dt);
     }
-}
 
     ParallelDescriptor::ReduceRealMin(estdt);
 

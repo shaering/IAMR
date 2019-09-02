@@ -21,7 +21,7 @@ module navierstokes_2d_module
 
   public gradp, fort_putdown, incrmult, fort_maxval, &
        summass, summass_cyl, cen2edg, edge_interp, &
-       pc_edge_interp, filcc_tile
+       pc_edge_interp, filcc_tile, fort_herschel_bulkley, print_multifab
   
 contains
 
@@ -440,6 +440,276 @@ contains
       endif
 
     end subroutine pc_edge_interp
+
+      subroutine fort_herschel_bulkley(visc, DIMS(visc), &
+                                       dat, DIMS(dat), &
+                                       lo, hi, domlo, domhi, delta, &
+                                       vel_bc) bind(C,name="herschel_bulkley")
+      use viscoplasticity_module
+      implicit none
+!
+! ::: This routine will compute the Papanastasiou regularised Bingham
+! ::: viscosity based on the velocity field
+!
+      integer    lo(2), hi(2)
+      integer    DIMDEC(visc)
+      integer    DIMDEC(dat)
+      integer    domlo(2), domhi(2)
+      integer    vel_bc(2,2,2)
+      REAL_T     delta(2)
+      REAL_T     visc(DIMV(visc),1)
+      REAL_T     dat(DIMV(dat),4)
+
+      integer   i,j
+      REAL_T    ux, vx, uy, vy, dx, dy
+      logical   fixlft, fixrgt, fixbot, fixtop
+      REAL_T    uxcen, uxlft, uxrgt, vxcen, vxlft, vxrgt
+      REAL_T    uycen, uybot, uytop, vycen, vybot, vytop
+      REAL_T    strnrt
+!
+!     ::::: some useful macro definitions
+!
+#     define U(i,j) dat(i,j,1)
+#     define V(i,j) dat(i,j,2)
+#     define L(i,j) dat(i,j,4)
+
+#     define ULOX vel_bc(1,1,1)
+#     define UHIX vel_bc(1,2,1)
+
+#     define VLOX vel_bc(1,1,2)
+#     define VHIX vel_bc(1,2,2)
+
+#     define ULOY vel_bc(2,1,1)
+#     define UHIY vel_bc(2,2,1)
+
+#     define VLOY vel_bc(2,1,2)
+#     define VHIY vel_bc(2,2,2)
+
+!
+!     ::::: statement functions that implement stencil
+!
+      uxcen(i,j) = half*(U(i+1,j)-U(i-1,j))/dx
+      uxlft(i,j) = (U(i+1,j)+three*U(i,j)-four*U(i-1,j))/(three*dx)
+      uxrgt(i,j) = (four*U(i+1,j)-three*U(i,j)-U(i-1,j))/(three*dx)
+
+      vxcen(i,j) = half*(V(i+1,j)-V(i-1,j))/dx
+      vxlft(i,j) = (V(i+1,j)+three*V(i,j)-four*V(i-1,j))/(three*dx)
+      vxrgt(i,j) = (four*V(i+1,j)-three*V(i,j)-V(i-1,j))/(three*dx)
+
+      uycen(i,j) = half*(U(i,j+1)-U(i,j-1))/dy
+      uybot(i,j) = (U(i,j+1)+three*U(i,j)-four*U(i,j-1))/(three*dy)
+      uytop(i,j) = (four*U(i,j+1)-three*U(i,j)-U(i,j-1))/(three*dy)
+
+      vycen(i,j) = half*(V(i,j+1)-V(i,j-1))/dy
+      vybot(i,j) = (V(i,j+1)+three*V(i,j)-four*V(i,j-1))/(three*dy)
+      vytop(i,j) = (four*V(i,j+1)-three*V(i,j)-V(i,j-1))/(three*dy)
+
+      dx = delta(1)
+      dy = delta(2)
+
+      do j = lo(2), hi(2)
+         do i = lo(1), hi(1)
+            ux  = uxcen(i,j)
+            vx  = vxcen(i,j)
+            uy  = uycen(i,j)
+            vy  = vycen(i,j)
+            strnrt = strnrt_fun_2d(ux,vx,uy,vy)
+            visc(i,j,1) = visc_fun(strnrt, L(i,j))
+         end do
+      end do
+
+      fixlft = ( (lo(1) .eq. domlo(1)) .and. &
+                 ( (ULOX .eq. EXT_DIR .or. ULOX .eq. HOEXTRAP .or. ULOX.eq.FOEXTRAP) .or. &
+                   (VLOX .eq. EXT_DIR .or. VLOX .eq. HOEXTRAP .or. ULOX.eq.FOEXTRAP) ) )
+      fixrgt = ( (hi(1) .eq. domhi(1)) .and. &
+                 ( (UHIX .eq. EXT_DIR .or. UHIX .eq. HOEXTRAP .or. UHIX.eq.FOEXTRAP) .or. &
+                   (VHIX .eq. EXT_DIR .or. VHIX .eq. HOEXTRAP .or. VHIX.eq.FOEXTRAP) ) )
+      fixbot = ( (lo(2) .eq. domlo(2)) .and. &
+                 ( (ULOY .eq. EXT_DIR .or. ULOY .eq. HOEXTRAP .or. ULOY.eq.FOEXTRAP) .or. &
+                   (VLOY .eq. EXT_DIR .or. VLOY .eq. HOEXTRAP .or. VLOY.eq.FOEXTRAP) ) )
+      fixtop = ( (hi(2) .eq. domhi(2)) .and. &
+                 ( (UHIY .eq. EXT_DIR .or. UHIY .eq. HOEXTRAP .or. UHIY.eq.FOEXTRAP) .or. &
+                   (VHIY .eq. EXT_DIR .or. VHIY .eq. HOEXTRAP .or. VHIY.eq.FOEXTRAP) ) )
+
+!
+!     ::::: handle special bndry conditions at the left edge
+!
+      if (fixlft) then
+         i = lo(1)
+         do j = lo(2), hi(2)
+            ux  = uxlft(i,j)
+            vx  = vxlft(i,j)
+            uy  = uycen(i,j) 
+            vy  = vycen(i,j)
+            strnrt = strnrt_fun_2d(ux,vx,uy,vy)
+            visc(i,j,1) = visc_fun(strnrt, L(i,j))
+            ! Linear extrapolation
+            visc(i-1,j,1) = visc(i,j,1)
+         end do
+      end if
+! 
+!     ::::: handle special bndry conditions on the right
+! 
+      if (fixrgt) then
+         i = hi(1)
+         do j = lo(2), hi(2)
+            ux  = uxrgt(i,j)
+            vx  = vxrgt(i,j)
+            uy  = uycen(i,j)
+            vy  = vycen(i,j)
+            strnrt = strnrt_fun_2d(ux,vx,uy,vy)
+            visc(i,j,1) = visc_fun(strnrt, L(i,j))
+            ! Linear extrapolation
+            visc(i+1,j,1) = visc(i,j,1)
+         end do
+      end if
+!
+!     ::::: handle special bndry conditions on bottom
+!
+      if (fixbot) then
+         j = lo(2)
+         do i = lo(1), hi(1)
+            ux  = uxcen(i,j)
+            vx  = vxcen(i,j)
+            uy  = uybot(i,j)
+            vy  = vybot(i,j)
+            strnrt = strnrt_fun_2d(ux,vx,uy,vy)
+            visc(i,j,1) = visc_fun(strnrt, L(i,j))
+            ! Linear extrapolation
+            visc(i,j-1,1) = visc(i,j,1)
+         end do
+      end if
+!
+!     ::::: handle special bndry conditions on top
+!
+      if (fixtop) then
+         j = hi(2)
+         do i = lo(1), hi(1)
+            ux  = uxcen(i,j)
+            vx  = vxcen(i,j)
+            uy  = uytop(i,j)
+            vy  = vytop(i,j)
+            strnrt = strnrt_fun_2d(ux,vx,uy,vy)
+            visc(i,j,1) = visc_fun(strnrt, L(i,j))
+            ! Linear extrapolation
+            visc(i,j+1,1) = visc(i,j,1)
+         end do
+      end if
+!
+!     ::::: check corners
+!
+      if (fixlft .and. fixbot) then
+         i = lo(1)
+         j = lo(2)
+         ux = uxlft(i,j)
+         vx = vxlft(i,j)
+         uy = uybot(i,j)
+         vy = vybot(i,j)
+         strnrt = strnrt_fun_2d(ux,vx,uy,vy)
+         visc(i,j,1) = visc_fun(strnrt, L(i,j))
+         ! Linear extrapolation
+         visc(i-1,j-1,1) = visc(i,j,1)
+      end if
+
+      if (fixlft .and. fixtop) then
+         i = lo(1)
+         j = hi(2)
+         ux = uxlft(i,j)
+         vx = vxlft(i,j)
+         uy = uytop(i,j)
+         vy = vytop(i,j)
+         strnrt = strnrt_fun_2d(ux,vx,uy,vy)
+         visc(i,j,1) = visc_fun(strnrt, L(i,j))
+         ! Linear extrapolation
+         visc(i-1,j+1,1) = visc(i,j,1)
+      end if
+
+      if (fixrgt .and. fixtop) then
+         i = hi(1)
+         j = hi(2)
+         ux = uxrgt(i,j)
+         vx = vxrgt(i,j)
+         uy = uytop(i,j)
+         vy = vytop(i,j)
+         strnrt = strnrt_fun_2d(ux,vx,uy,vy)
+         visc(i,j,1) = visc_fun(strnrt, L(i,j))
+         ! Linear extrapolation
+         visc(i+1,j+1,1) = visc(i,j,1)
+      end if
+
+      if (fixrgt .and. fixbot) then
+         i = hi(1)
+         j = lo(2)
+         ux = uxrgt(i,j)
+         vx = vxrgt(i,j)
+         uy = uybot(i,j)
+         vy = vybot(i,j)
+         strnrt = strnrt_fun_2d(ux,vx,uy,vy)
+         visc(i,j,1) = visc_fun(strnrt, L(i,j))
+         ! Linear extrapolation
+         visc(i+1,j-1,1) = visc(i,j,1)
+      end if
+
+      if (VLOX .eq. REFLECT_EVEN) then
+         do j = lo(2)-1, hi(2)+1
+            visc(lo(1)-1,j,1) = visc(lo(1),j,1)
+         end do
+      end if
+
+      if (VHIX .eq. REFLECT_EVEN) then
+         do j = lo(2)-1, hi(2)+1
+            visc(hi(1)+1,j,1) = visc(hi(1),j,1)
+         end do
+      end if
+
+      if (ULOY .eq. REFLECT_EVEN) then
+         do i = lo(1)-1, hi(1)+1
+            visc(i,lo(2)-1,1) = visc(i,lo(2),1)
+         end do
+      end if
+
+      if (UHIY .eq. REFLECT_EVEN) then
+         do i = lo(1)-1, hi(1)+1
+            visc(i,hi(2)+1,1) = visc(i,hi(2),1)
+         end do
+      end if
+
+#     undef U
+#     undef V      
+#     undef L
+
+      end subroutine fort_herschel_bulkley
+
+
+      subroutine print_multifab(dat, DIMS(dat), &
+                                lo, hi, domlo, domhi, delta) bind(C,name="print_multifab")
+      implicit none
+!
+! ::: This routine will print the contents of a multifab in each cell of
+! ::: the domain.
+!
+      integer    lo(2), hi(2)
+      integer    DIMDEC(dat)
+      integer    domlo(2), domhi(2)
+      REAL_T     delta(2)
+      REAL_T     dat(DIMV(dat),1)
+
+      integer   i, j
+      REAL_T    x, y, dx, dy
+
+      dx = delta(1)
+      dy = delta(2)
+
+      print*,'x   y   mf'      
+      do j = lo(2)-1, hi(2)+1
+         do i = lo(1)-1, hi(1)+1
+            x = domlo(1) + dx * (float(i) + half)
+            y = domlo(2) + dy * (float(j) + half)
+            print*,x,y,dat(i,j,1)
+         end do
+      end do
+
+      end subroutine print_multifab
 
 ! ::: -----------------------------------------------------------
 ! ::: This routine is intended to be a generic fill function

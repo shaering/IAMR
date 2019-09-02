@@ -431,7 +431,7 @@ contains
             v       = max(v,abs(vel(i,j,2)))
             tforce1 = max(tforce1,abs(tforces(i,j,1)/rho(i,j)))
             tforce2 = max(tforce2,abs(tforces(i,j,2)/rho(i,j)))
-c           TODO: find proper measure of viscoplastic impact on CFL
+!           TODO: find proper measure of viscoplastic impact on CFL
          end do
       end do
 
@@ -492,8 +492,7 @@ c           TODO: find proper measure of viscoplastic impact on CFL
          do i = lo(1), hi(1)
             old_velmag = sqrt(old_vel(i,j,1)**2+old_vel(i,j,2)**2)
             new_velmag = sqrt(new_vel(i,j,1)**2+new_vel(i,j,2)**2)
-            max_change = 
-     &          max(max_change,abs((new_velmag-old_velmag)/old_velmag))
+            max_change = max(max_change,abs((new_velmag-old_velmag)/old_velmag))
          end do
       end do
 

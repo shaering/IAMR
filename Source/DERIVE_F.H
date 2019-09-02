@@ -279,7 +279,7 @@ extern "C" {
 
 #endif
 
-     void FORT_DERMGSTRNRT  (amrex::Real* data, ARLIM_P(dat_lo), ARLIM_P(dat_hi),
+     void dermgstrnrt  (amrex::Real* data, ARLIM_P(dat_lo), ARLIM_P(dat_hi),
                            const int* nvar, const amrex::Real* compdat,
 			   ARLIM_P(clo), ARLIM_P(chi), const int* ncomp,
 			   const int* lo, const int* hi,
@@ -288,7 +288,7 @@ extern "C" {
 			   const amrex::Real* time, const amrex::Real* dt, const int* bcrec, 
                            const int* level, const int* grid_no) ;
 
-     void FORT_DERVISC  (amrex::Real* data, ARLIM_P(dat_lo), ARLIM_P(dat_hi),
+     void dervisc  (amrex::Real* data, ARLIM_P(dat_lo), ARLIM_P(dat_hi),
                            const int* nvar, const amrex::Real* compdat,
 			   ARLIM_P(clo), ARLIM_P(chi), const int* ncomp,
 			   const int* lo, const int* hi,
@@ -297,7 +297,7 @@ extern "C" {
 			   const amrex::Real* time, const amrex::Real* dt, const int* bcrec, 
                            const int* level, const int* grid_no) ;
 
-     void FORT_DERSTRESS  (amrex::Real* data, ARLIM_P(dat_lo), ARLIM_P(dat_hi),
+     void derstress  (amrex::Real* data, ARLIM_P(dat_lo), ARLIM_P(dat_hi),
                            const int* nvar, const amrex::Real* compdat,
 			   ARLIM_P(clo), ARLIM_P(chi), const int* ncomp,
 			   const int* lo, const int* hi,

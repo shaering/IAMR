@@ -2,91 +2,7 @@
 #ifndef _NAVIERSTOKES_F_H_
 #define _NAVIERSTOKES_F_H_
 
-#ifdef BL_LANG_FORT
-#    define FORT_FILCC       filcc
-#    define FORT_GRADP       gradp
-#    define FORT_PUTDOWN     putdown
-#    define FORT_INCRMULT    incrmult
-#    define FORT_MAXVAL      maxval
-#    define FORT_SUMMASS     summass
-#    define FORT_SUMMASS_CYL summass_cyl
-#    define FORT_CEN2EDG     cen2edg
-#    define FORT_EDGE_INTERP edge_interp
-#    define FORT_PC_CF_EDGE_INTERP pc_edge_interp
-#    define FORT_HERSCHEL_BULKLEY 	 herschel_bulkley
-#    define PRINT_MULTIFAB 	 print_multifab
-#    define FORT_SET_NS_PARAMS  setnsparams
-#if (BL_SPACEDIM == 3)
-#    define FORT_SUMTURB     sumturb
-#ifdef SUMJET
-#    define FORT_SUMJET      sumjet
-#endif
-#endif
-#else
-#  if defined(BL_FORT_USE_UPPERCASE)
-#    define FORT_FILCC       FILCC
-#    define FORT_GRADP       GRADP
-#    define FORT_PUTDOWN     PUTDOWN
-#    define FORT_INCRMULT    INCRMULT
-#    define FORT_MAXVAL      MAXVAL
-#    define FORT_SUMMASS     SUMMASS
-#    define FORT_SUMMASS_CYL SUMMASS_CYL
-#    define FORT_CEN2EDG     CEN2EDG
-#    define FORT_EDGE_INTERP EDGE_INTERP
-#    define FORT_PC_CF_EDGE_INTERP PC_EDGE_INTERP
-#    define FORT_HOEXTRAPTOCC HOEXTRAPTOCC
-#    define FORT_HERSCHEL_BULKLEY 	 HERSCHEL_BULKLEY
-#    define PRINT_MULTIFAB 	 PRINT_MULTIFAB
-#    define FORT_SET_NS_PARAMS  SETNSPARAMS
-#if (BL_SPACEDIM == 3)
-#    define FORT_SUMTURB     SUMTURB
-#ifdef SUMJET
-#    define FORT_SUMJET      SUMJET
-#endif
-#endif
-#  elif defined(BL_FORT_USE_LOWERCASE)
-#    define FORT_FILCC       filcc
-#    define FORT_GRADP       gradp
-#    define FORT_PUTDOWN     putdown
-#    define FORT_INCRMULT    incrmult
-#    define FORT_MAXVAL      maxval
-#    define FORT_SUMMASS     summass
-#    define FORT_SUMMASS_CYL summass_cyl
-#    define FORT_CEN2EDG     cen2edg
-#    define FORT_EDGE_INTERP edge_interp
-#    define FORT_PC_CF_EDGE_INTERP pc_edge_interp
-#    define FORT_HOEXTRAPTOCC hoextraptocc
-#    define FORT_HERSCHEL_BULKLEY 	 herschel_bulkley
-#    define PRINT_MULTIFAB 	 print_multifab
-#    define FORT_SET_NS_PARAMS  setnsparams
-#if (BL_SPACEDIM == 3)
-#    define FORT_SUMTURB     sumturb
-#ifdef SUMJET
-#    define FORT_SUMJET      sumjet
-#endif
-#endif
-#  elif defined(BL_FORT_USE_UNDERSCORE)
-#    define FORT_FILCC       filcc_
-#    define FORT_GRADP       gradp_
-#    define FORT_PUTDOWN     putdown_
-#    define FORT_INCRMULT    incrmult_
-#    define FORT_MAXVAL      maxval_
-#    define FORT_SUMMASS     summass_
-#    define FORT_SUMMASS_CYL summass_cyl_
-#    define FORT_CEN2EDG     cen2edg_
-#    define FORT_EDGE_INTERP edge_interp_
-#    define FORT_PC_CF_EDGE_INTERP pc_edge_interp_
-#    define FORT_HOEXTRAPTOCC hoextraptocc_
-#    define FORT_HERSCHEL_BULKLEY 	 herschel_bulkley_
-#    define PRINT_MULTIFAB 	 print_multifab_
-#    define FORT_SET_NS_PARAMS  setnsparams_
-#if (BL_SPACEDIM == 3)
-#    define FORT_SUMTURB     sumturb_
-#ifdef SUMJET
-#    define FORT_SUMJET      sumjet_
-#endif
-#endif
-#  endif
+#ifndef BL_LANG_FORT
 
 #include <AMReX_ArrayLim.H>
 #include <AMReX_filcc_f.H>
@@ -94,6 +10,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
     void filcc (const amrex::Real * q, ARLIM_P(q_lo), ARLIM_P(q_hi),
                      const int * domlo, const int * domhi,
                      const amrex::Real * dx_crse, const amrex::Real * xlo, 
@@ -189,22 +106,23 @@ extern "C" {
                                 amrex::Real*       fine, ARLIM_P(flo), ARLIM_P(fhi));
 
 
-    void FORT_HERSCHEL_BULKLEY(amrex::Real* visc, ARLIM_P(visc_lo), ARLIM_P(visc_hi),
+    void herschel_bulkley(amrex::Real* visc, ARLIM_P(visc_lo), ARLIM_P(visc_hi),
 		              const amrex::Real* dat, ARLIM_P(dat_lo), ARLIM_P(dat_hi),
                       const int* lo, const int* hi, const int* domain_lo, const int* domain_hi,
 		              const amrex::Real* delta, const int* vel_bc);
 
-    void PRINT_MULTIFAB(amrex::Real* dat, ARLIM_P(lo), ARLIM_P(hi),
+    void print_multifab(amrex::Real* dat, ARLIM_P(lo), ARLIM_P(hi),
                       const int* lo, const int* hi, const int* domain_lo, const int* domain_hi,
 		              const amrex::Real* delta);
 
 
-   void FORT_SET_NS_PARAMS(const int& n_fluids, 
+   void set_ns_params(const int& n_fluids, 
 	   		   const amrex::Real* dyn_visc_coef,
                            const amrex::Real* flow_index, 
                            const amrex::Real* yield_stress, 
                            const amrex::Real* reg_param, 
 			   int& variable_vel_visc);
+
 #ifdef __cplusplus
 }
 #endif

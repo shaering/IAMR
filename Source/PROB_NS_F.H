@@ -2,9 +2,7 @@
 #ifndef _PROB_NS_F_H_
 #define _PROB_NS_F_H_
 
-
 #ifndef BL_LANG_FORT
-
 
 #include <AMReX_ArrayLim.H>
 
@@ -22,21 +20,6 @@
                          const amrex::Real* dx,
                          const amrex::Real* xlo, const amrex::Real* xhi);
 
-     void FORT_XVELFILL (amrex::Real* data, ARLIM_P(data_lo), ARLIM_P(data_hi),
-                         const int* dom_lo, const int* dom_hi,
-                         const amrex::Real* dx, const amrex::Real* grd_lo,
-                         const amrex::Real* time, const int* bc);
-     
-     void FORT_YVELFILL (amrex::Real* data, ARLIM_P(data_lo), ARLIM_P(data_hi),
-                         const int* dom_lo, const int* dom_hi,
-                         const amrex::Real* dx, const amrex::Real* grd_lo,
-                         const amrex::Real* time, const int* bc);
- 
-     void FORT_ZVELFILL (amrex::Real* data, ARLIM_P(data_lo), ARLIM_P(data_hi),
-                         const int* dom_lo, const int* dom_hi,
-                         const amrex::Real* dx, const amrex::Real* grd_lo,
-                         const amrex::Real* time, const int* bc);
-
      void FORT_DENFILL  (amrex::Real* data, ARLIM_P(data_lo), ARLIM_P(data_hi),
                          const int* dom_lo, const int* dom_hi,
                          const amrex::Real* dx, const amrex::Real* grd_lo,
@@ -52,6 +35,22 @@
                          const amrex::Real* dx, const amrex::Real* grd_lo,
                          const amrex::Real* time, const int* bc);
 
+     void FORT_XVELFILL (amrex::Real* data, ARLIM_P(data_lo), ARLIM_P(data_hi),
+                         const int* dom_lo, const int* dom_hi,
+                         const amrex::Real* dx, const amrex::Real* grd_lo,
+                         const amrex::Real* time, const int* bc);
+
+     void FORT_YVELFILL (amrex::Real* data, ARLIM_P(data_lo), ARLIM_P(data_hi),
+                         const int* dom_lo, const int* dom_hi,
+                         const amrex::Real* dx, const amrex::Real* grd_lo,
+                         const amrex::Real* time, const int* bc);
+
+#if (BL_SPACEDIM == 3)
+     void FORT_ZVELFILL (amrex::Real* data, ARLIM_P(data_lo), ARLIM_P(data_hi),
+                         const int* dom_lo, const int* dom_hi,
+                         const amrex::Real* dx, const amrex::Real* grd_lo,
+                         const amrex::Real* time, const int* bc);
+#endif
      void FORT_PRESFILL (amrex::Real* data, ARLIM_P(data_lo), ARLIM_P(data_hi),
                          const int* dom_lo, const int* dom_hi,
                          const amrex::Real* dx, const amrex::Real* grd_lo,
@@ -86,22 +85,9 @@
 #endif
 				   const int* getForceVerbose);
 
-     void FORT_MAKEFORCE (const amrex::Real* time,
-			  amrex::Real* force,
-			  const amrex::Real* vel,
-			  const amrex::Real* scal,
-                          ARLIM_P(f_lo), ARLIM_P(f_hi),
-                          ARLIM_P(v_lo), ARLIM_P(v_hi),
-                          ARLIM_P(s_lo), ARLIM_P(s_hi),
-                          const amrex::Real* dx,
-                          const amrex::Real* xlo, const amrex::Real* xhi,
-			  const amrex::Real* gravity,
-			  const int* scomp, const int* ncomp, const int* nscal,
-			  const int* getForceVerbose);
-
 #ifdef __cplusplus
   }
 #endif
 #endif
 
-#endif /*_PROB_F_H_*/
+#endif /*_PROB_NS_F_H_*/

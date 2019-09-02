@@ -14,11 +14,18 @@
 #define SMALL 1.0d-10
 #endif
 
-c
-c ::: This module contains helper functions for computing derived
-c ::: quantities related to viscoplastic fluids. 
-c
+!
+! ::: This module contains helper functions for computing derived
+! ::: quantities related to viscoplastic fluids. 
+!
       module viscoplasticity_module
+
+      implicit none
+
+      private
+
+      public :: strnrt_fun_2d, strnrt_fun_3d, visc_fun, stress_fun
+
 #include <NSCOMM_F.H>
 
       contains 
@@ -32,8 +39,8 @@ c
       REAL_T function strnrt_fun_3d(ux,uy,uz,vx,vy,vz,wx,wy,wz)
          ! Magnitude of rate-of-strain tensor (3D)
          REAL_T, intent(in) :: ux,uy,uz,vx,vy,vz,wx,wy,wz
-         strnrt_fun_3d = sqrt(ux**2+vy**2+wz**2
-     &              +half*(uy+vx)**2+half*(uz+wx)**2+half*(vz+wy)**2)
+         strnrt_fun_3d = sqrt(ux**2+vy**2+wz**2 &
+                    +half*(uy+vx)**2+half*(uz+wx)**2+half*(vz+wy)**2)
       end function strnrt_fun_3d
 
       REAL_T function regularisation(strnrt)
@@ -44,12 +51,12 @@ c
          if (strnrt > SMALL) then
             regularisation = (one-exp(-strnrt/eps))/strnrt
          else
-            regularisation = one/eps*
-     &                (one
-     &                -half*strnrt/eps
-     &                +sixth*(strnrt/eps)**2
-     &                -sixth*fourth*(strnrt/eps)**3
-     &                +sixth*fourth*fifth*(strnrt/eps)**4)
+            regularisation = one/eps*                       &
+                      (one                                  &
+                      -half*strnrt/eps                      &
+                      +sixth*(strnrt/eps)**2                & 
+                      -sixth*fourth*(strnrt/eps)**3         &
+                      +sixth*fourth*fifth*(strnrt/eps)**4) 
           end if
       end function regularisation
 
@@ -90,13 +97,14 @@ c
       end function visc_fun
 
       REAL_T function stress_fun(strnrt, lambda)
+
       ! Regularised Herschel-Bulkley stress
          REAL_T, intent(in)  :: strnrt
          REAL_T, intent(in)  :: lambda
          REAL_T              :: visc
          if (varvisc .eq. 0) then
             ! If non-variable, stress equals 2 mu strnrt everywhere
-            stress_fun = 2*mu*strnrt
+            stress_fun = 2*mu_in(1)*strnrt
          else
             ! Calculate viscosity based on flow index value, use this to
             ! find stress

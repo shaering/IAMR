@@ -1,5 +1,3 @@
-
-
 #include <NavierStokes.H>
 #include <NS_BC.H>
 #include <RegType.H>
@@ -348,18 +346,18 @@ NavierStokes::variableSetUp ()
     //
     // magnitude of rate-of-strain tensor
     //
-    derive_lst.add("mag_strainrate",IndexType::TheCellType(),1,FORT_DERMGSTRNRT,grow_box_by_one);
+    derive_lst.add("mag_strainrate",IndexType::TheCellType(),1,dermgstrnrt,grow_box_by_one);
     derive_lst.addComponent("mag_strainrate",desc_lst,State_Type,Xvel,BL_SPACEDIM);
     //
     // apparent viscosity
     //
-    derive_lst.add("eff_visc",IndexType::TheCellType(),1,FORT_DERVISC,grow_box_by_one);
+    derive_lst.add("eff_visc",IndexType::TheCellType(),1,dervisc,grow_box_by_one);
     derive_lst.addComponent("eff_visc",desc_lst,State_Type,Xvel,BL_SPACEDIM);
     derive_lst.addComponent("eff_visc",desc_lst,State_Type,Trac,1);
     //
     // magnitude of stress tensor
     //
-    derive_lst.add("stress",IndexType::TheCellType(),1,FORT_DERSTRESS,grow_box_by_one);
+    derive_lst.add("stress",IndexType::TheCellType(),1,derstress,grow_box_by_one);
     derive_lst.addComponent("stress",desc_lst,State_Type,Xvel,BL_SPACEDIM);
     derive_lst.addComponent("stress",desc_lst,State_Type,Trac,1);
     //

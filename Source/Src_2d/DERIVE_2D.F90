@@ -13,12 +13,6 @@
 
 #define SDIM 2
 
-#if defined(BL_USE_FLOAT) || defined(BL_T3E) || defined(BL_CRAY)
-#define SMALL 1.0e-10
-#else
-#define SMALL 1.0d-10
-#endif
-
 
 module derive_2d_module
   
@@ -26,10 +20,9 @@ module derive_2d_module
 
   private
 
-  public dermodgradrho, derkeng,derlogs, dermvel, &
-       derdvrho, dermprho, derlgrhodust,dermgvort, &
-       dermgvort2,dermgdivu, deravgpres, &
-       dergrdpx,dergrdpy, dergrdp, dernull
+  public dermodgradrho, derkeng, derlogs, dermvel, derdvrho, dermprho, derlgrhodust, dermgvort, &
+       dermgvort2, dermgdivu, dermgstrnrt, dervisc, derstress, deravgpres, dergrdpx, dergrdpy, &
+       dergrdp, dernull
 
 contains
 
@@ -142,12 +135,15 @@ contains
 
       integer    i,j
       REAL_T     rho
+      REAL_T     sml
+
+      parameter (sml = 1.0D-10)
 
       do j = lo(2), hi(2)
          do i = lo(1), hi(1)
-	    rho = max(dat(i,j,1),SMALL)
-	    e(i,j,1) = log10(rho)
-	 end do
+            rho = max(dat(i,j,1),sml)
+            e(i,j,1) = log10(rho)
+         end do
       end do
 
     end subroutine derlogs
@@ -260,13 +256,15 @@ contains
       integer    level, grid_no
 
       integer    i,j
-      REAL_T     dust
+      REAL_T     dust, sml
+
+      parameter (sml = 1.0D-10)
 
       do j = lo(2), hi(2)
          do i = lo(1), hi(1)
-	    dust = max(SMALL,dat(i,j,2)*dat(i,j,1))
-	    e(i,j,1) = log10(dust)
-	 end do
+            dust = max(sml,dat(i,j,2)*dat(i,j,1))
+            e(i,j,1) = log10(dust)
+         end do
       end do
 
     end subroutine derlgrhodust
@@ -524,15 +522,15 @@ contains
 
     end subroutine dermgvort2
 
-      subroutine FORT_DERMGSTRNRT (strnrt,DIMS(strnrt),nv,dat,DIMS(dat),ncomp,
-     &                             lo,hi,domlo,domhi,delta,xlo,time,dt,
-     $                             bc,level,grid_no)
+      subroutine dermgstrnrt (strnrt,DIMS(strnrt),nv,dat,DIMS(dat),ncomp, &
+                                   lo,hi,domlo,domhi,delta,xlo,time,dt, &
+                                   bc,level,grid_no) bind(C,name="dermgstrnrt")
       use viscoplasticity_module
       implicit none
-c
-c ::: This routine will derive magnitude of rate-of-strain tensor from
-c ::: the velocity field
-c
+!c
+!c ::: This routine will derive magnitude of rate-of-strain tensor from
+!c ::: the velocity field
+!c
       integer    lo(2), hi(2)
       integer    DIMDEC(strnrt)
       integer    DIMDEC(dat)
@@ -549,9 +547,9 @@ c
       logical   fixlft, fixrgt, fixbot, fixtop
       REAL_T    uxcen, uxlft, uxrgt, vxcen, vxlft, vxrgt
       REAL_T    uycen, uybot, uytop, vycen, vybot, vytop
-c
-c     ::::: some useful macro definitions
-c
+! c
+! c     ::::: some useful macro definitions
+! c
 #     define U(i,j) dat(i,j,1)
 #     define V(i,j) dat(i,j,2)
 
@@ -567,9 +565,9 @@ c
 #     define VLOY bc(2,1,2)
 #     define VHIY bc(2,2,2)
 
-c
-c     ::::: statement functions that implement stencil
-c
+! c
+! c     ::::: statement functions that implement stencil
+! c
       uxcen(i,j) = half*(U(i+1,j)-U(i-1,j))/dx
       uxlft(i,j) = (U(i+1,j)+three*U(i,j)-four*U(i-1,j))/(three*dx)
       uxrgt(i,j) = (four*U(i+1,j)-three*U(i,j)-U(i-1,j))/(three*dx)
@@ -599,21 +597,21 @@ c
          end do
       end do
 
-      fixlft = ( (lo(1) .eq. domlo(1)) .and. 
-     &           ( (ULOX .eq. EXT_DIR .or. ULOX .eq. HOEXTRAP) .or. 
-     &             (VLOX .eq. EXT_DIR .or. VLOX .eq. HOEXTRAP) ) )
-      fixrgt = ( (hi(1) .eq. domhi(1)) .and. 
-     &           ( (UHIX .eq. EXT_DIR .or. UHIX .eq. HOEXTRAP) .or.
-     &             (VHIX .eq. EXT_DIR .or. VHIX .eq. HOEXTRAP) ) )
-      fixbot = ( (lo(2) .eq. domlo(2)) .and. 
-     &           ( (ULOY .eq. EXT_DIR .or. ULOY .eq. HOEXTRAP) .or.
-     &           (VLOY .eq. EXT_DIR .or. VLOY .eq. HOEXTRAP) ) )
-      fixtop = ( (hi(2) .eq. domhi(2)) .and. 
-     &           ( (UHIY .eq. EXT_DIR .or. UHIY .eq. HOEXTRAP) .or.
-     &           (VHIY .eq. EXT_DIR .or. VHIY .eq. HOEXTRAP) ) )
-c
-c     ::::: handle special bndry conditions at the left edge
-c
+      fixlft = ( (lo(1) .eq. domlo(1)) .and.  &
+                 ( (ULOX .eq. EXT_DIR .or. ULOX .eq. HOEXTRAP) .or. &
+                   (VLOX .eq. EXT_DIR .or. VLOX .eq. HOEXTRAP) ) )
+      fixrgt = ( (hi(1) .eq. domhi(1)) .and. &
+                 ( (UHIX .eq. EXT_DIR .or. UHIX .eq. HOEXTRAP) .or. &
+                   (VHIX .eq. EXT_DIR .or. VHIX .eq. HOEXTRAP) ) )
+      fixbot = ( (lo(2) .eq. domlo(2)) .and. &
+                 ( (ULOY .eq. EXT_DIR .or. ULOY .eq. HOEXTRAP) .or. &
+                 (VLOY .eq. EXT_DIR .or. VLOY .eq. HOEXTRAP) ) )
+      fixtop = ( (hi(2) .eq. domhi(2)) .and. &
+                 ( (UHIY .eq. EXT_DIR .or. UHIY .eq. HOEXTRAP) .or. &
+                 (VHIY .eq. EXT_DIR .or. VHIY .eq. HOEXTRAP) ) )
+! c
+! c     ::::: handle special bndry conditions at the left edge
+! c
       if (fixlft) then
          i = lo(1)
          do j = lo(2), hi(2)
@@ -624,9 +622,9 @@ c
             strnrt(i,j,1) = strnrt_fun_2d(ux,vx,uy,vy)
          end do
       end if
-c
-c     ::::: handle special bndry conditions on the right
-c
+! c
+! c     ::::: handle special bndry conditions on the right
+! c
       if (fixrgt) then
          i = hi(1)
          do j = lo(2), hi(2)
@@ -637,9 +635,9 @@ c
             strnrt(i,j,1) = strnrt_fun_2d(ux,vx,uy,vy)
          end do
       end if
-c
-c     ::::: handle special bndry conditions on bottom
-c
+! c
+! c     ::::: handle special bndry conditions on bottom
+! c
       if (fixbot) then
          j = lo(2)
          do i = lo(1), hi(1)
@@ -650,9 +648,9 @@ c
             strnrt(i,j,1) = strnrt_fun_2d(ux,vx,uy,vy)
          end do
       end if
-c
-c     ::::: handle special bndry conditions on top
-c
+! c
+! c     ::::: handle special bndry conditions on top
+! c
       if (fixtop) then
          j = hi(2)
          do i = lo(1), hi(1)
@@ -663,9 +661,9 @@ c
             strnrt(i,j,1) = strnrt_fun_2d(ux,vx,uy,vy)
          end do
       end if
-c
-c     ::::: check corners
-c
+! c
+! c     ::::: check corners
+! c
       if (fixlft .and. fixbot) then
          i = lo(1)
          j = lo(2)
@@ -710,17 +708,18 @@ c
 #     undef ULOY
 #     undef UHIY
 
-      end
+      end subroutine dermgstrnrt
 
-c
-c ::: This routine will compute the 
-c ::: viscosity based on the velocity field
-c
-      subroutine FORT_DERVISC (visc,DIMS(visc),nv,dat,DIMS(dat),ncomp,
-     &                         lo,hi,domlo,domhi,delta,xlo,time,dt,
-     $                         bc,level,grid_no)
+!c
+!c ::: This routine will compute the 
+!c ::: viscosity based on the velocity field
+!c
+      subroutine dervisc (visc,DIMS(visc),nv,dat,DIMS(dat),ncomp, &
+                               lo,hi,domlo,domhi,delta,xlo,time,dt, &
+                               bc,level,grid_no) bind(C,name="dervisc")
       use viscoplasticity_module
       implicit none
+#include <NSCOMM_F.H>
 
       integer    lo(2), hi(2)
       integer    DIMDEC(visc)
@@ -739,11 +738,12 @@ c
       REAL_T    uxcen, uxlft, uxrgt, vxcen, vxlft, vxrgt
       REAL_T    uycen, uybot, uytop, vycen, vybot, vytop
       REAL_T    strnrt
-c
-c     ::::: some useful macro definitions
-c
+! c
+! c     ::::: some useful macro definitions
+! c
 #     define U(i,j) dat(i,j,1)
 #     define V(i,j) dat(i,j,2)
+#     define L(i,j) dat(i,j,4)
 
 #     define ULOX bc(1,1,1)
 #     define UHIX bc(1,2,1)
@@ -757,9 +757,9 @@ c
 #     define VLOY bc(2,1,2)
 #     define VHIY bc(2,2,2)
 
-c
-c     ::::: statement functions that implement stencil
-c
+! c
+! c     ::::: statement functions that implement stencil
+! c
       uxcen(i,j) = half*(U(i+1,j)-U(i-1,j))/dx
       uxlft(i,j) = (U(i+1,j)+three*U(i,j)-four*U(i-1,j))/(three*dx)
       uxrgt(i,j) = (four*U(i+1,j)-three*U(i,j)-U(i-1,j))/(three*dx)
@@ -781,7 +781,7 @@ c
 
       do j = lo(2), hi(2)
          do i = lo(1), hi(1)
-            visc(i,j,1) = mu
+            visc(i,j,1) = mu_in(1)
          end do
       end do
 
@@ -798,26 +798,26 @@ c
             uy  = uycen(i,j)
             vy  = vycen(i,j)
             strnrt = strnrt_fun_2d(ux,vx,uy,vy)
-            visc(i,j,1) = visc_fun(strnrt)
+            visc(i,j,1) = visc_fun(strnrt,L(i,j))
          end do
       end do
 
-      fixlft = ( (lo(1) .eq. domlo(1)) .and. 
-     &           ( (ULOX .eq. EXT_DIR .or. ULOX .eq. HOEXTRAP .or. ULOX.eq.FOEXTRAP) .or. 
-     &             (VLOX .eq. EXT_DIR .or. VLOX .eq. HOEXTRAP .or. ULOX.eq.FOEXTRAP) ) )
-      fixrgt = ( (hi(1) .eq. domhi(1)) .and. 
-     &           ( (UHIX .eq. EXT_DIR .or. UHIX .eq. HOEXTRAP .or. UHIX.eq.FOEXTRAP) .or.
-     &             (VHIX .eq. EXT_DIR .or. VHIX .eq. HOEXTRAP .or. VHIX.eq.FOEXTRAP) ) )
-      fixbot = ( (lo(2) .eq. domlo(2)) .and. 
-     &           ( (ULOY .eq. EXT_DIR .or. ULOY .eq. HOEXTRAP .or. ULOY.eq.FOEXTRAP) .or.
-     &             (VLOY .eq. EXT_DIR .or. VLOY .eq. HOEXTRAP .or. VLOY.eq.FOEXTRAP) ) )
-      fixtop = ( (hi(2) .eq. domhi(2)) .and. 
-     &           ( (UHIY .eq. EXT_DIR .or. UHIY .eq. HOEXTRAP .or. UHIY.eq.FOEXTRAP) .or.
-     &             (VHIY .eq. EXT_DIR .or. VHIY .eq. HOEXTRAP .or. VHIY.eq.FOEXTRAP) ) )
+      fixlft = ( (lo(1) .eq. domlo(1)) .and. &
+                 ( (ULOX .eq. EXT_DIR .or. ULOX .eq. HOEXTRAP .or. ULOX.eq.FOEXTRAP) .or. &
+                   (VLOX .eq. EXT_DIR .or. VLOX .eq. HOEXTRAP .or. ULOX.eq.FOEXTRAP) ) )
+      fixrgt = ( (hi(1) .eq. domhi(1)) .and. &
+                 ( (UHIX .eq. EXT_DIR .or. UHIX .eq. HOEXTRAP .or. UHIX.eq.FOEXTRAP) .or. &
+                   (VHIX .eq. EXT_DIR .or. VHIX .eq. HOEXTRAP .or. VHIX.eq.FOEXTRAP) ) )
+      fixbot = ( (lo(2) .eq. domlo(2)) .and. &
+                 ( (ULOY .eq. EXT_DIR .or. ULOY .eq. HOEXTRAP .or. ULOY.eq.FOEXTRAP) .or. &
+                   (VLOY .eq. EXT_DIR .or. VLOY .eq. HOEXTRAP .or. VLOY.eq.FOEXTRAP) ) )
+      fixtop = ( (hi(2) .eq. domhi(2)) .and. &
+                 ( (UHIY .eq. EXT_DIR .or. UHIY .eq. HOEXTRAP .or. UHIY.eq.FOEXTRAP) .or. &
+                   (VHIY .eq. EXT_DIR .or. VHIY .eq. HOEXTRAP .or. VHIY.eq.FOEXTRAP) ) )
 
-c
-c     ::::: handle special bndry conditions at the left edge
-c
+! c
+! c     ::::: handle special bndry conditions at the left edge
+! c
       if (fixlft) then
          i = lo(1)
          do j = lo(2), hi(2)
@@ -826,12 +826,12 @@ c
             uy  = uycen(i,j)
             vy  = vycen(i,j)
             strnrt = strnrt_fun_2d(ux,vx,uy,vy)
-            visc(i,j,1) = visc_fun(strnrt)
+            visc(i,j,1) = visc_fun(strnrt,L(i,j))
          end do
       end if
-c
-c     ::::: handle special bndry conditions on the right
-c
+! c
+! c     ::::: handle special bndry conditions on the right
+! c
       if (fixrgt) then
          i = hi(1)
          do j = lo(2), hi(2)
@@ -840,12 +840,12 @@ c
             uy  = uycen(i,j)
             vy  = vycen(i,j)
             strnrt = strnrt_fun_2d(ux,vx,uy,vy)
-            visc(i,j,1) = visc_fun(strnrt)
+            visc(i,j,1) = visc_fun(strnrt,L(i,j))
          end do
       end if
-c
-c     ::::: handle special bndry conditions on bottom
-c
+! c
+! c     ::::: handle special bndry conditions on bottom
+! c
       if (fixbot) then
          j = lo(2)
          do i = lo(1), hi(1)
@@ -854,12 +854,12 @@ c
             uy  = uybot(i,j)
             vy  = vybot(i,j)
             strnrt = strnrt_fun_2d(ux,vx,uy,vy)
-            visc(i,j,1) = visc_fun(strnrt)
+            visc(i,j,1) = visc_fun(strnrt,L(i,j))
          end do
       end if
-c
-c     ::::: handle special bndry conditions on top
-c
+! c
+! c     ::::: handle special bndry conditions on top
+! c
       if (fixtop) then
          j = hi(2)
          do i = lo(1), hi(1)
@@ -868,12 +868,12 @@ c
             uy  = uytop(i,j)
             vy  = vytop(i,j)
             strnrt = strnrt_fun_2d(ux,vx,uy,vy)
-            visc(i,j,1) = visc_fun(strnrt)
+            visc(i,j,1) = visc_fun(strnrt,L(i,j))
          end do
       end if
-c
-c     ::::: check corners
-c
+! c
+! c     ::::: check corners
+! c
       if (fixlft .and. fixbot) then
          i = lo(1)
          j = lo(2)
@@ -882,7 +882,7 @@ c
          uy = uybot(i,j)
          vy = vybot(i,j)
          strnrt = strnrt_fun_2d(ux,vx,uy,vy)
-         visc(i,j,1) = visc_fun(strnrt)
+         visc(i,j,1) = visc_fun(strnrt,L(i,j))
       end if
       if (fixlft .and. fixtop) then
          i = lo(1)
@@ -892,7 +892,7 @@ c
          uy = uytop(i,j)
          vy = vytop(i,j)
          strnrt = strnrt_fun_2d(ux,vx,uy,vy)
-         visc(i,j,1) = visc_fun(strnrt)
+         visc(i,j,1) = visc_fun(strnrt,L(i,j))
       end if
       if (fixrgt .and. fixtop) then
          i = hi(1)
@@ -902,7 +902,7 @@ c
          uy = uytop(i,j)
          vy = vytop(i,j)
          strnrt = strnrt_fun_2d(ux,vx,uy,vy)
-         visc(i,j,1) = visc_fun(strnrt)
+         visc(i,j,1) = visc_fun(strnrt,L(i,j))
       end if
       if (fixrgt .and. fixbot) then
          i = hi(1)
@@ -912,7 +912,7 @@ c
          uy = uybot(i,j)
          vy = vybot(i,j)
          strnrt = strnrt_fun_2d(ux,vx,uy,vy)
-         visc(i,j,1) = visc_fun(strnrt)
+         visc(i,j,1) = visc_fun(strnrt,L(i,j))
       end if
 
       end if
@@ -924,18 +924,14 @@ c
 #     undef ULOY
 #     undef UHIY
 
-      end
+      end subroutine dervisc
 
-      subroutine FORT_DERSTRESS (stress,DIMS(stress),nv,dat,DIMS(dat),ncomp,
-     &                           lo,hi,domlo,domhi,delta,xlo,time,dt,
-     $                           bc,level,grid_no)
+      subroutine derstress (stress,DIMS(stress),nv,dat,DIMS(dat),ncomp, &
+                                 lo,hi,domlo,domhi,delta,xlo,time,dt, &
+                                 bc,level,grid_no) bind(C,name="derstress")
       use viscoplasticity_module
       implicit none
 
-c
-c ::: This routine will compute the 
-c ::: stress based on the velocity field
-c
       integer    lo(2), hi(2)
       integer    DIMDEC(stress)
       integer    DIMDEC(dat)
@@ -953,11 +949,12 @@ c
       REAL_T    uxcen, uxlft, uxrgt, vxcen, vxlft, vxrgt
       REAL_T    uycen, uybot, uytop, vycen, vybot, vytop
       REAL_T    strnrt
-c
-c     ::::: some useful macro definitions
-c
+! c
+! c     ::::: some useful macro definitions
+! c
 #     define U(i,j) dat(i,j,1)
 #     define V(i,j) dat(i,j,2)
+#     define L(i,j) dat(i,j,4)
 
 #     define ULOX bc(1,1,1)
 #     define UHIX bc(1,2,1)
@@ -971,9 +968,9 @@ c
 #     define VLOY bc(2,1,2)
 #     define VHIY bc(2,2,2)
 
-c
-c     ::::: statement functions that implement stencil
-c
+! c
+! c     ::::: statement functions that implement stencil
+! c
       uxcen(i,j) = half*(U(i+1,j)-U(i-1,j))/dx
       uxlft(i,j) = (U(i+1,j)+three*U(i,j)-four*U(i-1,j))/(three*dx)
       uxrgt(i,j) = (four*U(i+1,j)-three*U(i,j)-U(i-1,j))/(three*dx)
@@ -1000,25 +997,25 @@ c
             uy  = uycen(i,j)
             vy  = vycen(i,j)
             strnrt = strnrt_fun_2d(ux,vx,uy,vy)
-            stress(i,j,1) = stress_fun(strnrt)
+            stress(i,j,1) = stress_fun(strnrt,L(i,j))
          end do
       end do
 
-      fixlft = ( (lo(1) .eq. domlo(1)) .and. 
-     &           ( (ULOX .eq. EXT_DIR .or. ULOX .eq. HOEXTRAP) .or. 
-     &             (VLOX .eq. EXT_DIR .or. VLOX .eq. HOEXTRAP) ) )
-      fixrgt = ( (hi(1) .eq. domhi(1)) .and. 
-     &           ( (UHIX .eq. EXT_DIR .or. UHIX .eq. HOEXTRAP) .or.
-     &             (VHIX .eq. EXT_DIR .or. VHIX .eq. HOEXTRAP) ) )
-      fixbot = ( (lo(2) .eq. domlo(2)) .and. 
-     &           ( (ULOY .eq. EXT_DIR .or. ULOY .eq. HOEXTRAP) .or.
-     &           (VLOY .eq. EXT_DIR .or. VLOY .eq. HOEXTRAP) ) )
-      fixtop = ( (hi(2) .eq. domhi(2)) .and. 
-     &           ( (UHIY .eq. EXT_DIR .or. UHIY .eq. HOEXTRAP) .or.
-     &           (VHIY .eq. EXT_DIR .or. VHIY .eq. HOEXTRAP) ) )
-c
-c     ::::: handle special bndry conditions at the left edge
-c
+      fixlft = ( (lo(1) .eq. domlo(1)) .and. &
+                 ( (ULOX .eq. EXT_DIR .or. ULOX .eq. HOEXTRAP) .or. &
+                   (VLOX .eq. EXT_DIR .or. VLOX .eq. HOEXTRAP) ) )
+      fixrgt = ( (hi(1) .eq. domhi(1)) .and. &
+                 ( (UHIX .eq. EXT_DIR .or. UHIX .eq. HOEXTRAP) .or. &
+                   (VHIX .eq. EXT_DIR .or. VHIX .eq. HOEXTRAP) ) )
+      fixbot = ( (lo(2) .eq. domlo(2)) .and. &
+                 ( (ULOY .eq. EXT_DIR .or. ULOY .eq. HOEXTRAP) .or. &
+                 (VLOY .eq. EXT_DIR .or. VLOY .eq. HOEXTRAP) ) )
+      fixtop = ( (hi(2) .eq. domhi(2)) .and. &
+                 ( (UHIY .eq. EXT_DIR .or. UHIY .eq. HOEXTRAP) .or. &
+                 (VHIY .eq. EXT_DIR .or. VHIY .eq. HOEXTRAP) ) )
+! c
+! c     ::::: handle special bndry conditions at the left edge
+! c
       if (fixlft) then
          i = lo(1)
          do j = lo(2), hi(2)
@@ -1027,12 +1024,12 @@ c
             uy  = uycen(i,j)
             vy  = vycen(i,j)
             strnrt = strnrt_fun_2d(ux,vx,uy,vy)
-            stress(i,j,1) = stress_fun(strnrt)
+            stress(i,j,1) = stress_fun(strnrt,L(i,j))
          end do
       end if
-c
-c     ::::: handle special bndry conditions on the right
-c
+! c
+! c     ::::: handle special bndry conditions on the right
+! c
       if (fixrgt) then
          i = hi(1)
          do j = lo(2), hi(2)
@@ -1041,12 +1038,12 @@ c
             uy  = uycen(i,j)
             vy  = vycen(i,j)
             strnrt = strnrt_fun_2d(ux,vx,uy,vy)
-            stress(i,j,1) = stress_fun(strnrt)
+            stress(i,j,1) = stress_fun(strnrt,L(i,j))
          end do
       end if
-c
-c     ::::: handle special bndry conditions on bottom
-c
+! c
+! c     ::::: handle special bndry conditions on bottom
+! c
       if (fixbot) then
          j = lo(2)
          do i = lo(1), hi(1)
@@ -1055,12 +1052,12 @@ c
             uy  = uybot(i,j)
             vy  = vybot(i,j)
             strnrt = strnrt_fun_2d(ux,vx,uy,vy)
-            stress(i,j,1) = stress_fun(strnrt)
+            stress(i,j,1) = stress_fun(strnrt,L(i,j))
          end do
       end if
-c
-c     ::::: handle special bndry conditions on top
-c
+! c
+! c     ::::: handle special bndry conditions on top
+! c
       if (fixtop) then
          j = hi(2)
          do i = lo(1), hi(1)
@@ -1069,12 +1066,12 @@ c
             uy  = uytop(i,j)
             vy  = vytop(i,j)
             strnrt = strnrt_fun_2d(ux,vx,uy,vy)
-            stress(i,j,1) = stress_fun(strnrt)
+            stress(i,j,1) = stress_fun(strnrt,L(i,j))
          end do
       end if
-c
-c     ::::: check corners
-c
+! c
+! c     ::::: check corners
+! c
       if (fixlft .and. fixbot) then
          i = lo(1)
          j = lo(2)
@@ -1083,7 +1080,7 @@ c
          uy = uybot(i,j)
          vy = vybot(i,j)
          strnrt = strnrt_fun_2d(ux,vx,uy,vy)
-         stress(i,j,1) = stress_fun(strnrt)
+         stress(i,j,1) = stress_fun(strnrt,L(i,j))
       end if
       if (fixlft .and. fixtop) then
          i = lo(1)
@@ -1093,7 +1090,7 @@ c
          uy = uytop(i,j)
          vy = vytop(i,j)
          strnrt = strnrt_fun_2d(ux,vx,uy,vy)
-         stress(i,j,1) = stress_fun(strnrt)
+         stress(i,j,1) = stress_fun(strnrt,L(i,j))
       end if
       if (fixrgt .and. fixtop) then
          i = hi(1)
@@ -1103,7 +1100,7 @@ c
          uy = uytop(i,j)
          vy = vytop(i,j)
          strnrt = strnrt_fun_2d(ux,vx,uy,vy)
-         stress(i,j,1) = stress_fun(strnrt)
+         stress(i,j,1) = stress_fun(strnrt,L(i,j))
       end if
       if (fixrgt .and. fixbot) then
          i = hi(1)
@@ -1113,7 +1110,7 @@ c
          uy = uybot(i,j)
          vy = vybot(i,j)
          strnrt = strnrt_fun_2d(ux,vx,uy,vy)
-         stress(i,j,1) = stress_fun(strnrt)
+         stress(i,j,1) = stress_fun(strnrt,L(i,j))
       end if
 
 #     undef U
@@ -1123,11 +1120,11 @@ c
 #     undef ULOY
 #     undef UHIY
 
-      end
+      end subroutine derstress
 
-      subroutine FORT_DERMGDIVU (divu,DIMS(divu),nv,dat,DIMS(dat),ncomp,
-     &                           lo,hi,domlo,domhi,delta,xlo,time,dt,
-     $                           bc,level,grid_no)
+      subroutine dermgdivu (divu,DIMS(divu),nv,dat,DIMS(dat),ncomp, &
+                                 lo,hi,domlo,domhi,delta,xlo,time,dt, &
+                                 bc,level,grid_no) bind(C,name="dermgdivu")
       implicit none
 !c
 !c ::: This routine will derive magnitude of the divergence of velocity
@@ -1169,10 +1166,11 @@ c
       vylo(i,j) = (eight*V(i,j)-six*V(i,j+1)+V(i,j+2))/(three*dy)
       vyhi(i,j) = (eight*V(i,j)-six*V(i,j-1)+V(i,j-2))/(three*dy)
 
-      call FORT_XVELFILL(dat(ARG_L1(dat),ARG_L2(dat),1),DIMS(dat),&
-                        domlo,domhi,delta,xlo,time,bc(1,1,1))
-      call FORT_YVELFILL(dat(ARG_L1(dat),ARG_L2(dat),2),DIMS(dat),&
-                        domlo,domhi,delta,xlo,time,bc(1,1,2))
+      !HACK 
+!      call FORT_XVELFILL(dat(ARG_L1(dat),ARG_L2(dat),1),DIMS(dat),&
+!                        domlo,domhi,delta,xlo,time,bc(1,1,1))
+!      call FORT_YVELFILL(dat(ARG_L1(dat),ARG_L2(dat),2),DIMS(dat),&
+!                        domlo,domhi,delta,xlo,time,bc(1,1,2))
 
       dx = delta(1)
       dy = delta(2)
@@ -1243,10 +1241,11 @@ c
 !c
 !c we overwrote the ghost cells above, so set them back below
 !c
-      call FORT_XVELFILL(dat(ARG_L1(dat),ARG_L2(dat),1),DIMS(dat),&
-                        domlo,domhi,delta,xlo,time,bc(1,1,1))
-      call FORT_YVELFILL(dat(ARG_L1(dat),ARG_L2(dat),2),DIMS(dat),&
-                        domlo,domhi,delta,xlo,time,bc(1,1,2))
+! HACK
+!      call FORT_XVELFILL(dat(ARG_L1(dat),ARG_L2(dat),1),DIMS(dat),&
+!                        domlo,domhi,delta,xlo,time,bc(1,1,1))
+!      call FORT_YVELFILL(dat(ARG_L1(dat),ARG_L2(dat),2),DIMS(dat),&
+!                        domlo,domhi,delta,xlo,time,bc(1,1,2))
 
 #     undef U
 #     undef V      
