@@ -975,10 +975,10 @@ contains
             vel(i,j,1) = zero
             vel(i,j,2) = zero
             if ((x .lt. 0.1d0) .and. (y .lt. 0.1d0)) then
-               scal(i,j,1) = 997.0d0
+               scal(i,j,1) = 1000.0d0
                scal(i,j,2) = one
             else
-               scal(i,j,1) = 1.225d0
+               scal(i,j,1) = 1.0d0
                scal(i,j,2) = zero
             endif
          end do
