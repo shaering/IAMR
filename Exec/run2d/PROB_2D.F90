@@ -710,21 +710,20 @@ contains
       hx = dx(1)
       hy = dx(2)
 
-      L_x = 0.5d0
+      L_x = 1.0d0
 
       rho_1 = 1.d0
-      rho_2 = 2.d0
+      rho_2 = 3.d0
 
       do j = lo(2), hi(2)
          y = hy*(float(j) + half)
          do i = lo(1), hi(1)
             x = hx*(float(i) + half)
 
-            pertheight = 0.5d0 + 0.005d0* &
-                (cos(2.d0*Pi*x/L_x)+cos(2.d0*Pi*(L_x-x)/L_x))
+            pertheight = 2.d0*L_x + 0.1d0*L_x*cos(2.d0*Pi*x/L_x)
 
             scal(i,j,1) = rho_1 +  &
-                ((rho_2-rho_1)/2.d0)*(1+tanh((y-pertheight)/0.005d0))
+                ((rho_2-rho_1)/2.d0)*(1+tanh((y-pertheight)/(0.01d0*L_x)))
 
             vel(i,j,1) = zero
             vel(i,j,2) = zero
