@@ -9,7 +9,7 @@ amr.probin_file 	= probin.3d.periodic_shear_layer
 # WHEN SHOULD THE SIMULATION STOP?
 #*******************************************************************************
 # Maximum number of timesteps to be taken, if stop_time is not reached first.
-max_step 				= 1
+max_step 				= 1000
 # Time at which calculation stops, if max_step is not reached first.
 stop_time 				= 2.0
 # Stop simulation when we reach steady-state?
@@ -20,18 +20,16 @@ ns.steady_tol 			= 1.0e-5
 # CFL 
 #*******************************************************************************
 
-ns.cfl  	     	= 0.5  # CFL number used to set dt
+ns.cfl  		     	= 0.5  # CFL number used to set dt
 ns.init_shrink       	= 1.0  # factor which multiplies the very first time step
 #ns.change_max 	      	= 1.1  # maximum change for dt (NOTE: does not seem to be implemented)
-#ns.init_iter 	      	= 0    # number of initial iterations
-#ns.do_init_proj = 0
+ns.init_iter 	      	= 1    # number of initial iterations
 
 #*******************************************************************************
 # FLUID PROPERTIES 
 #*******************************************************************************
 
-# Viscosity coefficient
-ns.variable_vel_visc = 1
+# Viscosity coefficient 
 ns.vel_visc_coef     	= 0.001
 # Forcing term defaults to  rho * abs(gravity) "down"
 ns.gravity           	= 0.0
@@ -43,8 +41,8 @@ ns.scal_diff_coefs   	= 0.0
 #*******************************************************************************
 
 # Number of cells in each coordinate direction at the coarsest level
-amr.n_cell 		= 64 64 64
-amr.max_grid_size	= 32
+amr.n_cell 				= 32 32 32
+amr.max_grid_size		= 64
 
 # Set to 0 if x-y coordinate system, set to 1 if r-z.
 geometry.coord_sys   	=  0
@@ -76,7 +74,7 @@ ns.hi_bc   	         	= 0 0 0
 #*******************************************************************************
 
 # Maximum level (defaults to 0 for single level calculation)
-amr.max_level		 	= 1
+amr.max_level		 	= 0
 # Refinement criterion
 ns.do_tracer_ref 		= 1
 # Interval (in number of level l timesteps) between regridding
@@ -94,11 +92,11 @@ amr.grid_eff 		   	= 0.75
 
 # Choose which quantities to write to plot file
 amr.plot_vars    		= ALL
-amr.derive_plot_vars 	= mag_vort gradp diveru
+amr.derive_plot_vars 	= mag_vort gradp
 
 # Interval (in number of coarse timesteps) between plot files
 amr.plot_file 			= plt
-#amr.plot_int			= 1
+#amr.plot_int			= 5
 amr.plot_per			= 0.2
 
 # Interval (in number of coarse timesteps) between checkpoint(restart) files

@@ -7,33 +7,25 @@
 
 # Maximum number of coarse grid timesteps to be taken, if stop_time is
 #  not reached first.
-max_step 		= 5
+max_step 		= 1000
 
 # Time at which calculation stops, if max_step is not reached first.
-stop_time 		= 5 #2.5
+stop_time 		= 2.5
 
 ns.do_vorticity_ref = 1
 
 #*******************************************************************************
 
 # Number of cells in each coordinate direction at the coarsest level
-amr.n_cell 		= 64  128 #16 32 #256 512 #128 256 #
+amr.n_cell 		= 64  128
 amr.max_grid_size	= 32
 
-#amr.grid_eff = 0.95
+amr.grid_eff = 0.95
 
 #*******************************************************************************
 
-ns.init_iter = 1
-ns.do_init_proj = 1
-proj.v = 10
-#proj.sync_tol = 1.e-7
-
 # Maximum level (defaults to 0 for single level calculation)
-amr.max_level		= 0 # maximum number of levels of refinement
-
-# Grid File - test this code with fixed grids
-#amr.regrid_file = /home/candace/CCSE/test/IAMR/Exec/run2d/fixed_grids
+amr.max_level		= 2 # maximum number of levels of refinement
 
 #*******************************************************************************
 
@@ -58,12 +50,12 @@ amr.v                   = 1
 #*******************************************************************************
 
 # Interval (in number of coarse timesteps) between checkpoint(restart) files
-amr.check_int		= 1
+amr.check_int		= 50 
 
 #*******************************************************************************
 
 # Interval (in number of coarse timesteps) between plot files
-amr.plot_int		= 1
+amr.plot_int		= 10
 
 #*******************************************************************************
 
@@ -73,13 +65,12 @@ ns.cfl                  = 0.9  # CFL number used to set dt
 #*******************************************************************************
 
 # Factor by which the first time is shrunk relative to CFL constraint
-ns.init_shrink          = 0.5  # factor which multiplies the very first time step
+ns.init_shrink          = 0.1  # factor which multiplies the very first time step
 
 #*******************************************************************************
 
 # Viscosity coefficient 
-ns.vel_visc_coef        = 0.1
-ns.variable_vel_visc = 1
+ns.vel_visc_coef        = 0.0
 
 #*******************************************************************************
 
@@ -94,7 +85,7 @@ ns.gravity              = -1.0
 #*******************************************************************************
 
 # Name of the file which specifies problem-specific parameters (defaults to "probin")
-amr.probin_file 	= /home/candace/CCSE/test/IAMR/Exec/run2d/probin.2d.rt
+amr.probin_file 	= probin.2d.rt
 
 #*******************************************************************************
 

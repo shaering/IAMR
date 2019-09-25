@@ -1,11 +1,10 @@
  &fortin
 
   probtype = 5
-  xblob = 0.
-  yblob = 0.
-  radblob = 0.4
+  xblob = 0.5
+  yblob = 0.5
+  radblob = 0.2
   denfact = 1.0
-  adv_dir = 0
   adverr  = 0.5
   vorterr = 0.0
 
