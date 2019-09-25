@@ -2,11 +2,14 @@
 # INPUTS.2D.LID_DRIVEN_CAVITY
 #*******************************************************************************
 
+#ns.do_init_proj = 0
+#ns.init_iter = 0
+
 #NOTE: You may set *either* max_step or stop_time, or you may set them both.
 
 # Maximum number of coarse grid timesteps to be taken, if stop_time is
 #  not reached first.
-max_step 				= 100000
+max_step 				= 2
 
 # Time at which calculation stops, if max_step is not reached first.
 stop_time 				= -1
@@ -15,11 +18,13 @@ stop_time 				= -1
 ns.stop_when_steady 	= 1
 ns.steady_tol 			= 1.0e-5
 
+#ns.do_vorticity_ref = 1
+
 #*******************************************************************************
 
 # Number of cells in each coordinate direction at the coarsest level
-amr.n_cell 				= 128 128
-amr.max_grid_size		= 16
+amr.n_cell 			= 32 32 #128 128 #64 64 #
+amr.max_grid_size		= 256
 
 #*******************************************************************************
 
@@ -60,6 +65,7 @@ ns.init_shrink          = 0.3  # factor which multiplies the very first time ste
 
 # Viscosity coefficient 
 ns.vel_visc_coef        = 0.001
+ns.variable_vel_visc = 1
 
 #*******************************************************************************
 

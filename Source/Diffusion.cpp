@@ -1138,9 +1138,6 @@ Diffusion::diffuse_tensor_velocity (Real                   dt,
       // Copy into state variable at new time.
       //
       MultiFab::Copy(U_new,Soln,0,Xvel,AMREX_SPACEDIM,soln_ng);
-    //FIXME check soln
-      static int count = 0; count++;
-      amrex::WriteSingleLevelPlotfile("ds_"+std::to_string(count), U_new, {AMREX_D_DECL("x","y","z"),"den","trac"},navier_stokes->Geom(), 0.0, 0);
 
       //
       // Modify diffusive fluxes here.
