@@ -793,26 +793,25 @@ Diffusion::diffuse_tensor_velocity (Real                   dt,
 	computeBeta(face_bcoef,betan,betaComp);
 	
 	tensorop.setShearViscosity(0, amrex::GetArrOfConstPtrs(face_bcoef));
+	// FIXME??? Hack 
+	// remove the "divmusi" terms by setting kappa = (2/3) mu
+	//
+	Print()<<"WARNING: Hack to get rid of divU terms ...\n";
+	Array<MultiFab,AMREX_SPACEDIM> kappa;
+	Real twothirds = 2.0/3.0;
+	for (int idim = 0; idim < AMREX_SPACEDIM; ++idim)
+	{
+	  kappa[idim].define(face_bcoef[idim].boxArray(), face_bcoef[idim].DistributionMap(), 1, 0);
+	  MultiFab::Copy(kappa[idim], face_bcoef[idim], 0, 0, 1, 0);
+	  kappa[idim].mult(twothirds);
+	}
+	// bulk viscosity not ususally needed for gasses
+	tensorop.setBulkViscosity(0, amrex::GetArrOfConstPtrs(kappa));
 	//ebtensorop.setEBShearViscosity(0, bcoef);
 	// not usually needed for gasses
 	// ebtensorop.setBulkViscosity(0, .);
 	// ebtensorop.setEBBulkViscosity(0, .);
-	
-	// FIXME??? Hack to compare MLMG to old way
-	// remove the "divmusi" terms by setting kappa = (2/3) mu
-	//
-	// => not a good idea. periodic_shear_layer gets numerical noise that grows
-	//  
-	// Print()<<"WARNING: Hack to get rid of divU terms ...\n";
-	// Array<MultiFab,AMREX_SPACEDIM> kappa;
-	// Real twothirds = 2.0/3.0;
-	// for (int idim = 0; idim < AMREX_SPACEDIM; ++idim)
-	// {
-	//   kappa[idim].define(betan[idim]->boxArray(), betan[idim]->DistributionMap(), 1, 0);
-	//   MultiFab::Copy(kappa[idim], *betan[idim], 0, 0, 1, 0);
-	//   kappa[idim].mult(twothirds);
-	// }
-	// tensorop.setBulkViscosity(0, amrex::GetArrOfConstPtrs(kappa));
+
 	  
 	MLMG mlmg(tensorop);
 	// FIXME -- consider making new parameters max_iter and bottom_verbose
@@ -1100,6 +1099,20 @@ Diffusion::diffuse_tensor_velocity (Real                   dt,
 	Array<MultiFab,AMREX_SPACEDIM> face_bcoef;
 	computeBeta(face_bcoef,betan,betaComp);
 	tensorop.setShearViscosity(0, amrex::GetArrOfConstPtrs(face_bcoef));
+	// FIXME??? Hack 
+	// remove the "divmusi" terms by setting kappa = (2/3) mu
+	//
+	Print()<<"WARNING: Hack to get rid of divU terms ...\n";
+	Array<MultiFab,AMREX_SPACEDIM> kappa;
+	Real twothirds = 2.0/3.0;
+	for (int idim = 0; idim < AMREX_SPACEDIM; ++idim)
+	{
+	  kappa[idim].define(face_bcoef[idim].boxArray(), face_bcoef[idim].DistributionMap(), 1, 0);
+	  MultiFab::Copy(kappa[idim], face_bcoef[idim], 0, 0, 1, 0);
+	  kappa[idim].mult(twothirds);
+	}
+	// bulk viscosity not ususally needed for gasses
+	tensorop.setBulkViscosity(0, amrex::GetArrOfConstPtrs(kappa));
 	// ebtensorop.setEBShearViscosity(0, bcoef);
 	// not usually needed for gasses
 	// ebtensorop.setBulkViscosity(0, .);
@@ -1126,8 +1139,8 @@ Diffusion::diffuse_tensor_velocity (Real                   dt,
       //
       MultiFab::Copy(U_new,Soln,0,Xvel,AMREX_SPACEDIM,soln_ng);
     //FIXME check soln
-      // static int count = 0; count++;
-      // amrex::WriteSingleLevelPlotfile("ds_"+std::to_string(count), U_new, {AMREX_D_DECL("x","y","z"),"den","trac"},navier_stokes->Geom(), 0.0, 0);
+      static int count = 0; count++;
+      amrex::WriteSingleLevelPlotfile("ds_"+std::to_string(count), U_new, {AMREX_D_DECL("x","y","z"),"den","trac"},navier_stokes->Geom(), 0.0, 0);
 
       //
       // Modify diffusive fluxes here.
@@ -1658,6 +1671,20 @@ Diffusion::diffuse_tensor_Vsync (MultiFab&              Vsync,
 	Array<MultiFab,AMREX_SPACEDIM> face_bcoef;
 	computeBeta(face_bcoef, nullptr, 0);
 	tensorop.setShearViscosity(0, amrex::GetArrOfConstPtrs(face_bcoef));
+	// FIXME??? Hack 
+	// remove the "divmusi" terms by setting kappa = (2/3) mu
+	//
+	Print()<<"WARNING: Hack to get rid of divU terms ...\n";
+	Array<MultiFab,AMREX_SPACEDIM> kappa;
+	Real twothirds = 2.0/3.0;
+	for (int idim = 0; idim < AMREX_SPACEDIM; ++idim)
+	{
+	  kappa[idim].define(face_bcoef[idim].boxArray(), face_bcoef[idim].DistributionMap(), 1, 0);
+	  MultiFab::Copy(kappa[idim], face_bcoef[idim], 0, 0, 1, 0);
+	  kappa[idim].mult(twothirds);
+	}
+	// bulk viscosity not ususally needed for gasses
+	tensorop.setBulkViscosity(0, amrex::GetArrOfConstPtrs(kappa));
 	// ebtensorop.setEBShearViscosity(0, bcoef);
 	// not usually needed for gasses
 	// ebtensorop.setBulkViscosity(0, .);
@@ -2577,6 +2604,20 @@ Diffusion::getTensorViscTerms (MultiFab&              visc_terms,
 	computeBeta(face_bcoef,beta,betaComp);
 	
 	tensorop.setShearViscosity(0, amrex::GetArrOfConstPtrs(face_bcoef));
+	// FIXME??? Hack 
+	// remove the "divmusi" terms by setting kappa = (2/3) mu
+	//
+	Print()<<"WARNING: Hack to get rid of divU terms ...\n";
+	Array<MultiFab,AMREX_SPACEDIM> kappa;
+	Real twothirds = 2.0/3.0;
+	for (int idim = 0; idim < AMREX_SPACEDIM; ++idim)
+	{
+	  kappa[idim].define(face_bcoef[idim].boxArray(), face_bcoef[idim].DistributionMap(), 1, 0);
+	  MultiFab::Copy(kappa[idim], face_bcoef[idim], 0, 0, 1, 0);
+	  kappa[idim].mult(twothirds);
+	}
+	// bulk viscosity not ususally needed for gasses
+	tensorop.setBulkViscosity(0, amrex::GetArrOfConstPtrs(kappa));
 	//ebtensorop.setEBShearViscosity(0, bcoef);
 	// not usually needed for gasses
 	// ebtensorop.setBulkViscosity(0, .);
@@ -2591,88 +2632,9 @@ Diffusion::getTensorViscTerms (MultiFab&              visc_terms,
 	//mlmg.setBottomVerbose(bottom_verbose);
 	  
 	mlmg.apply({&visc_tmp}, {&s_tmp});
+
       }
 	
-#if 0
-	// old tensor solver
-        ViscBndryTensor visc_bndry;
-        getTensorBndryData(visc_bndry,time);
-
-        DivVis tensor_op(visc_bndry,dx);
-        tensor_op.maxOrder(tensor_max_order);
-        tensor_op.setScalars(a,b);
-
-        tensor_op.ZeroACoefficients();
-
-        for (int n = 0; n < BL_SPACEDIM; n++)
-        {
-	    MultiFab bcoeffs(area[n].boxArray(),area[n].DistributionMap(),1,0);
-	    
-#ifdef _OPENMP
-#pragma omp parallel
-#endif
-            for (MFIter bcoeffsmfi(*beta[n],true); bcoeffsmfi.isValid(); ++bcoeffsmfi)
-            {
-	        const Box& bx = bcoeffsmfi.tilebox();
-	      
-		bcoeffs[bcoeffsmfi].copy(area[n][bcoeffsmfi],bx,0,bx,0,1);
-                bcoeffs[bcoeffsmfi].mult(dx[n],bx);
-                bcoeffs[bcoeffsmfi].mult((*beta[n])[bcoeffsmfi],bx,bx,betaComp,0,1);
-            }
-	    
-	    tensor_op.bCoefficients(bcoeffs,n); // not thread safe?
-        }
-
-        //MultiFab::Copy(s_tmp,S,Xvel,0,BL_SPACEDIM,0);
-
-        MultiFab vt(grids,dmap,BL_SPACEDIM,0,MFInfo(),navier_stokes->Factory());
-	vt.setVal(0.);
-        tensor_op.apply(vt,s_tmp);
-
-	//compare visc terms...
-	static int count = 0; count++;
-	// amrex::WriteSingleLevelPlotfile("vto_"+std::to_string(count), vt, {AMREX_D_DECL("x","y","z")},navier_stokes->Geom(), 0.0, 0);
-	// amrex::WriteSingleLevelPlotfile("vtn_"+std::to_string(count), visc_tmp, {AMREX_D_DECL("x","y","z")},navier_stokes->Geom(), 0.0, 0);	
-	// MultiFab::Subtract(vt,visc_terms,0,0,AMREX_SPACEDIM,0);
-	// //amrex::WriteSingleLevelPlotfile("vtd_"+std::to_string(count), vt, {AMREX_D_DECL("x","y","z")},navier_stokes->Geom(), 0.0, 0);
-	// VisMF::Write(vt,"vtdiff");
-
-    // fixme -- compare 
-    // MultiFab** tmp = new MultiFab*[1]; 
-    // int dir = 0;
-    // if (count >= 2) //for (int dir = 0; dir < 1; dir++)
-    // {
-    //   tmp[dir] = new MultiFab(grids,dmap,AMREX_SPACEDIM,0);
-    //   MultiFab::Copy(*tmp[dir],vt,0,0,AMREX_SPACEDIM,0);
-    //   MultiFab::Subtract(*tmp[dir],visc_tmp,0,0,AMREX_SPACEDIM,0);
-    //   VisMF::Write(*tmp[dir],"tmp"+std::to_string(count));
-
-    //   Vector<Real> nrm0,nrm1,nrm2;
-    // 	  Real n0=0.,n1=0.,n2=0.;
-    // 	  nrm0 = tmp[dir]->norm0({AMREX_D_DECL(0,1,2)});
-    // 	  nrm1 = tmp[dir]->norm1({AMREX_D_DECL(0,1,2)});
-    // 	  nrm2 = tmp[dir]->norm2({AMREX_D_DECL(0,1,2)});
-    // 	  for (int i = 0; i<AMREX_SPACEDIM; i++){
-    // 	    n0=max(nrm0[i],n0);
-    // 	    n1+=nrm1[i];
-    // 	    n2+=nrm2[i];
-    // 	  }
-    // 	  n1*=pow(navier_stokes->Geom().CellSize()[0],AMREX_SPACEDIM)/AMREX_SPACEDIM;
-    // 	  n2*=pow(navier_stokes->Geom().CellSize()[0],AMREX_SPACEDIM)/AMREX_SPACEDIM;
-    // 	  Print()<<(navier_stokes->Geom().Domain().hiVect())[0]+1<<" "
-    // 	  	  <<navier_stokes->Geom().CellSize()[0]<<" "
-    // 	  	  <<n0<<" "<<n1<<" "<<n2<<" \n";
-    // 	  std::ofstream datafile;
-    // 	  datafile.open("vtDiff"+std::to_string(dir)+".txt", std::ofstream::out | std::ofstream::app);
-    // 	  datafile<<(navier_stokes->Geom().Domain().hiVect())[0]+1<<" "
-    // 	  	  <<navier_stokes->Geom().CellSize()[0]<<" "
-    // 	  	  <<n0<<" "<<n1<<" "<<n2<<" \n";
-    // 	  datafile.close();
-
-    // }
-
-#endif
-
 	//
         // Must divide by volume.
         //
