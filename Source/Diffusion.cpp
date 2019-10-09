@@ -969,8 +969,12 @@ Diffusion::diffuse_tensor_velocity (Real                   dt,
       }
     }
 #endif
-  }
-
+    }
+    else
+    {
+      Rhs.setVal(0.);
+    }
+      
     	  //fixme -- for RZ, test MLMG metric terms 
 	  // amrex::WriteSingleLevelPlotfile("rhsMLMG_"+std::to_string(count), Rhs, {AMREX_D_DECL("x","y","z")},navier_stokes->Geom(), 0.0, 0);
 	  // amrex::WriteSingleLevelPlotfile("rhsOld_"+std::to_string(count), Rhs2, {AMREX_D_DECL("x","y","z")},navier_stokes->Geom(), 0.0, 0);
@@ -1163,7 +1167,8 @@ Diffusion::diffuse_tensor_velocity (Real                   dt,
 	for (int d = 0; d < BL_SPACEDIM; d++)
         {
 	  tensorflux[d]->mult(b/(dt*navier_stokes->Geom().CellSize()[d]),0);
-	  tensorflux[d]->plus(*(tensorflux_old[d]),0,BL_SPACEDIM,0);
+	  if ( be_cn_theta!=1 )
+	    tensorflux[d]->plus(*(tensorflux_old[d]),0,BL_SPACEDIM,0);
 	}       
 
 	if (level > 0)
