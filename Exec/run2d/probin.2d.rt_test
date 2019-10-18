@@ -1,0 +1,5 @@
+&fortin
+
+  probtype = 8
+  vorterr  = 5.e-3
+/
