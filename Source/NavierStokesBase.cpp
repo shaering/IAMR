@@ -1770,6 +1770,10 @@ NavierStokesBase::init ()
     //
     // Get best coarse state and pressure data.
     //
+#ifdef AMREX_DEBUG
+    // fixme? try this to appease debug & amrex.fpe_trap_invalid
+    S_new.setVal(1.2345e99);
+#endif
     FillCoarsePatch(S_new,0,cur_time,State_Type,0,NUM_STATE);
     FillCoarsePatch(P_new,0,cur_pres_time,Press_Type,0,1);
 
