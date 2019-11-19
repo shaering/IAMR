@@ -2390,6 +2390,7 @@ void Projection::doMLMGNodalProjection (int c_lev, int nlevel,
 #ifdef AMREX_USE_EB
     Vector<const EBFArrayBoxFactory*> ebf_rebase{ebfactory.begin()+c_lev, ebfactory.begin()+c_lev+nlevel};
     MLNodeLaplacian mlndlap(mg_geom, mg_grids, mg_dmap, info, ebf_rebase);
+    mlndlap.setCoarseningStrategy(MLNodeLinOp::CoarseningStrategy::Sigma);
 #else
     MLNodeLaplacian mlndlap(mg_geom, mg_grids, mg_dmap, info);
 #endif
