@@ -255,7 +255,7 @@ MacProj::setup (int level)
         {
             const BoxArray& grids = LevelData[level]->boxArray();
             const DistributionMapping& dmap = LevelData[level]->DistributionMap();
-            mac_phi_crse[level].reset(new MultiFab(grids,dmap,1,1));
+            mac_phi_crse[level].reset(new MultiFab(grids,dmap,1,1, MFInfo(), LevelData[level]->Factory()));
             mac_phi_crse[level]->setVal(0.0);
         }
     }
@@ -337,7 +337,7 @@ MacProj::mac_project (int             level,
     //
     std::unique_ptr<MultiFab> raii;
     if (level == max_level) {
-        raii.reset(new MultiFab(grids,dmap,1,1));
+      raii.reset(new MultiFab(grids,dmap,1,1, MFInfo(), LevelData[level]->Factory()));
         mac_phi = raii.get();
     } else {
         mac_phi = mac_phi_crse[level].get();
@@ -364,19 +364,14 @@ MacProj::mac_project (int             level,
     // Initialize the rhs with divu.
     //
     const Real rhs_scale = 2.0/dt;
-    // fixme? RHS must need factory
-#ifdef AMREX_USE_EB
     MultiFab Rhs(grids,dmap,1,0, MFInfo(), LevelData[level]->Factory());
-#else
-    MultiFab Rhs(grids,dmap,1,0);
-#endif
 
     Rhs.copy(divu);
 
     MultiFab area_tmp[BL_SPACEDIM];
     if (anel_coeff[level] != 0) {
 	for (int i = 0; i < BL_SPACEDIM; ++i) {
-	    area_tmp[i].define(area_level[i].boxArray(), area_level[i].DistributionMap(), 1, 1);
+	    area_tmp[i].define(area_level[i].boxArray(), area_level[i].DistributionMap(), 1, 1, MFInfo(), LevelData[level]->Factory());
 	    MultiFab::Copy(area_tmp[i], area_level[i], 0, 0, 1, 1);
 	}
         scaleArea(level,area_tmp,anel_coeff[level]);
@@ -478,7 +473,9 @@ void
 MacProj::mac_sync_solve (int       level,
                          Real      dt,
                          MultiFab& rho_half,
-                         IntVect&  fine_ratio)
+                         IntVect&  fine_ratio,
+			 Array<MultiFab*,AMREX_SPACEDIM>& Ucorr,
+			 MultiFab* Rhs_increment)
 {
     BL_ASSERT(level < finest_level);
 
@@ -515,7 +512,7 @@ MacProj::mac_sync_solve (int       level,
     // MAC register, VOL = cell volume.  All other cells have a
     // value of zero (including crse cells under fine grids).
     //
-    MultiFab Rhs(grids,dmap,1,0);
+    MultiFab Rhs(grids,dmap,1,0, MFInfo(), LevelData[level]->Factory());
     Rhs.setVal(0.0);
     //
     // Reflux subtracts values at hi edge of coarse cell and
@@ -547,6 +544,11 @@ MacProj::mac_sync_solve (int       level,
         }
     }
 
+    if (Rhs_increment)
+    {
+      MultiFab::Add(Rhs,*Rhs_increment,0,0,1,0);
+    }
+
     mac_sync_phi->setVal(0.0);
 
     //
@@ -557,7 +559,7 @@ MacProj::mac_sync_solve (int       level,
     MultiFab area_tmp[BL_SPACEDIM];
     if (anel_coeff[level] != 0) {
 	for (int i = 0; i < BL_SPACEDIM; ++i) {
-	    area_tmp[i].define(area_level[i].boxArray(), area_level[i].DistributionMap(), 1, 1);
+	    area_tmp[i].define(area_level[i].boxArray(), area_level[i].DistributionMap(), 1, 1, MFInfo(), LevelData[level]->Factory());
 	    MultiFab::Copy(area_tmp[i], area_level[i], 0, 0, 1, 1);
 	}
         scaleArea(level,area_tmp,anel_coeff[level]);
@@ -566,7 +568,8 @@ MacProj::mac_sync_solve (int       level,
     const MultiFab* area = (anel_coeff[level] != 0) ? area_tmp : area_level;
 
     mlmg_mac_sync_solve(parent,*phys_bc, level, mac_sync_tol, mac_abs_tol,
-                        rhs_scale, area, volume, rho_half, Rhs, mac_sync_phi, verbose);
+                        rhs_scale, area, volume, rho_half, Rhs, mac_sync_phi,
+			Ucorr, verbose);
 
     if (verbose)
     {
@@ -579,6 +582,7 @@ MacProj::mac_sync_solve (int       level,
     }
 }
 
+  /* REMOVE in favor of single version above. subtract_avg and offset never used
 // this version is for the closed chamber LMC algorithm
 void
 MacProj::mac_sync_solve (int       level,
@@ -696,12 +700,12 @@ MacProj::mac_sync_solve (int       level,
 	amrex::Print() << "MacProj::mac_sync_solve(): time: " << run_time << std::endl;
     }
 }
-
+  */
 //
 // After solving for mac_sync_phi in mac_sync_solve(), we
 // can now do the sync advect step.  This consists of two steps
 //
-// 1. compute u_corr as the gradient of mac_sync_phi
+// 1. compute u_corr as the gradient of mac_sync_phi --- Now part of mac_sync_solve
 // 2. compute advective tendency of u_corr and
 //    add into Vsync or Ssync
 //
@@ -712,6 +716,7 @@ MacProj::mac_sync_solve (int       level,
 
 void
 MacProj::mac_sync_compute (int                   level,
+			   Array<MultiFab*,AMREX_SPACEDIM>& Ucorr,
                            MultiFab*             u_mac, 
                            MultiFab&             Vsync,
                            MultiFab&             Ssync,
@@ -745,6 +750,8 @@ MacProj::mac_sync_compute (int                   level,
     Godunov*        godunov             = ns_level.godunov;
     bool            use_forces_in_trans = godunov->useForcesInTrans() ? true : false;
 
+    //NOTE
+    // Visc terms, GradP, forces not used in EB advection algorithm
     MultiFab vel_visc_terms(grids,dmap,BL_SPACEDIM,1,MFInfo(),ns_level.Factory());
     MultiFab scal_visc_terms(grids,dmap,numscal,1,MFInfo(),ns_level.Factory());
 
@@ -773,8 +780,7 @@ MacProj::mac_sync_compute (int                   level,
             ns_level.getViscTerms(scal_visc_terms,BL_SPACEDIM,numscal,prev_time);
     }
 
-    MultiFab Gp(grids,dmap,BL_SPACEDIM,1);
-
+    MultiFab Gp(grids,dmap,BL_SPACEDIM,1,MFInfo(),ns_level.Factory());
     ns_level.getGradP(Gp, prev_pres_time);
 
     std::unique_ptr<MultiFab> divu_fp (ns_level.getDivCond(1,prev_time));
@@ -782,13 +788,15 @@ MacProj::mac_sync_compute (int                   level,
     // Compute the mac sync correction.
     //
     MultiFab fluxes[BL_SPACEDIM];
-    MultiFab mac_fluxes[BL_SPACEDIM];
     for (int i = 0; i < BL_SPACEDIM; i++) {
       const BoxArray& ba = LevelData[level]->getEdgeBoxArray(i);
-      fluxes[i].define(ba, dmap, NUM_STATE, 0);
-      mac_fluxes[i].define(ba, dmap, 1, 0);
+      fluxes[i].define(ba, dmap, NUM_STATE, 0, MFInfo(),ns_level.Factory());
     }
-        
+
+    // Make sure Ucorr has correct sign
+    for ( int idim=0; idim<AMREX_SPACEDIM; idim++)
+      Ucorr[idim]->negate();
+
     FillPatchIterator S_fpi(ns_level,vel_visc_terms,Godunov::hypgrow(),
                                  prev_time,State_Type,0,NUM_STATE);
     MultiFab& Smf = S_fpi.get_mf();
@@ -798,15 +806,15 @@ MacProj::mac_sync_compute (int                   level,
     {
       Vector<int> ns_level_bc;
       FArrayBox tforces, tvelforces, U;
-      FArrayBox grad_phi[BL_SPACEDIM], Rho;
-      FArrayBox flux[BL_SPACEDIM];
+      //      FArrayBox* grad_phi[BL_SPACEDIM];
+      FArrayBox flux[BL_SPACEDIM], Rho;
 
       for (MFIter Smfi(Smf,true); Smfi.isValid(); ++Smfi)
       {
         const int i     = Smfi.index();
         FArrayBox& S    = Smf[Smfi];
         FArrayBox& divu = (*divu_fp)[Smfi];
-        const Box bx = Smfi.tilebox();
+        const Box& bx = Smfi.tilebox();
         //
         // Step 1: compute ucorr = grad(phi)/rhonph
         //
@@ -814,13 +822,6 @@ MacProj::mac_sync_compute (int                   level,
         //
         Rho.resize(amrex::grow(bx,1),1);
 
-        D_TERM(grad_phi[0].resize(amrex::surroundingNodes(bx,0),1);,
-               grad_phi[1].resize(amrex::surroundingNodes(bx,1),1);,
-	       grad_phi[2].resize(amrex::surroundingNodes(bx,2),1););
-
-        mac_vel_update(1,D_DECL(grad_phi[0],grad_phi[1],grad_phi[2]),
-                       (*mac_sync_phi)[Smfi], rho_half[Smfi],
-                       0, bx, bx, level, dx, dt/2.0);
         //
         // Step 2: compute Mac correction by calling GODUNOV box
         //
@@ -838,8 +839,8 @@ MacProj::mac_sync_compute (int                   level,
                                   scal_visc_terms[Smfi], 0, divu, 0, Rho, 0, 1);
         if (use_forces_in_trans)
         {
-            ns_level.getForce(tvelforces,bx,1,Xvel,BL_SPACEDIM,prev_time,Smf[Smfi],Smf[Smfi],Density);
-	          godunov->Sum_tf_gp_visc(tvelforces,0,vel_visc_terms[Smfi],0,Gp[Smfi],0,Rho,0);
+	    ns_level.getForce(tvelforces,bx,1,Xvel,BL_SPACEDIM,prev_time,Smf[Smfi],Smf[Smfi],Density);
+	    godunov->Sum_tf_gp_visc(tvelforces,0,vel_visc_terms[Smfi],0,Gp[Smfi],0,Rho,0);
         }
         //
         // Get the sync FABS.
@@ -847,10 +848,6 @@ MacProj::mac_sync_compute (int                   level,
         FArrayBox& u_sync = Vsync[Smfi];
         FArrayBox& s_sync = Ssync[Smfi];
 
-	//Why copy here and not just use S?
-	// SyncAdvect doesn't even use U
-        //U.resize(bx,BL_SPACEDIM);
-        //U.copy(Smf[Smfi],0,0,BL_SPACEDIM);
         D_TERM(FArrayBox& u_mac_fab0 = u_mac[0][Smfi];,
                FArrayBox& u_mac_fab1 = u_mac[1][Smfi];,
                FArrayBox& u_mac_fab2 = u_mac[2][Smfi];);
@@ -889,10 +886,10 @@ MacProj::mac_sync_compute (int                   level,
                 }
 
                 godunov->SyncAdvect(bx, dx, dt, level, 
-                                    area[0][i], u_mac_fab0, grad_phi[0], flux[0], 
-                                    area[1][i], u_mac_fab1, grad_phi[1], flux[1],
+                                    area[0][i], u_mac_fab0, (*Ucorr[0])[Smfi], flux[0], 
+                                    area[1][i], u_mac_fab1, (*Ucorr[1])[Smfi], flux[1],
 #if (BL_SPACEDIM == 3)                            
-                                    area[2][i], u_mac_fab2, grad_phi[2], flux[2],
+                                    area[2][i], u_mac_fab2, (*Ucorr[2])[Smfi], flux[2],
 #endif
                                     S, *Sp, tforces, divu, comp, temp, sync_ind,
                                     use_conserv_diff, comp,
@@ -911,17 +908,6 @@ MacProj::mac_sync_compute (int                   level,
             }
         }
         //
-        // Include grad_phi in the mac registers corresponding
-        // to the next coarsest interface.
-        //
-        if (level > 0 && update_fluxreg)
-        {
-	  for (int d = 0; d < BL_SPACEDIM; d++){
-	    const Box& ebx = Smfi.nodaltilebox(d);
-	    mac_fluxes[d][Smfi].copy(grad_phi[d],ebx,0,ebx,0,1);
-	  }                 
-        }
-        //
         // Multiply the sync term by dt -- now done in the calling routine.
         //
       }
@@ -934,7 +920,11 @@ MacProj::mac_sync_compute (int                   level,
 	    adv_flux_reg->FineAdd(fluxes[d],d,comp,comp,1,-dt);
 	  }
 	}
-	mac_reg[level]->FineAdd(mac_fluxes[d],area[d],d,0,0,1,mlt);
+        //
+        // Include grad_phi(aka Ucorr) in the mac registers corresponding
+        // to the next coarsest interface.
+        //
+	mac_reg[level]->FineAdd(*Ucorr[d],area[d],d,0,0,1,mlt);
       }
     }
 }
@@ -949,6 +939,7 @@ MacProj::mac_sync_compute (int                   level,
 //
 void
 MacProj::mac_sync_compute (int                    level,
+			   Array<MultiFab*,AMREX_SPACEDIM>& Ucorr,
                            MultiFab&              Sync,
                            int                    comp,
                            int                    s_ind,
@@ -975,8 +966,12 @@ MacProj::mac_sync_compute (int                    level,
     MultiFab fluxes[BL_SPACEDIM];
     for (int i = 0; i < BL_SPACEDIM; i++) {
       const BoxArray& ba = LevelData[level]->getEdgeBoxArray(i);
-      fluxes[i].define(ba, dmap, 1, 0);
+      fluxes[i].define(ba, dmap, 1, 0, MFInfo(),ns_level.Factory());
     }
+
+    // Make sure Ucorr has correct sign
+    for ( int idim=0; idim<AMREX_SPACEDIM; idim++)
+      Ucorr[idim]->negate();
 
     //
     // Compute the mac sync correction.
@@ -985,25 +980,13 @@ MacProj::mac_sync_compute (int                    level,
 #pragma omp parallel 
 #endif
     {
-      FArrayBox flux[BL_SPACEDIM], grad_phi[BL_SPACEDIM];
+      FArrayBox flux[BL_SPACEDIM];
+      FArrayBox* grad_phi[BL_SPACEDIM];
     
       for (MFIter Syncmfi(Sync,true); Syncmfi.isValid(); ++Syncmfi)
       {
 	const Box& bx = Syncmfi.tilebox();
 
-        //
-        // Step 1: compute ucorr = grad(phi)/rhonph
-        //
-        D_TERM(grad_phi[0].resize(amrex::surroundingNodes(bx,0),1);,
-               grad_phi[1].resize(amrex::surroundingNodes(bx,1),1);,
-               grad_phi[2].resize(amrex::surroundingNodes(bx,2),1););
-
-        mac_vel_update(1,
-                       D_DECL(grad_phi[0],grad_phi[1],grad_phi[2]),
-                       (*mac_sync_phi)[Syncmfi],
-                       rho_half[Syncmfi], 0,
-                       bx, bx, level,
-                       geom.CellSize(), dt/2.0);
         //
         // Step 2: compute Mac correction by advecting the edge states.
         //
@@ -1019,18 +1002,16 @@ MacProj::mac_sync_compute (int                    level,
 
         godunov.ComputeSyncAofs(bx,
                                 area[0][Syncmfi],
-                                grad_phi[0],       flux[0],
-                                
-                                area[1][Syncmfi],
-                                grad_phi[1],       flux[1],
+                                (*Ucorr[0])[Syncmfi], flux[0],
+				area[1][Syncmfi],
+				(*Ucorr[1])[Syncmfi], flux[1],
 #if (BL_SPACEDIM == 3)                            
                                 area[2][Syncmfi],
-                                grad_phi[2],       flux[2],
+				(*Ucorr[2])[Syncmfi], flux[2],
 #endif
                                 volume[Syncmfi], Sync[Syncmfi],
                                 s_ind, use_conserv_diff);
 
-        D_TERM(grad_phi[0].clear();, grad_phi[1].clear();, grad_phi[2].clear(););
         //
         // NOTE: the signs here are opposite from VELGOD.
         // NOTE: fluxes expected to be in extensive form.

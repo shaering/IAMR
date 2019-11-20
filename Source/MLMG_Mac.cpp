@@ -1,4 +1,7 @@
-
+//fixme, for writesingle level plotfile
+#include<AMReX_PlotFileUtil.H>
+////
+#include <AMReX_MacProjector.H>
 #include <AMReX_MLABecLaplacian.H>
 #include <AMReX_MLMG.H>
 #include <AMReX_ParmParse.H>
@@ -9,7 +12,6 @@
 
 #ifdef AMREX_USE_EB
 #include <AMReX_EBFArrayBox.H>
-#include <AMReX_MacProjector.H>
 //fixme
 #include <AMReX_EBMultiFabUtil.H>
 #include <AMReX_VisMF.H>
@@ -227,7 +229,8 @@ void mlmg_mac_sync_solve (Amr* parent, const BCRec& phys_bc,
                           int level, Real mac_tol, Real mac_abs_tol, Real rhs_scale,
                           const MultiFab* area, const MultiFab& volume,
                           const MultiFab& rho, MultiFab& Rhs,
-                          MultiFab* mac_phi, int verbose)
+                          MultiFab* mac_phi, Array<MultiFab*,AMREX_SPACEDIM>& Ucorr,
+			  int verbose)
 {
     if (!initialized) 
     {
@@ -238,6 +241,10 @@ void mlmg_mac_sync_solve (Amr* parent, const BCRec& phys_bc,
         ppmac.query("agglomeration", agglomeration);
         ppmac.query("consolidation", consolidation);
         ppmac.query("max_fmg_iter", max_fmg_iter);
+#ifdef AMREX_USE_HYPRE
+        ppmac.query("use_hypre", use_hypre);
+        ppmac.query("hypre_verbose", hypre_verbose);
+#endif
         
         initialized = true;
     }
@@ -246,40 +253,76 @@ void mlmg_mac_sync_solve (Amr* parent, const BCRec& phys_bc,
     const BoxArray& ba = Rhs.boxArray();
     const DistributionMapping& dm = Rhs.DistributionMap();
 
+    // no need to set A coef because it's zero
+    Array<std::unique_ptr<MultiFab>,AMREX_SPACEDIM> bcoefs;
+    for (int idim = 0; idim < AMREX_SPACEDIM; ++idim)
+    {
+        BoxArray nba = amrex::convert(ba,IntVect::TheDimensionVector(idim));
+        bcoefs[idim].reset(new  MultiFab(nba, dm, 1, 0, MFInfo(),
+                                            (parent->getLevel(level)).Factory()));
+    }
+
+    //
+    // Want to go back to ML(EB)ABecLap. MacProjector takes div and don't need that here
+    // Will MLEBABecLap take care of bcoef like MacProj?
+    // Not so relevant at the moment with restrriction EB not crossing coarse-fine bndry
+    
+    // Set bcoefs to the average of Density at the faces
+    // This does NOT compute the average at the CENTROIDS, but at the faces
+    // Operator inside MAc projector will take care of this.
+    average_cellcenter_to_face( GetArrOfPtrs(bcoefs), rho, geom);
+
+    // Now invert the coefficients and apply scale factor
+    int ng_for_invert(0);
+    Real scale_factor(1.0/rhs_scale);
+
+    for (int idim = 0; idim < AMREX_SPACEDIM; ++idim)
+    {
+        bcoefs[idim]->invert(scale_factor,ng_for_invert);
+        bcoefs[idim]->FillBoundary( geom.periodicity() );
+    }
+    
     LPInfo info;
     info.setAgglomeration(agglomeration);
     info.setConsolidation(consolidation);
 
+    // MacProjector is not what we want for sync
+    // takes Face-centered velocity and interally computes div, but already have div
+    //
+    // Create right containers for MacProjector
+    //Array<MultiFab*,AMREX_SPACEDIM>  a_umac({mac_phi});
+    //
+    // Create MacProjection object
+    // make sure u_mac already has bndry properly filled
+    //MacProjector macproj( {a_umac}, {GetArrOfConstPtrs(bcoefs)}, {geom}, info, {&Rhs} );
+
+#ifdef AMREX_USE_EB
+    MLEBABecLaplacian mlabec({geom}, {ba}, {dm}, info, {(parent->getLevel(level)).Factory()});
+#else
     MLABecLaplacian mlabec({geom}, {ba}, {dm}, info);
+#endif
     mlabec.setMaxOrder(max_order);
+    mlabec.setVerbose(verbose);
 
     std::array<MLLinOp::BCType,AMREX_SPACEDIM> mlmg_lobc;
     std::array<MLLinOp::BCType,AMREX_SPACEDIM> mlmg_hibc;
     set_mac_solve_bc(mlmg_lobc, mlmg_hibc, phys_bc, geom);
 
     mlabec.setDomainBC(mlmg_lobc, mlmg_hibc);
-    if (level > 0) {
-        mlabec.setCoarseFineBC(nullptr, parent->refRatio(level-1)[0]);
-    }
+    // weiqun says not needed... I think default is the 0 we want
+    // if (level > 0) {
+    //     mlabec.setCoarseFineBC(nullptr, parent->refRatio(level-1)[0]);
+    // }
     mlabec.setLevelBC(0, mac_phi);
 
     mlabec.setScalars(0.0, 1.0);
-
-    // no need to set A coef because it's zero
-     
-    std::array<MultiFab,AMREX_SPACEDIM> bcoefs;
-    for (int idim = 0; idim < AMREX_SPACEDIM; ++idim)
-    {
-        const BoxArray& nba = amrex::convert(ba, IntVect::TheDimensionVector(idim));
-        bcoefs[idim].define(nba, dm, 1, 0);
-    }
-    compute_mac_coefficient(bcoefs, rho, 0, 1.0/rhs_scale);
     mlabec.setBCoeffs(0, amrex::GetArrOfConstPtrs(bcoefs));
 
     MLMG mlmg(mlabec);
     if (use_hypre) {
         mlmg.setBottomSolver(MLMG::BottomSolver::hypre);
         mlmg.setBottomVerbose(hypre_verbose);
+      mlmg.setVerbose(hypre_verbose);
     }
     mlmg.setMaxFmgIter(max_fmg_iter);
     mlmg.setVerbose(verbose);
@@ -288,8 +331,39 @@ void mlmg_mac_sync_solve (Amr* parent, const BCRec& phys_bc,
 
     mlmg.setFinalFillBC(true);
     mlmg.solve({mac_phi}, {&Rhs}, mac_tol, mac_abs_tol);
+    //
+    static int count=0; count++;
+    Print()<<"RHS in mac sync..."<<"\n";
+    amrex::WriteSingleLevelPlotfile("rhs_"+std::to_string(count), Rhs, {"rhs"},geom, 0.0, 0);
+    ///////
+
+    //mlabec.setMaxOrder(2);    
+    //Ucorr = fluxes = -B grad phi
+    mlmg.getFluxes({Ucorr});
+
+    // // Solve with initial guess of zero
+    // macproj.project(mac_tol,mac_abs_tol,MLMG::Location::FaceCentroid);
+
+    // // Enforce perodicity
+    // for (int i=0; i<AMREX_SPACEDIM; ++i)
+    //   mac_phi[i].FillBoundary(geom.periodicity());
+
+    //if (verbose)  // Always print this for now
+//     {
+//       MultiFab divu(ba, dm, 1, 0, MFInfo(), (parent->getLevel(level)).Factory());
+// #ifdef AMREX_USE_EB
+//       bool already_on_centroid(true);
+//       EB_computeDivergence(divu,GetArrOfConstPtrs(a_umac),geom,already_on_centroid);
+// #else
+//       computeDivergence(divu,GetArrOfConstPtrs(a_umac),geom);
+// #endif
+      
+//       Print() << "  MAC SYNC solve on level "<< level
+//     	      << " BEFORE projection: max(abs(divu)) = " << divu.norm0() << "\n";
+//     }
 }
 
+// FIXME -- Need to take this fn and make one mac_level_solve()
 //
 // EB functions
 //

@@ -1663,6 +1663,11 @@ NavierStokes::mac_sync ()
     BL_PROFILE_REGION_START("R::NavierStokes::mac_sync()");
     BL_PROFILE("NavierStokes::mac_sync()");
 
+    //
+    // fixme - why not just return immediately if do_reflux = false
+    //  why waste time computing things and then not use them
+    //
+    
     const int  numscal        = NUM_STATE - BL_SPACEDIM;
     const Real prev_time      = state[State_Type].prevTime();
     const Real prev_pres_time = state[Press_Type].prevTime();
@@ -1671,11 +1676,19 @@ NavierStokes::mac_sync ()
     // does this have ghosts filled?
     MultiFab&  Rh             = get_rho_half_time();
 
+    Array<MultiFab*,AMREX_SPACEDIM> Ucorr;
+    for (int idim = 0; idim < AMREX_SPACEDIM; ++idim){
+      const BoxArray& edgeba = getEdgeBoxArray(idim);
+      //
+      // fixme? unsure how many ghost cells...
+      Ucorr[idim]= new MultiFab(edgeba,dmap,1,0,MFInfo(),Factory());
+    }
+    
     sync_setup(DeltaSsync);
     //
     // Compute the u_mac for the correction.
     //
-    mac_projector->mac_sync_solve(level,dt,Rh,fine_ratio);
+    mac_projector->mac_sync_solve(level,dt,Rh,fine_ratio,Ucorr);
     //
     // Update coarse grid state by adding correction from mac_sync solve
     // the correction is the advective tendency of the new velocities.
@@ -1683,13 +1696,24 @@ NavierStokes::mac_sync ()
     if (do_reflux)
     {
       MultiFab& S_new = get_new_data(State_Type);
-      mac_projector->mac_sync_compute(level,u_mac,Vsync,Ssync,Rh,
+      mac_projector->mac_sync_compute(level,Ucorr,u_mac,Vsync,Ssync,Rh,
                                       level > 0 ? &getAdvFluxReg(level) : 0,
                                       advectionType, prev_time,
                                       prev_pres_time,dt,
                                       NUM_STATE,be_cn_theta, 
                                       modify_reflux_normal_vel,
                                       do_mom_diff);
+      //fixme
+      static int count=0; count++;
+      Print()<<"mac_sync: level = "<<level<<"\n";
+      amrex::WriteSingleLevelPlotfile("snew_"+std::to_string(count), get_new_data(State_Type), {AMREX_D_DECL("x","y","z"),"den","trac","temp"},geom, 0.0, 0);
+            amrex::WriteSingleLevelPlotfile("ssync_"+std::to_string(count), Ssync, {"den","trac","temp"},geom, 0.0, 0);
+    ///////
+
+      //
+      // fixme? clear Ucorr here? think we're done with it
+      //
+      
       //
       // For all conservative variables Q (other than density)
       // express Q as rho*q and increment sync by -(sync_for_rho)*q
@@ -1915,17 +1939,17 @@ NavierStokes::mac_sync ()
 #endif
           for (MFIter SsyncMfi(Ssync,true); SsyncMfi.isValid(); ++SsyncMfi)
           {
-		        const Box& bx = SsyncMfi.tilebox();
+	    const Box& bx = SsyncMfi.tilebox();
             Ssync[SsyncMfi].plus((*DeltaSsync)[SsyncMfi], bx,
-                                     iconserved, istate-BL_SPACEDIM, 1);
+				 iconserved, istate-BL_SPACEDIM, 1);
            }
         }
       }
+
       //
       // Add the sync correction to the state.
       //
 	    //fixme -- check this with conservatively advected tracer...
-
       for (int sigma  = 0; sigma < numscal; sigma++)
       {
 #ifdef _OPENMP
@@ -1934,7 +1958,7 @@ NavierStokes::mac_sync ()
 	      for (MFIter S_newmfi(S_new,true); S_newmfi.isValid(); ++S_newmfi)
         {
           S_new[S_newmfi].plus(Ssync[S_newmfi],S_newmfi.tilebox(),
-                                     sigma,BL_SPACEDIM+sigma,1);
+			       sigma,BL_SPACEDIM+sigma,1);
         }
       }
       //

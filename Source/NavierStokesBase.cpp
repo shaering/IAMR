@@ -2640,9 +2640,16 @@ NavierStokesBase::post_timestep (int crse_iteration)
         
     if (level < finest_level)
         avgDown();
-    
+
+    //fixme
+    static int count=0; count++;
+    Print()<<"post timestime: level = "<<level<<"\n";
+    amrex::WriteSingleLevelPlotfile("avgd_"+std::to_string(count), get_new_data(State_Type), {AMREX_D_DECL("x","y","z"),"den","trac","temp"},geom, 0.0, 0);
+    ///////
+
     if (do_mac_proj && level < finest_level)
         mac_sync();
+    amrex::WriteSingleLevelPlotfile("macsync_"+std::to_string(count), get_new_data(State_Type), {AMREX_D_DECL("x","y","z"),"den","trac","temp"},geom, 0.0, 0);
 
     if (do_sync_proj && (level < finest_level))
         level_sync(crse_iteration);    
