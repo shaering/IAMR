@@ -2,7 +2,6 @@
 #include<AMReX_PlotFileUtil.H>
 ////
 #include <AMReX_MacProjector.H>
-#include <AMReX_MLABecLaplacian.H>
 #include <AMReX_MLMG.H>
 #include <AMReX_ParmParse.H>
 
@@ -12,9 +11,12 @@
 
 #ifdef AMREX_USE_EB
 #include <AMReX_EBFArrayBox.H>
+#include <AMReX_MLEBABecLap.H>
 //fixme
 #include <AMReX_EBMultiFabUtil.H>
 #include <AMReX_VisMF.H>
+#else
+#include <AMReX_MLABecLaplacian.H>
 #endif
 
 using namespace amrex;
@@ -297,7 +299,8 @@ void mlmg_mac_sync_solve (Amr* parent, const BCRec& phys_bc,
     //MacProjector macproj( {a_umac}, {GetArrOfConstPtrs(bcoefs)}, {geom}, info, {&Rhs} );
 
 #ifdef AMREX_USE_EB
-    MLEBABecLaplacian mlabec({geom}, {ba}, {dm}, info, {(parent->getLevel(level)).Factory()});
+    const auto& ebf = &dynamic_cast<EBFArrayBoxFactory const&>((parent->getLevel(level)).Factory());
+    MLEBABecLap mlabec({geom}, {ba}, {dm}, info, {ebf});
 #else
     MLABecLaplacian mlabec({geom}, {ba}, {dm}, info);
 #endif
