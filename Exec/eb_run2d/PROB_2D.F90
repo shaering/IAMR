@@ -27,7 +27,7 @@ module prob_2D_module
             FORT_DENFILL, FORT_ADVFILL, FORT_TEMPFILL, FORT_XVELFILL, &
             FORT_YVELFILL, FORT_PRESFILL, FORT_DIVUFILL, FORT_DSDTFILL
 
-  REAL_T :: m_problo(SDIM), m_probhi(SDIM)        
+  REAL_T :: m_problo(SDIM), m_probhi(SDIM)
 
 contains
 
@@ -40,15 +40,15 @@ contains
 !c ::: problem specific data from a namelist or other input
 !c ::: files and possibly store them or derived information
 !c ::: in FORTRAN common blocks for later use.
-!c ::: 
+!c :::
 !c ::: INPUTS/OUTPUTS:
-!c ::: 
+!c :::
 !c ::: init      => TRUE if called at start of problem run
 !c :::              FALSE if called from restart
 !c ::: name      => name of "probin" file
 !c ::: namlen    => length of name
 !c ::: strttime <=  start problem with this time variable
-!c ::: 
+!c :::
 !c ::: -----------------------------------------------------------
       subroutine amrex_probinit (init,name,namlen,problo,probhi) bind(c)
 
@@ -79,7 +79,7 @@ contains
                        velfact, probtype, randfact, bubgrad, &
      			rhozero, tempzero, c_d, r_d, grav_angle, &
                        adv_dir, adv_vel, axis_dir, radvort, &
-                       lid_vel 
+                       lid_vel
 #ifdef BL_DO_FLCT
                        ,forceInflow, numInflPlanesStore, strmwse_dir, &
                        forceLo, forceHi, flct_file, turb_scale
@@ -152,7 +152,7 @@ contains
         f_probhi(i) = probhi(i)
       enddo
 
-      end subroutine amrex_probinit 
+      end subroutine amrex_probinit
 
 !c ::: -----------------------------------------------------------
 !c ::: This routine is called at problem setup time and is used
@@ -161,15 +161,15 @@ contains
 !c ::: field need not be set.  A subsequent projection iteration
 !c ::: will define aa divergence free velocity field along with a
 !c ::: consistant pressure.
-!c ::: 
+!c :::
 !c ::: NOTE:  all arrays have one cell of ghost zones surrounding
 !c :::        the grid interior.  Values in these cells need not
 !c :::        be set here.
-!c ::: 
+!c :::
 !c ::: INPUTS/OUTPUTS:
-!c ::: 
+!c :::
 !c ::: level     => amr level of grid
-!c ::: time      => time at which to init data             
+!c ::: time      => time at which to init data
 !c ::: lo,hi     => index limits of grid interior (cell centered)
 !c ::: nscal     => number of scalar quantities.  You should know
 !c :::		   this already!
@@ -278,7 +278,7 @@ contains
       REAL_T     xlo(SDIM), xhi(SDIM), probhi(SDIM)
       REAL_T     vel(DIMV(state),SDIM)
       REAL_T     scal(DIMV(state),nscal)
-      REAL_T     press(DIMV(press))
+     REAL_T     press(DIMV(press))
 !c
 !c     ::::: local variables
 !c
@@ -360,7 +360,7 @@ contains
       else if (adv_dir .eq. 2) then
          x_vel = zero
          y_vel = adv_vel
-      else 
+      else
          write(6,*) "initbubble: adv_dir = ",adv_dir
          stop
       end if
@@ -376,7 +376,7 @@ contains
 !c           scal(i,j,1) = merge(denfact,one,dist.lt.radblob)
             do n = 2,nscal-1
                scal(i,j,n) = one
-            end do                  
+            end do
             scal(i,j,nscal) = merge(one,zero,dist.lt.radblob)
          end do
       end do
@@ -420,7 +420,7 @@ contains
       else if (adv_dir .eq. 2) then
          x_vel = zero
          y_vel = adv_vel
-      else 
+      else
          write(6,*) "INITSPIN: adv_dir = ",adv_dir
          stop
       end if
@@ -443,7 +443,7 @@ contains
                scal(i,j,1) = one + (denfact-one) * tanh(10.*(dist-radblob))
                do n = 2,nscal-1
                   scal(i,j,n) = one
-               end do                  
+               end do
                scal(i,j,nscal) = merge(one,zero,dist.lt.radblob)
 
             end do
@@ -452,17 +452,17 @@ contains
       end subroutine initspin
 !c
 !c ::: -----------------------------------------------------------
-!c ::: This case is an unsteady  viscous benchmark for which the 
+!c ::: This case is an unsteady  viscous benchmark for which the
 !c ::: exact solution is,
 !c :::     u(x,y,t) = - Cos(Pi x) Sin(Pi y) Exp(-2 Pi^2 Nu t)
 !c :::     v(x,y,t) =   Sin(Pi x) Cos(Pi y) Exp(-2 Pi^2 Nu t)
 !c :::     p(x,y,t) = - {Cos(2 Pi x) + Cos(2 Pi y)} Exp(-4 Pi^2 Nu t) / 4
-!c ::: In the utilities, iamrlib/BenchMarks, there is a 
+!c ::: In the utilities, iamrlib/BenchMarks, there is a
 !c ::: tool ViscBench2d.cpp that reads a plot file and compares the
 !c ::: solution against this exact solution.  This benchmark was
-!c ::: originally derived by G.I. Taylor (Phil. Mag., Vol. 46, No. 274, 
-!c ::: pp. 671-674, 1923) and Ethier and Steinman 
-!c ::: (Intl. J. Num. Meth. Fluids, Vol. 19, pp. 369-375, 1994) give 
+!c ::: originally derived by G.I. Taylor (Phil. Mag., Vol. 46, No. 274,
+!c ::: pp. 671-674, 1923) and Ethier and Steinman
+!c ::: (Intl. J. Num. Meth. Fluids, Vol. 19, pp. 369-375, 1994) give
 !c ::: the pressure field.
 !c
       subroutine initviscbench(level,time,lo,hi,nscal, &
@@ -509,7 +509,7 @@ contains
             scal(i,j,1) = one
             do n = 2,nscal
                scal(i,j,n) = cpx*cpy
-            end do                  
+            end do
 
          end do
       end do
@@ -522,7 +522,7 @@ contains
      	 	          vel,scal,DIMS(state),press,DIMS(press), &
                          dx,xlo,xhi) &
                          bind(C, name="initvort")
-                         
+
       integer    level, nscal
       integer    lo(SDIM), hi(SDIM)
       integer    DIMDEC(state)
@@ -569,7 +569,7 @@ contains
                scal(i,j,1) = merge(denfact,one,r.lt.radblob)
                do n = 2,nscal-1
                   scal(i,j,n) = one
-               end do                  
+               end do
                scal(i,j,nscal) = merge(one,zero,r.lt.radblob)
             end do
          end do
@@ -619,7 +619,7 @@ contains
 
             do n = 2,nscal-1
                scal(i,j,n) = one
-            end do                  
+            end do
 
             x = xlo(1) + hx*(float(i-lo(1)) + half)
             dist = sqrt((x-xblob)**2 + (y-yblob)**2)
@@ -679,7 +679,7 @@ contains
                do n = 2,nscal-1
                   scal(i,j,n) = one
                end do
-                  
+
                dist = sqrt((x-xblob)**2 + (y-yblob)**2)
                scal(i,j,nscal) = merge(one,zero,dist.lt.radblob)
             end do
@@ -724,7 +724,7 @@ contains
       else if (adv_dir .eq. 2) then
          x_vel = zero
          y_vel = adv_vel
-      else 
+      else
          write(6,*) "inithotspot: adv_dir = ",adv_dir
          stop
       end if
@@ -738,7 +738,7 @@ contains
             x = xlo(1) + hx*(float(i-lo(1)) + half)
             spx = sin(half*Pi*x)
             cpx = cos(half*Pi*x)
-            
+
             dist = sqrt((x-xblob)**2 + (y-yblob)**2)
 
             !vel(i,j,1) = x_vel
@@ -755,9 +755,9 @@ contains
             scal(i,j,nscal) = one / scal(i,j,1)
          end do
       end do
-      
+
       end subroutine inithotspot
-      
+
 !c
 !c ::: -----------------------------------------------------------
 !c
@@ -811,7 +811,7 @@ contains
 
          end do
       end do
-      
+
       end subroutine initrt
 
 !c
@@ -856,9 +856,9 @@ contains
 
          end do
       end do
-      
+
       end subroutine inittraceradvect
-      
+
 !c
 !c ::: -----------------------------------------------------------
 !c
@@ -892,7 +892,7 @@ contains
          do i=lo(1),hi(1)
             x = hx*(float(i) + half) - half
             y2 = hy*(float(j) + half) - yblob
-            
+
             dist = sqrt((x)**2 + (y)**2)
             fac = exp(-(dist*dist/(0.16d0*0.16d0)))
             vel(i,j,1) = 2.0d0*dist*y/dist*fac
@@ -906,13 +906,13 @@ contains
 
          end do
       end do
-      
+
       end subroutine initNodeEBtest
-      
+
 !c
 !c ::: -----------------------------------------------------------
 !c ::: Initialise system from rest. Introduced for the lid-driven cavity
-!c ::: test case, also used for Poiseuille flow in square duct. 
+!c ::: test case, also used for Poiseuille flow in square duct.
 !c
       subroutine initfromrest(lo,hi,nscal, &
                          vel,scal,DIMS(state), &
@@ -943,15 +943,15 @@ contains
 
          end do
       end do
-      
+
       end subroutine initfromrest
-      
+
 !c ::: -----------------------------------------------------------
-!c ::: This routine will tag high error cells based on the 
+!c ::: This routine will tag high error cells based on the
 !c ::: magnitude of the density
-!c ::: 
+!c :::
 !c ::: INPUTS/OUTPUTS:
-!c ::: 
+!c :::
 !c ::: tag      <=  integer tag array
 !c ::: DIMS(tag) => index extent of tag array
 !c ::: set       => integer value to tag cell for refinement
@@ -1051,7 +1051,7 @@ contains
             enddo
          enddo
       enddo
-      
+
       if (getForceVerbose.gt.0) then
          call bl_pd_is_ioproc(isioproc)
          if (isioproc .eq. 1) then
@@ -1133,13 +1133,13 @@ contains
          if ( isioproc == 1 ) then
 
             write (6,*) "In MAKEFORCE"
-            
+
             write (6,*) "probtype = ",probtype
             write (6,*) "gravity = ",gravity
             write (6,*) "scomp = ",scomp
             write (6,*) "ncomp = ",ncomp
             write (6,*) "nscal = ",nscal
-            
+
             do n = 0, SDIM-1
                velmin(n) = 1.d234
                velmax(n) = -1.d234
@@ -1148,7 +1148,7 @@ contains
                scalmin(n) = 1.d234
                scalmax(n) = -1.d234
             enddo
-            
+
             ! Get min/max
             do k = f_lo(3), f_hi(3)
                do j = f_lo(2), f_hi(2)
@@ -1172,11 +1172,11 @@ contains
                            scalmin(n)=scal(i,j,k,n)
                      endif
                   enddo
-                  
+
                   enddo
                enddo
             enddo
-            
+
             do n = 0, SDIM-1
                write (6,*) "velmin (",n,") = ",velmin(n)
                write (6,*) "velmax (",n,") = ",velmax(n)
@@ -1188,10 +1188,10 @@ contains
          endif
       endif
 
-!     
+!
 !     Here's where the forcing actually gets done
 !
-      
+
       if ( scomp == 0 ) then
 !
 !     Do velocity forcing
@@ -1303,11 +1303,11 @@ contains
       end subroutine FORT_MAKEFORCE
 
 !c ::: -----------------------------------------------------------
-!c ::: This routine will tag high error cells based on the 
+!c ::: This routine will tag high error cells based on the
 !c ::: magnitude of the tracer
-!c ::: 
+!c :::
 !c ::: INPUTS/OUTPUTS:
-!c ::: 
+!c :::
 !c ::: tag      <=  integer tag array
 !c ::: DIMS(tag) => index extent of tag array
 !c ::: set       => integer value to tag cell for refinement
@@ -1431,10 +1431,10 @@ contains
         print *,'DONT KNOW THIS PROBTYPE IN FORT_ADVERROR ',probtype
         stop
       end if
- 
+
       end subroutine FORT_ADVERROR
-      
-      
+
+
       subroutine FORT_ADV2ERROR (tag,DIMS(tag),set,clear, &
                                adv,DIMS(adv),lo,hi,nvar, &
                                domlo,domhi,dx,xlo,  &
@@ -1534,8 +1534,8 @@ contains
         print *,'DONT KNOW THIS PROBTYPE IN FORT_ADVERROR ',probtype
         stop
       end if
- 
-      end subroutine FORT_ADV2ERROR 
+
+      end subroutine FORT_ADV2ERROR
 
 !c ::: -----------------------------------------------------------
 !c ::: This routine will tag high error cells based on the
@@ -1627,14 +1627,14 @@ contains
         stop
       end if
 
-      end subroutine FORT_TEMPERROR 
+      end subroutine FORT_TEMPERROR
 
 !c ::: -----------------------------------------------------------
-!c ::: This routine will tag high error cells based on the 
+!c ::: This routine will tag high error cells based on the
 !c ::: magnitude of vorticity
-!c ::: 
+!c :::
 !c ::: INPUTS/OUTPUTS:
-!c ::: 
+!c :::
 !c ::: tag      <=  integer tag array
 !c ::: DIMS(tag) => index extent of tag array
 !c ::: set       => integer value to tag cell for refinement
@@ -1739,7 +1739,7 @@ contains
         stop
       end if
 
-      end subroutine FORT_MVERROR 
+      end subroutine FORT_MVERROR
 
 !c ::: -----------------------------------------------------------
 !c ::: This routine is called during a filpatch operation when
@@ -1747,14 +1747,14 @@ contains
 !c ::: of the problem domain.  You are requested to supply the
 !c ::: data outside the problem interior in such a way that the
 !c ::: data is consistant with the types of the boundary conditions
-!c ::: you specified in the C++ code.  
-!c ::: 
+!c ::: you specified in the C++ code.
+!c :::
 !c ::: NOTE:  you can assume all interior cells have been filled
 !c :::        with valid data and that all non-interior cells have
 !c ::         have been filled with a large real number.
-!c ::: 
+!c :::
 !c ::: INPUTS/OUTPUTS:
-!c ::: 
+!c :::
 !c ::: rho      <=  density array
 !c ::: DIMS(rho) => index extent of rho array
 !c ::: domlo,hi  => index extent of problem domain
@@ -1787,7 +1787,7 @@ contains
                rho(i,j) = denfact
             end do
          end do
-      end if            
+      end if
 
       if (bc(1,2).eq.EXT_DIR.and.ARG_H1(rho).gt.domhi(1)) then
          do i = domhi(1)+1, ARG_H1(rho)
@@ -1795,7 +1795,7 @@ contains
                rho(i,j) = denfact
             end do
          end do
-      end if            
+      end if
 
 
       if (bc(2,1).eq.EXT_DIR.and.ARG_L2(rho).lt.domlo(2)) then
@@ -1804,7 +1804,7 @@ contains
                rho(i,j) = denfact
             end do
          end do
-      end if            
+      end if
 
       if (bc(2,2).eq.EXT_DIR.and.ARG_H2(rho).gt.domhi(2)) then
          do j = domhi(2)+1, ARG_H2(rho)
@@ -1812,7 +1812,7 @@ contains
                rho(i,j) = denfact
             end do
          end do
-      end if            
+      end if
 
       end subroutine FORT_DENFILL
 
@@ -1822,14 +1822,14 @@ contains
 !c ::: of the problem domain.  You are requested to supply the
 !c ::: data outside the problem interior in such a way that the
 !c ::: data is consistant with the types of the boundary conditions
-!c ::: you specified in the C++ code.  
-!c ::: 
+!c ::: you specified in the C++ code.
+!c :::
 !c ::: NOTE:  you can assume all interior cells have been filled
 !c :::        with valid data and that all non-interior cells have
 !c ::         have been filled with a large real number.
-!c ::: 
+!c :::
 !c ::: INPUTS/OUTPUTS:
-!c ::: 
+!c :::
 !c ::: adv      <=  advected quantity array
 !c ::: DIMS(adv) => index extent of adv array
 !c ::: domlo,hi  => index extent of problem domain
@@ -1861,7 +1861,7 @@ contains
                adv(i,j) = zero
             end do
          end do
-      end if            
+      end if
 
       if (bc(1,2).eq.EXT_DIR.and.ARG_H1(adv).gt.domhi(1)) then
          do i = domhi(1)+1, ARG_H1(adv)
@@ -1869,7 +1869,7 @@ contains
                adv(i,j) = zero
             end do
          end do
-      end if            
+      end if
 
       if (bc(2,1).eq.EXT_DIR.and.ARG_L2(adv).lt.domlo(2)) then
 
@@ -1891,7 +1891,7 @@ contains
 
          end if
 
-      end if            
+      end if
 
       if (bc(2,2).eq.EXT_DIR.and.ARG_H2(adv).gt.domhi(2)) then
          do j = domhi(2)+1, ARG_H2(adv)
@@ -1899,7 +1899,7 @@ contains
                adv(i,j) = zero
             end do
          end do
-      end if            
+      end if
 
       end subroutine FORT_ADVFILL
 
@@ -1924,7 +1924,7 @@ contains
                adv(i,j) = zero
             end do
          end do
-      end if            
+      end if
 
       if (bc(1,2).eq.EXT_DIR.and.ARG_H1(adv).gt.domhi(1)) then
          do i = domhi(1)+1, ARG_H1(adv)
@@ -1932,7 +1932,7 @@ contains
                adv(i,j) = zero
             end do
          end do
-      end if            
+      end if
 
       if (bc(2,1).eq.EXT_DIR.and.ARG_L2(adv).lt.domlo(2)) then
 
@@ -1942,7 +1942,7 @@ contains
             end do
          end do
 
-      end if            
+      end if
 
       if (bc(2,2).eq.EXT_DIR.and.ARG_H2(adv).gt.domhi(2)) then
          do j = domhi(2)+1, ARG_H2(adv)
@@ -1950,7 +1950,7 @@ contains
                adv(i,j) = zero
             end do
          end do
-      end if            
+      end if
 
       end subroutine FORT_ADV2FILL
 
@@ -2008,7 +2008,7 @@ contains
                temperature(i,j) = one
            end do
          end do
-      end if    
+      end if
 
       if (bc(2,1).eq.EXT_DIR.and.ARG_L2(temp).lt.domlo(2)) then
          do j = ARG_L2(temp), domlo(2)-1
@@ -2016,7 +2016,7 @@ contains
                temperature(i,j) = one
           end do
        end do
-      end if    
+      end if
 
       if (bc(2,2).eq.EXT_DIR.and.ARG_H2(temp).gt.domhi(2)) then
          do j = domhi(2)+1, ARG_H2(temp)
@@ -2024,7 +2024,7 @@ contains
                temperature(i,j) = one
            end do
          end do
-      end if    
+      end if
 
       end subroutine FORT_TEMPFILL
 
@@ -2034,14 +2034,14 @@ contains
 !c ::: of the problem domain.  You are requested to supply the
 !c ::: data outside the problem interior in such a way that the
 !c ::: data is consistant with the types of the boundary conditions
-!c ::: you specified in the C++ code.  
-!c ::: 
+!c ::: you specified in the C++ code.
+!c :::
 !c ::: NOTE:  you can assume all interior cells have been filled
 !c :::        with valid data and that all non-interior cells have
 !c ::         have been filled with a large real number.
-!c ::: 
+!c :::
 !c ::: INPUTS/OUTPUTS:
-!c ::: 
+!c :::
 !c ::: u        <=  x velocity array
 !c ::: DIMS(u)   => index extent of u array
 !c ::: domlo,hi  => index extent of problem domain
@@ -2104,7 +2104,7 @@ contains
 
       if (adv_dir .eq. 1)then
          x_vel = adv_vel
-      else  
+      else
          x_vel = zero
       end if
 
@@ -2116,7 +2116,7 @@ contains
                u(i,j) = x_vel
             end do
          end do
-      end if            
+      end if
 
       if (bc(1,2).eq.EXT_DIR.and.ARG_H1(u).gt.domhi(1)) then
          do i = domhi(1)+1, ARG_H1(u)
@@ -2124,7 +2124,7 @@ contains
                u(i,j) = x_vel
             end do
          end do
-      end if            
+      end if
 
       if (bc(2,1).eq.EXT_DIR.and.ARG_L2(u).lt.domlo(2)) then
          do j = ARG_L2(u), domlo(2)-1
@@ -2140,7 +2140,7 @@ contains
 #endif
             end do
          end do
-      end if            
+      end if
 
       if (bc(2,2).eq.EXT_DIR.and.ARG_H2(u).gt.domhi(2)) then
          do j = domhi(2)+1, ARG_H2(u)
@@ -2148,33 +2148,33 @@ contains
                if (probtype .eq. 10) then
 !c ::: Lid-driven cavity test case, constant velocity on top of domain
                   u(i,j) = lid_vel
-               else 
+               else
                   u(i,j) = zero
                end if
             end do
          end do
-      end if    
+      end if
 
-#ifdef BL_DO_FLCT        
+#ifdef BL_DO_FLCT
       if (forceInflow) deallocate(uflct)
 #endif
 
-      end subroutine FORT_XVELFILL 
- 
+      end subroutine FORT_XVELFILL
+
 !c ::: -----------------------------------------------------------
 !c ::: This routine is called during a filpatch operation when
 !c ::: the patch to be filled falls outside the interior
 !c ::: of the problem domain.  You are requested to supply the
 !c ::: data outside the problem interior in such a way that the
 !c ::: data is consistant with the types of the boundary conditions
-!c ::: you specified in the C++ code.  
-!c ::: 
+!c ::: you specified in the C++ code.
+!c :::
 !c ::: NOTE:  you can assume all interior cells have been filled
 !c :::        with valid data and that all non-interior cells have
 !c ::         have been filled with a large real number.
-!c ::: 
+!c :::
 !c ::: INPUTS/OUTPUTS:
-!c ::: 
+!c :::
 !c ::: v        <=  y velocity array
 !c ::: DIMS(v)  => index extent of v array
 !c ::: domlo,hi  => index extent of problem domain
@@ -2236,7 +2236,7 @@ contains
 
       if (adv_dir .eq. 2) then
          y_vel = adv_vel
-      else  
+      else
          y_vel = zero
       end if
 
@@ -2248,7 +2248,7 @@ contains
              v(i,j) = zero
            end do
          end do
-      end if            
+      end if
 
       if (bc(1,2).eq.EXT_DIR.and.ARG_H1(v).gt.domhi(1)) then
          do i = domhi(1)+1, ARG_H1(v)
@@ -2256,7 +2256,7 @@ contains
              v(i,j) = zero
            end do
          end do
-      end if   
+      end if
 
       if (bc(2,1).eq.EXT_DIR.and.ARG_L2(v).lt.domlo(2)) then
 
@@ -2264,7 +2264,7 @@ contains
 
             do j = ARG_L2(v), domlo(2)-1
                do i = ARG_L1(v), ARG_H1(v)
-              
+
                   x = xlo(1) + dx(1)*(float(i-lo(1)) + half)
                   if (x .gt. 0.45d0 .and.  &
                      x .lt. 0.55d0 .and. &
@@ -2292,7 +2292,7 @@ contains
                end do
             end do
 
-         end if            
+         end if
 
       end if
 
@@ -2302,30 +2302,30 @@ contains
              v(i,j) = y_vel
            end do
          end do
-      end if            
+      end if
 
 #ifdef BL_DO_FLCT
       if (forceInflow) deallocate(vflct)
 #endif
 
-      end subroutine FORT_YVELFILL 
+      end subroutine FORT_YVELFILL
 
 
 
-         
+
 !c ::: -----------------------------------------------------------
 !c ::: This routine is called during a filpatch operation when
 !c ::: the patch to be filled falls outside the interior
 !c ::: of the problem domain.  You are requested to supply the
 !c ::: data outside the problem interior in such a way that the
 !c ::: data is consistant with the types of the boundary conditions
-!c ::: you specified in the C++ code.  
-!c ::: 
+!c ::: you specified in the C++ code.
+!c :::
 !c ::: NOTE:  you can assume all interior cells have been filled
 !c :::        with valid data.
-!c ::: 
+!c :::
 !c ::: INPUTS/OUTPUTS:
-!c ::: 
+!c :::
 !c ::: p        <=  pressure array
 !c ::: DIMS(p)   => index extent of p array
 !c ::: domlo,hi  => index extent of problem domain
@@ -2333,7 +2333,7 @@ contains
 !c ::: xlo       => physical location of lower left hand
 !c :::	           corner of rho array
 !c ::: time      => problem evolution time
-!c ::: bc	=> array of boundary flags bc(BL_SPACEDIM,lo:hi) 
+!c ::: bc	=> array of boundary flags bc(BL_SPACEDIM,lo:hi)
 !c ::: -----------------------------------------------------------
 
       subroutine FORT_PRESFILL (p,DIMS(p),domlo,domhi,dx,xlo,time,bc)&
@@ -2435,9 +2435,9 @@ contains
             end do
          end if
       end if
-      
+
 !c
-!c     ::::: bottom 
+!c     ::::: bottom
 !c
       if (fix_ylo) then
          do j = ARG_L2(p), domlo(2)-1
@@ -2494,13 +2494,13 @@ contains
 !c ::: of the problem domain.  You are requested to supply the
 !c ::: data outside the problem interior in such a way that the
 !c ::: data is consistant with the types of the boundary conditions
-!c ::: you specified in the C++ code.  
-!c ::: 
+!c ::: you specified in the C++ code.
+!c :::
 !c ::: NOTE:  you can assume all interior cells have been filled
 !c :::        with valid data.
-!c ::: 
+!c :::
 !c ::: INPUTS/OUTPUTS:
-!c ::: 
+!c :::
 !c ::: divu     <=  divu array
 !c ::: DIMS(divu)=> index extent of p array
 !c ::: domlo,hi  => index extent of problem domain
@@ -2508,7 +2508,7 @@ contains
 !c ::: xlo       => physical location of lower left hand
 !c :::	           corner of rho array
 !c ::: time      => problem evolution time
-!c ::: bc	=> array of boundary flags bc(BL_SPACEDIM,lo:hi) 
+!c ::: bc	=> array of boundary flags bc(BL_SPACEDIM,lo:hi)
 !c ::: -----------------------------------------------------------
 
       subroutine FORT_DIVUFILL (divu,DIMS(divu),domlo,domhi,delta, &
@@ -2562,7 +2562,7 @@ contains
              end do
            end if
 
-      end if            
+      end if
 
       if (bc(1,2).eq.EXT_DIR.and.hi(1).gt.domhi(1)) then
            if(jlo.le.jhi)then
@@ -2586,7 +2586,7 @@ contains
                end do
              end do
            end if
-      end if            
+      end if
 
       if (bc(2,1).eq.EXT_DIR.and.lo(2).lt.domlo(2)) then
            if(ilo.le.ihi)then
@@ -2611,7 +2611,7 @@ contains
              end do
            end if
 
-      end if            
+      end if
 
       if (bc(2,2).eq.EXT_DIR.and.hi(2).gt.domhi(2)) then
            if(ilo.le.ihi)then
@@ -2635,7 +2635,7 @@ contains
                end do
              end do
            end if
-      end if            
+      end if
 
       end subroutine FORT_DIVUFILL
 
@@ -2645,13 +2645,13 @@ contains
 !c ::: of the problem domain.  You are requested to supply the
 !c ::: data outside the problem interior in such a way that the
 !c ::: data is consistant with the types of the boundary conditions
-!c ::: you specified in the C++ code.  
-!c ::: 
+!c ::: you specified in the C++ code.
+!c :::
 !c ::: NOTE:  you can assume all interior cells have been filled
 !c :::        with valid data.
-!c ::: 
+!c :::
 !c ::: INPUTS/OUTPUTS:
-!c ::: 
+!c :::
 !c ::: dsdt     <=  dsdt array
 !c ::: DIMS(dsdt)=> index extent of p array
 !c ::: domlo,hi  => index extent of problem domain
@@ -2659,7 +2659,7 @@ contains
 !c ::: xlo       => physical location of lower left hand
 !c :::	           corner of rho array
 !c ::: time      => problem evolution time
-!c ::: bc	=> array of boundary flags bc(BL_SPACEDIM,lo:hi) 
+!c ::: bc	=> array of boundary flags bc(BL_SPACEDIM,lo:hi)
 !c ::: -----------------------------------------------------------
 
 
@@ -2697,7 +2697,7 @@ contains
                dsdt(i,j) = zero
              end do
            end do
-      end if            
+      end if
 
       if (bc(1,2).eq.EXT_DIR.and.hi(1).gt.domhi(1)) then
            do i = domhi(1)+1, hi(1)
@@ -2705,7 +2705,7 @@ contains
                dsdt(i,j) = zero
              end do
            end do
-      end if            
+      end if
 
       if (bc(2,1).eq.EXT_DIR.and.lo(2).lt.domlo(2)) then
            do j = lo(2), domlo(2)-1
@@ -2713,7 +2713,7 @@ contains
                  dsdt(i,j) = zero
               end do
            end do
-      end if            
+      end if
 
       if (bc(2,2).eq.EXT_DIR.and.hi(2).gt.domhi(2)) then
            do j = domhi(2)+1, hi(2)
@@ -2721,7 +2721,7 @@ contains
                  dsdt(i,j) = zero
               end do
            end do
-      end if            
+      end if
 
       end subroutine FORT_DSDTFILL
 

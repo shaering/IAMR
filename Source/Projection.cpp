@@ -629,7 +629,10 @@ Projection::MLsyncProject (int             c_lev,
     const Geometry& fine_geom = parent->Geom(c_lev+1);
 
     NavierStokesBase* ns = dynamic_cast<NavierStokesBase*>(LevelData[c_lev]);
+    vel[c_lev]->FillBoundary(parent->Geom(c_lev).periodicity());
     ns->average_down(*vel[c_lev+1],*vel[c_lev],0,AMREX_SPACEDIM);
+    vel[c_lev+1]->FillBoundary(parent->Geom(c_lev+1).periodicity());
+
     //
     // restrict_level(v_crse, v_fine, ratio);
     // amrex::average_down(*vel[c_lev+1],*vel[c_lev],fine_geom,crse_geom,
@@ -651,6 +654,14 @@ Projection::MLsyncProject (int             c_lev,
     }
 
     bool proj2 = true;
+    Print() << "rtol, atol = "
+            << sync_tol << " "
+            << proj_abs_tol << std::endl;
+    // (*vel[c_lev])[0]()=10
+    // doMLMGNodalProjection(c_lev, 2, vel,
+    //                       amrex::GetVecOfPtrs(phi),
+    //                       sig, rhcc, rhnd_vec, 5.0e-4, proj_abs_tol, proj2,
+    //                       sync_resid_crse, sync_resid_fine.get());
     doMLMGNodalProjection(c_lev, 2, vel,
                           amrex::GetVecOfPtrs(phi),
                           sig, rhcc, rhnd_vec, sync_tol, proj_abs_tol, proj2,
@@ -837,7 +848,7 @@ Projection::initialVelocityProject (int  c_lev,
             {
                 amr_level.setPhysBoundaryValues(S_new[mfi],State_Type,curr_time,Xvel,Xvel,BL_SPACEDIM);
             }
-            
+
 
 
             if (have_divu)
@@ -875,10 +886,10 @@ Projection::initialVelocityProject (int  c_lev,
                 put_divu_in_cc_rhs(*rhcc[lev],lev,cur_divu_time);
             }
         }
-  
 
-  
-  
+
+
+
         if (OutFlowBC::HasOutFlowBC(phys_bc) && do_outflow_bcs && have_divu)
         {
             set_outflow_bcs(INITIAL_VEL,phi,vel,
@@ -892,14 +903,19 @@ Projection::initialVelocityProject (int  c_lev,
         //
         for (lev = c_lev; lev <= f_lev; lev++)
         {
+            vel[lev]->setVal(10.0,0,1,vel[lev]->nGrow());
             scaleVar(INITIAL_VEL,sig[lev].get(),1,vel[lev],lev);
+            vel[lev]->FillBoundary(parent->Geom(lev).periodicity());
         }
 
         //
         // Project
         //
         //
-                
+        VisMF::Write(*vel[c_lev], "vel0");
+        VisMF::Write(*vel[f_lev], "vel1");
+
+        // exit(0);
         bool proj2 = true;
         if (!have_divu)
         {
@@ -923,7 +939,10 @@ Projection::initialVelocityProject (int  c_lev,
                                   {},
                                   proj_tol, proj_abs_tol, proj2, 0, 0);
         }
-        
+        VisMF::Write(*vel[c_lev], "vel0");
+        VisMF::Write(*vel[f_lev], "vel1");
+
+        // exit(0);
         //
         // Unscale initial projection variables.
         //
@@ -2297,6 +2316,11 @@ void Projection::doMLMGNodalProjection (int c_lev, int nlevel,
                 mlmg_hibc[idim] = LinOpBCType::Neumann;
             }
         }
+
+        Print() << "DIRECTION " << idim << "BC LO, BC HI = "
+                << mlmg_lobc[idim] << " "
+                << mlmg_hibc[idim]
+                << std::endl;
     }
 
     //
@@ -2343,7 +2367,6 @@ void Projection::doMLMGNodalProjection (int c_lev, int nlevel,
         rhcc_rebase.assign(rhcc.begin()+c_lev, rhcc.begin()+c_lev+nlevel);
     }
 
-
     // Setup nodal projector object
     NodalProjector  nodal_projector(vel_rebase, GetVecOfConstPtrs(sigma_rebase), mg_geom, info, rhcc_rebase, rhnd_rebase);
     nodal_projector.setDomainBC(mlmg_lobc, mlmg_hibc);
@@ -2360,7 +2383,7 @@ void Projection::doMLMGNodalProjection (int c_lev, int nlevel,
     nodal_projector.getLinOp().setGaussSeidel(use_gauss_seidel);
     nodal_projector.getLinOp().setHarmonicAverage(use_harmonic_average);
     nodal_projector.getMLMG().setMaxFmgIter(max_fmg_iter);
-    nodal_projector.getMLMG().setVerbose(P_code);
+    nodal_projector.getMLMG().setVerbose(2);//P_code);
 
     if (max_mlmg_iter > 0)
         nodal_projector.getMLMG().setMaxIter(max_mlmg_iter);
@@ -2373,7 +2396,9 @@ void Projection::doMLMGNodalProjection (int c_lev, int nlevel,
     {
         nodal_projector.setSyncResidualCrse(sync_resid_crse, parent->refRatio(c_lev), parent->boxArray(c_lev+1));
     }
-
+    VisMF::Write(*phi_rebase[0], "phi_rb_0");
+    if(nlevel==2)
+        VisMF::Write(*phi_rebase[1],"phi_rb_1");
     nodal_projector.project(phi_rebase,rel_tol,abs_tol);
 
 
