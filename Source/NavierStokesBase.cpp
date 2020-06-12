@@ -79,6 +79,7 @@ int         NavierStokesBase::do_density_ref            = 0;
 int         NavierStokesBase::do_tracer_ref             = 0;
 int         NavierStokesBase::do_tracer2_ref            = 0;
 int         NavierStokesBase::do_vorticity_ref          = 0;
+int         NavierStokesBase::do_reg_ref                = 0;
 int         NavierStokesBase::do_temp_ref               = 0;
 int         NavierStokesBase::do_scalar_update_in_order = 0;
 Vector<int>  NavierStokesBase::scalarUpdateOrder;
@@ -400,6 +401,7 @@ NavierStokesBase::Initialize ()
     pp.query("do_tracer_ref",            do_tracer_ref    );
     pp.query("do_tracer2_ref",           do_tracer2_ref   );
     pp.query("do_vorticity_ref",         do_vorticity_ref );
+    pp.query("do_reg_ref",               do_reg_ref       );
     pp.query("do_temp_ref",              do_temp_ref      );
 
     pp.query("visc_tol",visc_tol);

@@ -44,6 +44,15 @@ extern "C" {
                      const amrex::Real* time, const amrex::Real* dt, const int* bcrec,
                      const int* level, const int* grid_no) ;
 
+     void derregrad (BL_FORT_FAB_ARG_ANYD(der),const int* nvar,
+                     const BL_FORT_FAB_ARG_ANYD(data),const int* ncomp,
+                     AMREX_ARLIM_P(vlo), AMREX_ARLIM_P(vhi),
+                     AMREX_ARLIM_P(dlo), AMREX_ARLIM_P(dhi),
+                     const amrex::Real* delta, const amrex::Real* xlo,
+                     const amrex::Real* time, const amrex::Real* dt, const int* bcrec,
+  		     const int* level, const int* grid_no) ;
+
+
 #if (BL_SPACEDIM == 3)
 
      void dervortx  (amrex::Real* data, ARLIM_P(dat_lo), ARLIM_P(dat_hi),

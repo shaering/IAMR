@@ -42,4 +42,8 @@ NavierStokes::error_setup()
         err_list.add("temp", 1, ErrorRec::Special, FORT_TEMPERROR);
 	amrex::Print() << "Refining on TEMP and/or GRAD T" << std::endl;
     }
+    if (do_reg_ref) {
+        err_list.add("re_grad", 0, ErrorRec::Special,FORT_RGERROR);
+	amrex::Print() << "Refining on RE_GRAD" << std::endl;
+    }
 }
