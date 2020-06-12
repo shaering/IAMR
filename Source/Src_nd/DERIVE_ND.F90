@@ -773,7 +773,8 @@ contains
       dx = delta(1)
       dy = delta(2)
       dz = delta(3)
-      nu_m = 1.0e-4 !visc_coef[0] !ns.vel_visc_coef
+!      nu_m = 1.0e-4 !visc_coef[0] !ns.vel_visc_coef
+      nu_m = 3.5e-4 ! FIX THIS HARD CODE
 
 !      print*, "HERE: derregrad3"
 

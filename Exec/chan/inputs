@@ -29,10 +29,10 @@ amr.derive_plot_vars    = re_grad mag_vort
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #               PHYSICS                 #
 #.......................................#
-ns.gravity          =   0.  0.  543.5  # Gravitational force (3D)
-#ns.gravity          =   0.  0.  182.0
-ns.vel_visc_coef    = 1.0e-4
-#ns.vel_visc_coef    = 3.5e-4
+#ns.gravity          =   0.  0.  543.5  # Gravitational force (3D)
+ns.gravity          =   0.  0.  182.0
+#ns.vel_visc_coef    = 1.0e-4
+ns.vel_visc_coef    = 3.5e-4
 ns.scal_diff_coefs  = 1.0
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #        ADAPTIVE MESH REFINEMENT       #
