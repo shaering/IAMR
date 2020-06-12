@@ -588,7 +588,8 @@ contains
             do i = lo(1), hi(1)
 !               tag(i,j,k) = clear
 
-               tag(i,j,k) = merge(set,tag(i,j,k),re_g(i,j,k,1) .GT. rgerr / (10.0d0**level))
+               tag(i,j,k) = merge(set,tag(i,j,k),re_g(i,j,k,1) .GT. rgerr )
+!               tag(i,j,k) = merge(set,tag(i,j,k),re_g(i,j,k,1) .GT. rgerr / (10.0d0**level))
 
 !               if (re_g(i,j,k,1) .GT. rgerr) print*, "TEST:", level, re_g(i,j,k,1), rgerr, tag(i,j,k), clear, set
 !               if (re_g(i,j,k,1) .GT. rgerr) then 
