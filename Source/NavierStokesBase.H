@@ -207,6 +207,8 @@ public:
 
     static int DoTrac2();
 
+    static int DoParticleVel();
+
 protected:
 
     NavierStokesBase ();
@@ -698,9 +700,12 @@ protected:
     //
     static int        radius_grow;
     static int        verbose;
-    static amrex::Real       gravity;
     static int        NUM_SCALARS;      // number of non-velocity components
     static int        NUM_STATE;        // total number of state variables
+    static amrex::Real       gravity;
+    static amrex::Real       Fx;
+    static amrex::Real       Fy;
+    static amrex::Real       Fz;
 #ifdef AMREX_USE_EB
     static const int  NUM_GROW=4;         // number of ghost cells
     static int refine_cutcells;
@@ -727,6 +732,7 @@ protected:
     static int  Tracer;
     static int  Tracer2;
     static int  Temp;
+  //    static int  Pvel;
     static int  do_trac2;
     static int  do_temp;
     static int  do_cons_trac;
@@ -746,6 +752,7 @@ protected:
     static int  do_vorticity_ref;
     static int  do_reg_ref;
     static int  do_temp_ref;
+  //    static int  do_particle_vel;
     static int  do_scalar_update_in_order;  // Flags to allow evaluation of source terms
     static amrex::Vector<int> scalarUpdateOrder;
     static int  getForceVerbose;            // Does exactly what it says on the tin
@@ -759,6 +766,14 @@ protected:
     static amrex::Real sigma_Cs_cst;       // A parameter for the Sigma model, usually set to 1.5 
     //
     // Member when pressure defined at points in time rather than interval
+    //
+    //
+    // swh: for particles
+    //
+    static amrex::Real particle_Rep;
+    static amrex::Real particle_tau;
+    static int particle_extra_reals;
+    static int particle_extra_ints;
     //
     static int  Dpdt_Type;
     //

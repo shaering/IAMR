@@ -46,9 +46,12 @@ int  NavierStokesBase::jet_interval_split = 2;
 
 int  NavierStokesBase::radius_grow = 1;
 int  NavierStokesBase::verbose     = 0;
-Real NavierStokesBase::gravity     = 0.0;
 int  NavierStokesBase::NUM_SCALARS = 0;
 int  NavierStokesBase::NUM_STATE   = 0;
+Real NavierStokesBase::gravity     = 0.0;
+Real NavierStokesBase::Fx          = 0.0;
+Real NavierStokesBase::Fy          = 0.0;
+Real NavierStokesBase::Fz          = 0.0;
 
 Vector<AdvectionForm> NavierStokesBase::advectionType;
 Vector<DiffusionForm> NavierStokesBase::diffusionType;
@@ -62,7 +65,9 @@ Real        NavierStokesBase::be_cn_theta        = 0.5;
 int         NavierStokesBase::Tracer                    = -1;
 int         NavierStokesBase::Tracer2                   = -1;
 int         NavierStokesBase::Temp                      = -1;
+//int         NavierStokesBase::Pvel                      = -1;
 int         NavierStokesBase::do_trac2                  = 0;
+//int         NavierStokesBase::do_particle_vel           = 0;
 int         NavierStokesBase::do_temp                   = 0;
 int         NavierStokesBase::do_cons_trac              = 0;
 int         NavierStokesBase::do_cons_trac2             = 0;
@@ -90,6 +95,10 @@ std::string NavierStokesBase::LES_model                 = "Smagorinsky";
 Real        NavierStokesBase::smago_Cs_cst              = 0.18;
 Real        NavierStokesBase::sigma_Cs_cst              = 1.5;
 
+Real        NavierStokesBase::particle_Rep              = 1.0;
+Real        NavierStokesBase::particle_tau              = 1.0;
+int         NavierStokesBase::particle_extra_reals      = 0;
+int         NavierStokesBase::particle_extra_ints       = 0;
 
 
 int  NavierStokesBase::Dpdt_Type = -1;
@@ -164,6 +173,13 @@ BL_FORT_PROC_DECL(BL_NS_DOTRAC2,bl_ns_dotrac2)(int* dotrac2)
 {
     *dotrac2 = NavierStokesBase::DoTrac2();
 }
+
+//int NavierStokesBase::DoParticleVel() {return NavierStokesBase::do_particle_vel;}
+//
+//BL_FORT_PROC_DECL(BL_NS_DOPARTICLEVEL,bl_ns_doparticlevel)(int* doparticlevel)
+//{
+//    *doparticlevel = NavierStokesBase::DoParticleVel();
+//}
 
 NavierStokesBase::NavierStokesBase ()
 {
@@ -381,11 +397,15 @@ NavierStokesBase::Initialize ()
     pp.query("jet_interval",jet_interval);
     pp.query("jet_interval_split",jet_interval_split);
     pp.query("gravity",gravity);
+    pp.query("Fx",Fx);
+    pp.query("Fy",Fy);
+    pp.query("Fz",Fz);
     //
     // Get run options.
     //
     pp.query("do_temp",                  do_temp          );
     pp.query("do_trac2",                 do_trac2         );
+    //    pp.query("do_particle_vel",          do_particle_vel  );
     pp.query("do_cons_trac",             do_cons_trac     );
     pp.query("do_cons_trac2",            do_cons_trac2    );
     int initial_do_sync_proj =           do_sync_proj;
@@ -406,6 +426,7 @@ NavierStokesBase::Initialize ()
 
     pp.query("visc_tol",visc_tol);
     pp.query("visc_abs_tol",visc_abs_tol);
+
 
     if (modify_reflux_normal_vel)
         amrex::Abort("modify_reflux_normal_vel is no longer supported");
@@ -624,8 +645,16 @@ NavierStokesBase::Initialize_specific ()
     if (do_temp)
     {
 	    Temp = ++scalId;
+	    std::cout << "Temp ID:" << Temp << "\n";
 	    pp.get("temp_cond_coef",visc_coef[Temp]);
     }
+    //
+    //        if (do_particle_vel)
+    //        {
+    //    	    Pvel = ++scalId;
+    //	    //	    pp.get("temp_cond_coef",visc_coef[Pvel]);
+    //	    visc_coef[Pvel] = 0.0;
+    //        }
 }
 
 
@@ -4473,6 +4502,13 @@ NavierStokesBase::read_particle_params ()
     // Used in post_restart() to write out the file of particles.
     //
     ppp.query("particle_output_file", particle_output_file);
+    // swh
+    ppp.query("particle_Rep", particle_Rep);
+    ppp.query("particle_tau", particle_tau);
+
+    ppp.query("particle_extra_reals", particle_extra_reals);
+    ppp.query("particle_extra_ints", particle_extra_ints);
+
 }
 
 void
@@ -4489,7 +4525,8 @@ NavierStokesBase::initParticleData ()
 
         if (!particle_init_file.empty())
         {
-            NSPC->InitFromAsciiFile(particle_init_file,0);
+	  //	  NSPC->InitFromAsciiFile(particle_init_file,0); // zero here should be number of extra reals beyond position (AMReX_ParticleInit.H)
+	  NSPC->InitFromAsciiFile(particle_init_file,particle_extra_reals);
         }
     }
 }
@@ -4515,7 +4552,7 @@ NavierStokesBase::post_restart_particle ()
 
         if (!particle_restart_file.empty())
         {
-            NSPC->InitFromAsciiFile(particle_restart_file,0);
+            NSPC->InitFromAsciiFile(particle_restart_file,particle_extra_reals);
         }
 
         if (!particle_output_file.empty())

@@ -84,6 +84,9 @@
                           const amrex::Real* dx,
                           const amrex::Real* xlo, const amrex::Real* xhi,
                           const amrex::Real* gravity,
+                          const amrex::Real* Fx,
+                          const amrex::Real* Fy,
+                          const amrex::Real* Fz,
                           const int* scomp, const int* ncomp, const int* nscal,
                           const int* getForceVerbose);
 

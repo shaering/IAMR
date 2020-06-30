@@ -32,6 +32,8 @@ module prob_3D_module
    !
    REAL_T, parameter :: U0       = 1.0
    REAL_T, parameter :: density  = 1.0
+   REAL_T, parameter :: temp_bot  = 373.15
+   REAL_T, parameter :: temp_top  = 273.15
 
    !
    ! Set problo and probhi as module variables so that they can be
@@ -206,6 +208,9 @@ contains
                ! arrays to  zero
                scal(i,j,k,2:nscal) = zero
 
+               ! Temp, not sure how this gets a 3...
+               scal(i,j,k,3) = temp_bot + 0.5d0*y*(temp_top-temp_bot)
+
             end do
          end do
       end do
@@ -281,6 +286,28 @@ contains
 
    end subroutine FORT_AVERAGE_EDGE_STATES
 
+
+! NS_getForce.cpp:
+!NavierStokesBase::getForce (FArrayBox&       force,
+!                            const Box&       bx,
+!                            int              ngrow,
+!                            int              scomp,
+!                            int              ncomp,
+!                            const Real       time,
+!                            const FArrayBox& Vel,
+!                            const FArrayBox& Scal,
+!                            int              scalScomp)
+
+! Fortran call:
+!   FORT_MAKEFORCE (&time,
+!                   BL_TO_FORTRAN_ANYD(force),
+!                   BL_TO_FORTRAN_ANYD(Vel),
+!                   BL_TO_FORTRAN_N_ANYD(Scal,scalScomp),
+!                   dx,
+!                   gridloc.lo(),
+!                   gridloc.hi(),
+!                   &grav,&scomp,&ncomp,&nscal,&getForceVerbose);
+
    !------------------------------------------------------------
    ! This routine add the forcing terms to the momentum equation
    !------------------------------------------------------------
@@ -289,6 +316,7 @@ contains
    &                            vel, v_lo, v_hi,   &
    &                           scal, s_lo, s_hi,   &
    &                           dx,xlo,xhi,gravity, &
+   &                           Fx,Fy,Fz, &
    &                           scomp,ncomp, nscal, &
    &                           getForceVerbose )   &
    &          bind(C, name="FORT_MAKEFORCE")
@@ -303,26 +331,110 @@ contains
       integer :: nscal, getForceVerbose
       REAL_T  :: time, dx(3)
       REAL_T  :: xlo(3), xhi(3)
-      REAL_T  :: gravity
+      REAL_T  :: gravity, Fx, Fy, Fz, rho, Tref, alpha, temp
       REAL_T, dimension(f_lo(1):f_hi(1),f_lo(2):f_hi(2),f_lo(3):f_hi(3),scomp:scomp+ncomp-1) :: force
       REAL_T, dimension(v_lo(1):v_hi(1),v_lo(2):v_hi(2),v_lo(3):v_hi(3),0:SDIM-1)            :: vel
       REAL_T, dimension(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),0:nscal-1)           :: scal
 
-      integer :: isioproc, n
+      integer :: isioproc, n, i, j, k
 
-      !
-      ! No forcing for this problem
-      !
+
       force = zero
 
-      if (getForceVerbose > 0) then
-         call bl_pd_is_ioproc(isioproc)
-         if (isioproc.eq.1) then
-            do n = 1, SDIM
-               write (6,*) "No forcing applied"
-            enddo
-         endif
-      endif
+!      return
+
+      Tref = 323.15  ! MAKE READABLE!
+      alpha = 0.0034 ! calc real values later
+
+!      if (getForceVerbose > 0) then
+!         call bl_pd_is_ioproc(isioproc)
+!         if (isioproc.eq.1) then
+!            do n = 1, SDIM
+!               write (6,*) "No forcing applied"
+!               write (6,*) "Forcing applied", n
+!            enddo
+!         endif
+!      endif
+
+!      print*, "NCOMP:", ncomp !3
+!      print*, "SCOMP:", scomp !0
+!      print*, "FORCING, Fi:", Fx, Fy, Fz
+
+
+! From NS_getForce.cpp L45
+!ncomp / scomp / forcing
+!  3       0       Vel
+!  X       0  "all components"
+!  1       3       rho
+!  X       3    scalars(all)
+!  X       4      tracers
+!  X       X  particular scalars
+
+!      do k = force_l3, force_h3
+!      do j = force_l2, force_h2
+!      do i = force_l1, force_h1
+
+
+
+      do k = f_lo(3), f_hi(3)
+         do j = f_lo(2), f_hi(2)
+            do i = f_lo(1), f_hi(1)
+
+          ! static rho for now
+          rho = scal(i,j,k,0)
+          temp = scal(i,j,k,2) ! need to make these slots general
+
+          ! this is terrible
+          if(scomp.eq.0) then ! velocity
+
+             ! basic forcing term 
+             force(i,j,k,0) = rho * Fx !0.d0 ! pass a read-in generic Fi
+             force(i,j,k,1) = rho * Fy !0.d0
+             force(i,j,k,2) = rho * Fz !0.d0
+
+             ! Boussinesq term, hardcode to y-dir (1) fix for grav vector later
+             force(i,j,k,1) = force(i,j,k,1) + rho * gravity * alpha * (temp-Tref)
+
+          elseif (scomp .EQ. 3 .AND. ncomp .EQ. 1) then ! rho only
+
+             force(i,j,k,scomp) = 0.d0
+
+          elseif (scomp .EQ. 3) then ! all scalars
+
+             force(i,j,k,scomp  ) = 0.d0 ! density(ish)
+             force(i,j,k,scomp+1) = 0.d0 ! tracer
+             force(i,j,k,scomp+2) = 0.d0 ! temp
+
+          elseif (scomp .EQ. 4) then ! tracer only
+
+             force(i,j,k,scomp) = 0.d0
+
+          else ! who knows
+
+             force(i,j,k,scomp) = 0.d0 
+
+          endif
+
+          ! get gradient at (i,j,k)
+!          call get_grad(vel(:,:,:,0),i,j,k,du)
+!          call get_grad(vel(:,:,:,1),i,j,k,dv)
+!          call get_grad(vel(:,:,:,2),i,j,k,dw)
+
+          ! get viscous diss
+!          call get_dissipation(du,dv,dw,epsi)
+!          epsi = nu_m * rho * epsi
+
+
+      end do
+      end do
+      end do
+
+
+
+
+!      call flush(6)
+
+!      print*, " DONE WITH FORT_MAKEFORCE"
 
    end subroutine FORT_MAKEFORCE
 
@@ -797,9 +909,75 @@ contains
       REAL_T     dx(SDIM), xlo(SDIM), time
       REAL_T     temp(DIMV(temp))
       integer    bc(SDIM,2)
+      integer    i, j, k, n
 
-      ! Since we are not advecting any scalar besides density
-      ! we do not need this subroutine to do anything
+
+      ! filcc fills bc_types foextrap, hoextrap, reflect_odd and reflect_even
+      call filcc(temp,DIMS(temp),domlo,domhi,dx,xlo,bc)
+
+      ! really only care about bottom and top wall for this case, 
+      ! others are not called
+
+      if (bc(1,1) .eq. EXT_DIR .and. ARG_L1(temp) .lt. domlo(1)) then
+         do i = ARG_L1(temp), domlo(1)-1
+            do k = ARG_L3(temp), ARG_H3(temp)
+               do j = ARG_L2(temp), ARG_H2(temp)
+                  temp(i,j,k) = temp_bot
+               end do
+            end do
+         end do
+      end if
+
+      if (bc(1,2).eq.EXT_DIR.and.ARG_H1(temp).gt.domhi(1)) then
+         do i = domhi(1)+1, ARG_H1(temp)
+            do k = ARG_L3(temp), ARG_H3(temp)
+               do j = ARG_L2(temp), ARG_H2(temp)
+                  temp(i,j,k) = temp_top
+               end do
+            end do
+         end do
+      end if
+
+      if (bc(2,1).eq.EXT_DIR.and.ARG_L2(temp).lt.domlo(2)) then
+         do j = ARG_L2(temp), domlo(2)-1
+            do k = ARG_L3(temp), ARG_H3(temp)
+               do i = ARG_L1(temp), ARG_H1(temp)
+                  temp(i,j,k) = temp_bot
+               end do
+            end do
+         end do
+      end if
+
+      if (bc(2,2).eq.EXT_DIR.and.ARG_H2(temp).gt.domhi(2)) then
+         do j = domhi(2)+1, ARG_H2(temp)
+            do k = ARG_L3(temp), ARG_H3(temp)
+               do i = ARG_L1(temp), ARG_H1(temp)
+                  temp(i,j,k) = temp_top
+               end do
+            end do
+         end do
+      end if
+
+      if (bc(3,1).eq.EXT_DIR.and.ARG_L3(temp).lt.domlo(3)) then
+         do k = ARG_L3(temp), domlo(3)-1
+            do j = ARG_L2(temp), ARG_H2(temp)
+               do i = ARG_L1(temp), ARG_H1(temp)
+                  temp(i,j,k) = temp_bot
+               end do
+            end do
+         end do
+      endif
+
+      if (bc(3,2).eq.EXT_DIR.and.ARG_H3(temp).gt.domhi(3)) then
+         do k = domhi(3)+1, ARG_H3(temp)
+            do j = ARG_L2(temp), ARG_H2(temp)
+               do i = ARG_L1(temp), ARG_H1(temp)
+                  temp(i,j,k) = temp_top
+               end do
+            end do
+         end do
+      end if
+
 
    end subroutine FORT_TEMPFILL
 

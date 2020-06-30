@@ -113,6 +113,11 @@ NavierStokes::initData ()
         const int* p_lo    = Pfab.loVect();
         const int* p_hi    = Pfab.hiVect();
 
+	// From PROB_*.F90
+	//	subroutine FORT_INITDATA(level,time,lo,hi,nscal, &
+	//				 vel,scal,DIMS(state),press,DIMS(press), &
+	//				 dx,xlo,xhi) &
+	//	  bind(C, name="FORT_INITDATA")
         FORT_INITDATA (&level,&cur_time,lo,hi,&ns,
                        Sfab.dataPtr(Xvel),
                        Sfab.dataPtr(BL_SPACEDIM),
@@ -424,7 +429,8 @@ NavierStokes::advance (Real time,
 #ifdef AMREX_PARTICLES
     if (theNSPC() != 0 and NavierStokes::initial_iter != true)
     {
-        theNSPC()->AdvectWithUmac(u_mac, level, dt);
+      //      theNSPC()->AdvectWithUmac(u_mac, level, dt); // PARTICLES (particles) ADVANCED HERE
+      theNSPC()->AdvectWithUmac(u_mac, level, dt, particle_Rep, particle_tau); // <warp>
     }
 #endif
     //
@@ -538,7 +544,7 @@ NavierStokes::predict_velocity (Real  dt)
             FArrayBox& Ufab = Umf[U_mfi];
 
             if (getForceVerbose) {
-                Print() << "---\nA - Predict velocity:\n Calling getForce...\n";
+                Print() << "---\nA - Predict velocity:\n Calling getForce L547...\n";
             }
             getForce(tforces,bx,1,Xvel,BL_SPACEDIM,prev_time,Ufab,Smf[U_mfi],0);
 
@@ -696,9 +702,9 @@ NavierStokes::scalar_advection (Real dt,
 
                 if (getForceVerbose) {
                     Print() << "---" << '\n' << "C - scalar advection:" << '\n'
-                            << " Calling getForce..." << '\n';
+                            << " Calling getForce L705..." << '\n';
                 }
-                getForce(tforces,bx,nGrowF,fscalar,num_scalars,prev_time,Umf[S_mfi],Smf[S_mfi],0);
+                getForce(tforces,bx,nGrowF,fscalar,num_scalars,prev_time,Umf[S_mfi],Smf[S_mfi],0); // arbitrary source terms?
 
                 for (int d=0; d<BL_SPACEDIM; ++d)
                 {
@@ -722,7 +728,7 @@ NavierStokes::scalar_advection (Real dt,
                                        D_DECL(     edgstate[0],     edgstate[1],     edgstate[2]), 0,
                                        Smf[S_mfi], 0, num_scalars, tforces, 0, (*divu_fp)[S_mfi], 0,
                                        (*aofs)[S_mfi], fscalar, advectionType, state_bc, FPU, volume[S_mfi]);
-
+		// just add a hack with cfluxes zero for particle_vel scalar?
                 if (do_reflux) {
                   for (int d=0; d<BL_SPACEDIM; ++d) {
                     const Box& ebx = S_mfi.nodaltilebox(d);
@@ -876,6 +882,7 @@ NavierStokes::scalar_diffusion_update (Real dt,
         const int Rho_comp = Density;
 	const int bc_comp  = sigma;
 
+	// swh: forcing/source in delta_rhs
         diffusion->diffuse_scalar (Sn, Sn, Snp1, Snp1, sigma, 1, Rho_comp,
                                    prev_time,curr_time,be_cn_theta,Rh,rho_flag,
                                    fluxn,fluxnp1,fluxComp,delta_rhs,rhsComp,

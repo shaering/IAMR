@@ -157,9 +157,12 @@ NavierStokes::variableSetUp ()
     NUM_STATE = Density + 1;
     int Trac = NUM_STATE++;
     int Trac2;
+    int Pvel;
     if (do_trac2)
 	Trac2 = NUM_STATE++;
     if (do_temp) NUM_STATE++;
+    //    if (do_particle_vel) NUM_STATE++;
+    //    if (do_particle_vel) Pvel = NUM_STATE;
     NUM_SCALARS = NUM_STATE - Density;
 
     if (do_scalar_update_in_order) {
@@ -215,6 +218,12 @@ NavierStokes::variableSetUp ()
        set_scalar_bc(bc,phys_bc);
        desc_lst.setComponent(State_Type,Trac2,"tracer2",bc,BndryFunc(FORT_ADV2FILL));
     }
+    //
+    //    if (do_particle_vel)
+    //    {
+    //       set_scalar_bc(bc,phys_bc);
+    //       desc_lst.setComponent(State_Type,Pvel,"particle_vel",bc,BndryFunc(FORT_ADV2FILL));
+    //    }
     //
     // **************  DEFINE TEMPERATURE  ********************
     //
@@ -344,7 +353,7 @@ NavierStokes::variableSetUp ()
     //
     // gradient-based Reynolds number
     //
-    derive_lst.add("re_grad",IndexType::TheCellType(),1,DeriveFunc3D(derregrad),grow_box_by_one);
+    derive_lst.add("re_grad",IndexType::TheCellType(),1,DeriveFunc3D(derregrad_old),grow_box_by_one);
     derive_lst.addComponent("re_grad",desc_lst,State_Type,Xvel,BL_SPACEDIM);
 #if (BL_SPACEDIM == 3)
     //

@@ -1,8 +1,9 @@
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #            SIMULATION STOP            #
 #.......................................#
-stop_time               =   100.0         # Max (simulated) time to evolve
-max_step                =  -1           # Max number of time steps
+#stop_time               =   100.0         # Max (simulated) time to evolve
+max_step                =  400           # Max number of time steps
+#max_step                =  2
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #           SOLVER SETTINGS             #
 #.......................................#
@@ -25,28 +26,45 @@ amr.plot_int            =   20          # Steps between plot files
 #amr.plot_per            =   5.0         # Time between plot files
 amr.check_int           =   1000        # Steps between checkpoint files
 amr.restart             =   ""          # Checkpoint to restart from
-amr.derive_plot_vars    = re_grad mag_vort
+amr.derive_plot_vars    = re_grad particle_count mag_vort
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #               PHYSICS                 #
 #.......................................#
-#ns.gravity          =   0.  0.  543.5  # Gravitational force (3D)
-ns.gravity          =   0.  0.  182.0
-#ns.vel_visc_coef    = 1.0e-4
+ns.do_temp          = 1
+#ns.gravity          =   182.  0.  0.
+#ns.gravity          =   9.81
+#ns.gravity          =   0.1
+ns.gravity          =   0.
+ns.Fx               =   0.05473960604
+#ns.Fx               =   0.
+ns.Fy               =   0.
+ns.Fz               =   0.
 ns.vel_visc_coef    = 3.5e-4
-ns.scal_diff_coefs  = 1.0
+ns.temp_cond_coef   = 2.0e-4
+ns.scal_diff_coefs  = 0.0
+#¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
+#            PARTICLE INPUTS            #
+#.......................................#
+#particles.particle_init_file = particle_file
+#particles.timestamp_dir = particle_dir
+#particles.timestamp_indices = 1
+#particles.particle_Rep = 1.0
+#particles.particle_tau = 1.0
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #        ADAPTIVE MESH REFINEMENT       #
 #.......................................#
-amr.n_cell              =   32 16 16    # Grid cells at coarsest AMRlevel
-amr.max_level           =   3           # Max AMR level in hierarchy
+#amr.n_cell              =   432 48 108    # Grid cells at coarsest AMRlevel
+amr.n_cell              =   32 16 16
+amr.max_level           =   2           # Max AMR level in hierarchy
 amr.grid_eff            =   0.7
-amr.n_error_buf         =   0
+amr.n_error_buf         =   1
 amr.max_grid_size_x     =   1024
 amr.max_grid_size_y     =   512
 amr.max_grid_size_z     =   512
-amr.blocking_factor     =   2
-amr.ref_ratio		=   2 2 2
-amr.regrid_int          =   10 20 40
+amr.blocking_factor     =   8
+amr.ref_ratio		=   2 2
+#amr.regrid_int          =   10 20
+amr.regrid_int          =   10000000
 #amr.refine_grid_layout  =   1
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #              GEOMETRY                 #
@@ -54,6 +72,7 @@ amr.regrid_int          =   10 20 40
 geometry.coord_sys      =   0
 geometry.prob_lo        =   0.  0.  0.  # Lo corner coordinates
 geometry.prob_hi        =   4.  2.  2.    # Hi corner coordinates
+#geometry.prob_hi        =   18.  2.  4.5
 geometry.is_periodic    =   1   0   1   # Periodicity x y z (0/1)
 
 # 0 = Interior/Periodic  3 = Symmetry
@@ -78,3 +97,4 @@ ns.v                    = 1 # NS solver
 proj.v                  = 0 # Nodal projection
 mac_proj.verbose        = 0 # MacProjector
 nodal_proj.verbose      = 0 # Nodal projection
+ns.getForceVerbose      = 0

@@ -1,0 +1,10 @@
+./NavierStokesBase.H:    static amrex::AmrTracerParticleContainer* theNSPC ();
+./NavierStokesBase.H~:    static amrex::AmrTracerParticleContainer* theNSPC ();
+./NavierStokesBase.cpp:    AmrTracerParticleContainer* NSPC = 0;
+./NavierStokesBase.cpp:AmrTracerParticleContainer* NavierStokesBase::theNSPC () { return NSPC; }
+./NavierStokesBase.cpp:            NSPC = new AmrTracerParticleContainer(parent);
+./NavierStokesBase.cpp:        NSPC = new AmrTracerParticleContainer(parent);
+./NavierStokesBase.cpp~:    AmrTracerParticleContainer* NSPC = 0;
+./NavierStokesBase.cpp~:AmrTracerParticleContainer* NavierStokesBase::theNSPC () { return NSPC; }
+./NavierStokesBase.cpp~:            NSPC = new AmrTracerParticleContainer(parent);
+./NavierStokesBase.cpp~:        NSPC = new AmrTracerParticleContainer(parent);

@@ -42,14 +42,14 @@ NavierStokesBase::getForce (FArrayBox&       force,
                      << "ngrow     = " << ngrow << std::endl
                      << "scalScomp = " << scalScomp << std::endl;
 
-   if (scomp==0)
-       if  (ncomp==3) amrex::Print() << "Doing velocities only" << std::endl;
-       else           amrex::Print() << "Doing all components" << std::endl;
-   else if (scomp==3)
-       if  (ncomp==1) amrex::Print() << "Doing density only" << std::endl;
-       else           amrex::Print() << "Doing all scalars" << std::endl;
-   else if (scomp==4) amrex::Print() << "Doing tracer only" << std::endl;
-   else               amrex::Print() << "Doing individual scalar" << std::endl;
+   if (scomp==0) // WTF IS THIS BULLSHIT?                                        ncomp / scomp / forcing
+     if  (ncomp==3) amrex::Print() << "Doing velocities only" << std::endl;//      3       0       Vel
+     else           amrex::Print() << "Doing all components" << std::endl;//       X       0        ?
+   else if (scomp==3) 
+     if  (ncomp==1) amrex::Print() << "Doing density only" << std::endl;//         1       3       rho
+     else           amrex::Print() << "Doing all scalars" << std::endl;//          X       3    scalars(all)
+   else if (scomp==4) amrex::Print() << "Doing tracer only" << std::endl;//        X       4      tracers
+   else               amrex::Print() << "Doing individual scalar" << std::endl;//  X       X    particular scalars
 
    }
 
@@ -166,7 +166,9 @@ NavierStokesBase::getForce (FArrayBox&       force,
                    dx,
                    gridloc.lo(),
                    gridloc.hi(),
-                   &grav,&scomp,&ncomp,&nscal,&getForceVerbose);
+                   &grav,
+                   &Fx,&Fy,&Fz,
+                   &scomp,&ncomp,&nscal,&getForceVerbose);
 
    if (ParallelDescriptor::IOProcessor() && getForceVerbose) {
       Vector<Real> forcemin(ncomp);
