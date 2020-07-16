@@ -674,6 +674,7 @@ contains
       REAL_T, intent(in)  :: delta(3), xlo(3), time, dt
       REAL_T, intent(out),dimension(e_lo(1):e_hi(1),e_lo(2):e_hi(2),e_lo(3):e_hi(3),nv) :: e
       REAL_T, intent(inout), dimension(d_lo(1):d_hi(1),d_lo(2):d_hi(2),d_lo(3):d_hi(3),ncomp) :: dat
+      REAL_T, dimension(e_lo(1):e_hi(1),e_lo(2):e_hi(2),e_lo(3):e_hi(3)) :: r0
       integer, intent(in) :: level, grid_no
 
 !  Local
@@ -819,11 +820,11 @@ contains
 #endif
 
                call get_reg_old(ux,uy,uz,vx,vy,vz,wx,wy,wz,dx,dy,dz,nu_m,re_g)
-               if(time .LE. dt) then
-                  e(i,j,k,1) = re_g
-               else
-                  e(i,j,k,1) = wt1*e(i,j,k,1) + (1.0d0-wt1)*re_g
-               endif
+!               if(time .LE. dt) then
+                  r0(i,j,k) = re_g
+!               else
+!                  e(i,j,k,1) = wt1*e(i,j,k,1) + (1.0d0-wt1)*re_g
+!               endif
 
             end do
          end do
@@ -893,11 +894,11 @@ contains
                wz = wzcen(i,j,k)
 #endif
                call get_reg_old(ux,uy,uz,vx,vy,vz,wx,wy,wz,dx,dy,dz,nu_m,re_g)
-               if(time .LE. dt) then
-                  e(i,j,k,1) = re_g
-               else
-                  e(i,j,k,1) = wt1*e(i,j,k,1) + (1.0d0-wt1)*re_g
-               endif
+!               if(time .LE. dt) then
+                  r0(i,j,k) = re_g
+!               else
+!                  e(i,j,k,1) = wt1*e(i,j,k,1) + (1.0d0-wt1)*re_g
+!               endif
             end do
          end do
       end if
@@ -918,11 +919,11 @@ contains
                wz = uzcen(i,j,k)
 #endif
                call get_reg_old(ux,uy,uz,vx,vy,vz,wx,wy,wz,dx,dy,dz,nu_m,re_g)
-               if(time .LE. dt) then
-                  e(i,j,k,1) = re_g
-               else
-                  e(i,j,k,1) = wt1*e(i,j,k,1) + (1.0d0-wt1)*re_g
-               endif
+!               if(time .LE. dt) then
+                  r0(i,j,k) = re_g
+!               else
+!                  e(i,j,k,1) = wt1*e(i,j,k,1) + (1.0d0-wt1)*re_g
+!               endif
             end do
          end do
       end if
@@ -943,11 +944,11 @@ contains
                wz = wzcen(i,j,k)
 #endif
                call get_reg_old(ux,uy,uz,vx,vy,vz,wx,wy,wz,dx,dy,dz,nu_m,re_g)
-               if(time .LE. dt) then
-                  e(i,j,k,1) = re_g
-               else
-                  e(i,j,k,1) = wt1*e(i,j,k,1) + (1.0d0-wt1)*re_g
-               endif
+!               if(time .LE. dt) then
+                  r0(i,j,k) = re_g
+!               else
+!                  e(i,j,k,1) = wt1*e(i,j,k,1) + (1.0d0-wt1)*re_g
+!               endif
             end do
          end do
       end if
@@ -968,11 +969,11 @@ contains
                wz = wzcen(i,j,k)
 #endif
                call get_reg_old(ux,uy,uz,vx,vy,vz,wx,wy,wz,dx,dy,dz,nu_m,re_g)
-               if(time .LE. dt) then
-                  e(i,j,k,1) = re_g
-               else
-                  e(i,j,k,1) = wt1*e(i,j,k,1) + (1.0d0-wt1)*re_g
-               endif
+!               if(time .LE. dt) then
+                  r0(i,j,k) = re_g
+!               else
+!                  e(i,j,k,1) = wt1*e(i,j,k,1) + (1.0d0-wt1)*re_g
+!               endif
             end do
          end do
       end if
@@ -995,11 +996,11 @@ contains
                wz = merge(wzlo(i,j,k),wzcen(i,j,k),fixwlo_z)
 
                call get_reg_old(ux,uy,uz,vx,vy,vz,wx,wy,wz,dx,dy,dz,nu_m,re_g)
-               if(time .LE. dt) then
-                  e(i,j,k,1) = re_g
-               else
-                  e(i,j,k,1) = wt1*e(i,j,k,1) + (1.0d0-wt1)*re_g
-               endif
+!               if(time .LE. dt) then
+                  r0(i,j,k) = re_g
+!               else
+!                  e(i,j,k,1) = wt1*e(i,j,k,1) + (1.0d0-wt1)*re_g
+!               endif
             end do
          end do
       end if
@@ -1022,11 +1023,11 @@ contains
                wz = merge(wzhi(i,j,k),wzcen(i,j,k),fixwhi_z)
 
                call get_reg_old(ux,uy,uz,vx,vy,vz,wx,wy,wz,dx,dy,dz,nu_m,re_g)
-               if(time .LE. dt) then
-                  e(i,j,k,1) = re_g
-               else
-                  e(i,j,k,1) = wt1*e(i,j,k,1) + (1.0d0-wt1)*re_g
-               endif
+!               if(time .LE. dt) then
+                  r0(i,j,k) = re_g
+!               else
+!                  e(i,j,k,1) = wt1*e(i,j,k,1) + (1.0d0-wt1)*re_g
+!               endif
             end do
          end do
       end if
@@ -1050,11 +1051,11 @@ contains
             wz = wzcen(i,j,k)
 #endif
                call get_reg_old(ux,uy,uz,vx,vy,vz,wx,wy,wz,dx,dy,dz,nu_m,re_g)
-               if(time .LE. dt) then
-                  e(i,j,k,1) = re_g
-               else
-                  e(i,j,k,1) = wt1*e(i,j,k,1) + (1.0d0-wt1)*re_g
-               endif
+!               if(time .LE. dt) then
+                  r0(i,j,k) = re_g
+!               else
+!                  e(i,j,k,1) = wt1*e(i,j,k,1) + (1.0d0-wt1)*re_g
+!               endif
          end do
       end if
 
@@ -1074,11 +1075,11 @@ contains
             wz = wzcen(i,j,k)
 #endif
                call get_reg_old(ux,uy,uz,vx,vy,vz,wx,wy,wz,dx,dy,dz,nu_m,re_g)
-               if(time .LE. dt) then
-                  e(i,j,k,1) = re_g
-               else
-                  e(i,j,k,1) = wt1*e(i,j,k,1) + (1.0d0-wt1)*re_g
-               endif
+!               if(time .LE. dt) then
+                  r0(i,j,k) = re_g
+!               else
+!                  e(i,j,k,1) = wt1*e(i,j,k,1) + (1.0d0-wt1)*re_g
+!               endif
          end do
       end if
 
@@ -1098,11 +1099,11 @@ contains
             wz = wzcen(i,j,k)
 #endif
                call get_reg_old(ux,uy,uz,vx,vy,vz,wx,wy,wz,dx,dy,dz,nu_m,re_g)
-               if(time .LE. dt) then
-                  e(i,j,k,1) = re_g
-               else
-                  e(i,j,k,1) = wt1*e(i,j,k,1) + (1.0d0-wt1)*re_g
-               endif
+!               if(time .LE. dt) then
+                  r0(i,j,k) = re_g
+!               else
+!                  e(i,j,k,1) = wt1*e(i,j,k,1) + (1.0d0-wt1)*re_g
+!               endif
          end do
       end if
 
@@ -1122,11 +1123,11 @@ contains
             wz = wzcen(i,j,k)
 #endif
                call get_reg_old(ux,uy,uz,vx,vy,vz,wx,wy,wz,dx,dy,dz,nu_m,re_g)
-               if(time .LE. dt) then
-                  e(i,j,k,1) = re_g
-               else
-                  e(i,j,k,1) = wt1*e(i,j,k,1) + (1.0d0-wt1)*re_g
-               endif
+!               if(time .LE. dt) then
+                  r0(i,j,k) = re_g
+!               else
+!                  e(i,j,k,1) = wt1*e(i,j,k,1) + (1.0d0-wt1)*re_g
+!               endif
          end do
       end if
 
@@ -1146,11 +1147,11 @@ contains
             wx = merge(wzlo(i,j,k),wzcen(i,j,k),fixwlo_z)
 #endif
                call get_reg_old(ux,uy,uz,vx,vy,vz,wx,wy,wz,dx,dy,dz,nu_m,re_g)
-               if(time .LE. dt) then
-                  e(i,j,k,1) = re_g
-               else
-                  e(i,j,k,1) = wt1*e(i,j,k,1) + (1.0d0-wt1)*re_g
-               endif
+!               if(time .LE. dt) then
+                  r0(i,j,k) = re_g
+!               else
+!                  e(i,j,k,1) = wt1*e(i,j,k,1) + (1.0d0-wt1)*re_g
+!               endif
          end do
       end if
 
@@ -1170,11 +1171,11 @@ contains
             wz = merge(wzlo(i,j,k),wzcen(i,j,k),fixwlo_z)
 #endif
                call get_reg_old(ux,uy,uz,vx,vy,vz,wx,wy,wz,dx,dy,dz,nu_m,re_g)
-               if(time .LE. dt) then
-                  e(i,j,k,1) = re_g
-               else
-                  e(i,j,k,1) = wt1*e(i,j,k,1) + (1.0d0-wt1)*re_g
-               endif
+!               if(time .LE. dt) then
+                  r0(i,j,k) = re_g
+!               else
+!                  e(i,j,k,1) = wt1*e(i,j,k,1) + (1.0d0-wt1)*re_g
+!               endif
          end do
       end if
 
@@ -1194,11 +1195,11 @@ contains
             wz = merge(wzhi(i,j,k),wzcen(i,j,k),fixwhi_z)
 #endif
                call get_reg_old(ux,uy,uz,vx,vy,vz,wx,wy,wz,dx,dy,dz,nu_m,re_g)
-               if(time .LE. dt) then
-                  e(i,j,k,1) = re_g
-               else
-                  e(i,j,k,1) = wt1*e(i,j,k,1) + (1.0d0-wt1)*re_g
-               endif
+!               if(time .LE. dt) then
+                  r0(i,j,k) = re_g
+!               else
+!                  e(i,j,k,1) = wt1*e(i,j,k,1) + (1.0d0-wt1)*re_g
+!               endif
          end do
       end if
 
@@ -1218,11 +1219,11 @@ contains
             uz = merge(wzhi(i,j,k),wzcen(i,j,k),fixwhi_z)
 #endif
                call get_reg_old(ux,uy,uz,vx,vy,vz,wx,wy,wz,dx,dy,dz,nu_m,re_g)
-               if(time .LE. dt) then
-                  e(i,j,k,1) = re_g
-               else
-                  e(i,j,k,1) = wt1*e(i,j,k,1) + (1.0d0-wt1)*re_g
-               endif
+!               if(time .LE. dt) then
+                  r0(i,j,k) = re_g
+!               else
+!                  e(i,j,k,1) = wt1*e(i,j,k,1) + (1.0d0-wt1)*re_g
+!               endif
          end do
       end if
 
@@ -1242,11 +1243,11 @@ contains
             wz = merge(wzlo(i,j,k),wzcen(i,j,k),fixwlo_z)
 #endif
                call get_reg_old(ux,uy,uz,vx,vy,vz,wx,wy,wz,dx,dy,dz,nu_m,re_g)
-               if(time .LE. dt) then
-                  e(i,j,k,1) = re_g
-               else
-                  e(i,j,k,1) = wt1*e(i,j,k,1) + (1.0d0-wt1)*re_g
-               endif
+!               if(time .LE. dt) then
+                  r0(i,j,k) = re_g
+!               else
+!                  e(i,j,k,1) = wt1*e(i,j,k,1) + (1.0d0-wt1)*re_g
+!               endif
          end do
       end if
 
@@ -1266,11 +1267,11 @@ contains
             wz = merge(wzlo(i,j,k),wzcen(i,j,k),fixwlo_z)
 #endif
                call get_reg_old(ux,uy,uz,vx,vy,vz,wx,wy,wz,dx,dy,dz,nu_m,re_g)
-               if(time .LE. dt) then
-                  e(i,j,k,1) = re_g
-               else
-                  e(i,j,k,1) = wt1*e(i,j,k,1) + (1.0d0-wt1)*re_g
-               endif
+!               if(time .LE. dt) then
+                  r0(i,j,k) = re_g
+!               else
+!                  e(i,j,k,1) = wt1*e(i,j,k,1) + (1.0d0-wt1)*re_g
+!               endif
          end do
       end if
 
@@ -1290,11 +1291,11 @@ contains
             wz = merge(wzhi(i,j,k),wzcen(i,j,k),fixwhi_z)
 #endif
                call get_reg_old(ux,uy,uz,vx,vy,vz,wx,wy,wz,dx,dy,dz,nu_m,re_g)
-               if(time .LE. dt) then
-                  e(i,j,k,1) = re_g
-               else
-                  e(i,j,k,1) = wt1*e(i,j,k,1) + (1.0d0-wt1)*re_g
-               endif
+!               if(time .LE. dt) then
+                  r0(i,j,k) = re_g
+!               else
+!                  e(i,j,k,1) = wt1*e(i,j,k,1) + (1.0d0-wt1)*re_g
+!               endif
          end do
       end if
 
@@ -1314,11 +1315,11 @@ contains
             wz = merge(wzhi(i,j,k),wzcen(i,j,k),fixwhi_z)
 #endif
                call get_reg_old(ux,uy,uz,vx,vy,vz,wx,wy,wz,dx,dy,dz,nu_m,re_g)
-               if(time .LE. dt) then
-                  e(i,j,k,1) = re_g
-               else
-                  e(i,j,k,1) = wt1*e(i,j,k,1) + (1.0d0-wt1)*re_g
-               endif
+!               if(time .LE. dt) then
+                  r0(i,j,k) = re_g
+!               else
+!                  e(i,j,k,1) = wt1*e(i,j,k,1) + (1.0d0-wt1)*re_g
+!               endif
          end do
       end if
 
@@ -1343,11 +1344,11 @@ contains
          wz = merge(wzlo(i,j,k),wzcen(i,j,k),fixwlo_z)
 #endif
                call get_reg_old(ux,uy,uz,vx,vy,vz,wx,wy,wz,dx,dy,dz,nu_m,re_g)
-               if(time .LE. dt) then
-                  e(i,j,k,1) = re_g
-               else
-                  e(i,j,k,1) = wt1*e(i,j,k,1) + (1.0d0-wt1)*re_g
-               endif
+!               if(time .LE. dt) then
+                  r0(i,j,k) = re_g
+!               else
+!                  e(i,j,k,1) = wt1*e(i,j,k,1) + (1.0d0-wt1)*re_g
+!               endif
       end if
 
       if ((fixuhi_x .or. fixvhi_x .or. fixwhi_x) .and. &
@@ -1368,11 +1369,11 @@ contains
          wz = merge(wzlo(i,j,k),wzcen(i,j,k),fixwlo_z)
 #endif
                call get_reg_old(ux,uy,uz,vx,vy,vz,wx,wy,wz,dx,dy,dz,nu_m,re_g)
-               if(time .LE. dt) then
-                  e(i,j,k,1) = re_g
-               else
-                  e(i,j,k,1) = wt1*e(i,j,k,1) + (1.0d0-wt1)*re_g
-               endif
+!               if(time .LE. dt) then
+                  r0(i,j,k) = re_g
+!               else
+!                  e(i,j,k,1) = wt1*e(i,j,k,1) + (1.0d0-wt1)*re_g
+!               endif
       end if
 
       if ((fixulo_x .or. fixvlo_x .or. fixwlo_x) .and. &
@@ -1393,11 +1394,11 @@ contains
          wz = merge(wzlo(i,j,k),wzcen(i,j,k),fixwlo_z)
 #endif
                call get_reg_old(ux,uy,uz,vx,vy,vz,wx,wy,wz,dx,dy,dz,nu_m,re_g)
-               if(time .LE. dt) then
-                  e(i,j,k,1) = re_g
-               else
-                  e(i,j,k,1) = wt1*e(i,j,k,1) + (1.0d0-wt1)*re_g
-               endif
+!               if(time .LE. dt) then
+                  r0(i,j,k) = re_g
+!               else
+!                  e(i,j,k,1) = wt1*e(i,j,k,1) + (1.0d0-wt1)*re_g
+!               endif
       end if
 
       if ((fixuhi_x .or. fixvhi_x .or. fixwhi_x) .and. &
@@ -1418,11 +1419,11 @@ contains
          wz = merge(wzlo(i,j,k),wzcen(i,j,k),fixwlo_z)
 #endif
                call get_reg_old(ux,uy,uz,vx,vy,vz,wx,wy,wz,dx,dy,dz,nu_m,re_g)
-               if(time .LE. dt) then
-                  e(i,j,k,1) = re_g
-               else
-                  e(i,j,k,1) = wt1*e(i,j,k,1) + (1.0d0-wt1)*re_g
-               endif
+!               if(time .LE. dt) then
+                  r0(i,j,k) = re_g
+!               else
+!                  e(i,j,k,1) = wt1*e(i,j,k,1) + (1.0d0-wt1)*re_g
+!               endif
       end if
 
       if ((fixulo_x .or. fixvlo_x .or. fixwlo_x) .and. &
@@ -1444,11 +1445,11 @@ contains
 #endif
 
                call get_reg_old(ux,uy,uz,vx,vy,vz,wx,wy,wz,dx,dy,dz,nu_m,re_g)
-               if(time .LE. dt) then
-                  e(i,j,k,1) = re_g
-               else
-                  e(i,j,k,1) = wt1*e(i,j,k,1) + (1.0d0-wt1)*re_g
-               endif
+!               if(time .LE. dt) then
+                  r0(i,j,k) = re_g
+!               else
+!                  e(i,j,k,1) = wt1*e(i,j,k,1) + (1.0d0-wt1)*re_g
+!               endif
       end if
 
       if ((fixuhi_x .or. fixvhi_x .or. fixwhi_x) .and. &
@@ -1470,11 +1471,11 @@ contains
 #endif
 
                call get_reg_old(ux,uy,uz,vx,vy,vz,wx,wy,wz,dx,dy,dz,nu_m,re_g)
-               if(time .LE. dt) then
-                  e(i,j,k,1) = re_g
-               else
-                  e(i,j,k,1) = wt1*e(i,j,k,1) + (1.0d0-wt1)*re_g
-               endif
+!               if(time .LE. dt) then
+                  r0(i,j,k) = re_g
+!               else
+!                  e(i,j,k,1) = wt1*e(i,j,k,1) + (1.0d0-wt1)*re_g
+!               endif
       end if
 
       if ((fixulo_x .or. fixvlo_x .or. fixwlo_x) .and. &
@@ -1496,11 +1497,11 @@ contains
 #endif
 
                call get_reg_old(ux,uy,uz,vx,vy,vz,wx,wy,wz,dx,dy,dz,nu_m,re_g)
-               if(time .LE. dt) then
-                  e(i,j,k,1) = re_g
-               else
-                  e(i,j,k,1) = wt1*e(i,j,k,1) + (1.0d0-wt1)*re_g
-               endif
+!               if(time .LE. dt) then
+                  r0(i,j,k) = re_g
+!               else
+!                  e(i,j,k,1) = wt1*e(i,j,k,1) + (1.0d0-wt1)*re_g
+!               endif
 
       end if
 
@@ -1524,13 +1525,40 @@ contains
 #endif
 
                call get_reg_old(ux,uy,uz,vx,vy,vz,wx,wy,wz,dx,dy,dz,nu_m,re_g)
-               if(time .LE. dt) then
-                  e(i,j,k,1) = re_g
-               else
-                  e(i,j,k,1) = wt1*e(i,j,k,1) + (1.0d0-wt1)*re_g
-               endif
+!               if(time .LE. dt) then
+                  r0(i,j,k) = re_g
+!               else
+!                  e(i,j,k,1) = wt1*e(i,j,k,1) + (1.0d0-wt1)*re_g
+!               endif
 
       end if
+
+
+
+      do k = lo(3), hi(3)
+         do j = lo(2), hi(2)
+            do i = lo(1), hi(1)
+               ux = uxcen(i,j,k)
+               uy = uycen(i,j,k)
+               vx = vxcen(i,j,k)
+               vy = vycen(i,j,k)
+#if ( AMREX_SPACEDIM == 3 )
+               uz = uzcen(i,j,k)
+               vz = vzcen(i,j,k)
+               wx = wxcen(i,j,k)
+               wy = wycen(i,j,k)
+               wz = wzcen(i,j,k)
+#endif
+
+!               if(time .LE. dt) then
+                  e(i,j,k,1) = r0(i,j,k)
+!               else
+!                  e(i,j,k,1) = wt1*e(i,j,k,1) + (1.0d0-wt1)*r0(i,j,k)
+!               endif
+
+            end do
+         end do
+      end do
 
 
 
