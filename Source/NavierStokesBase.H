@@ -27,6 +27,9 @@
 #include <AMReX_EBFluxRegister.H>
 #endif
 
+#include <activeParticles.H>
+//#include <AmrActiveParticles.H>
+
 //
 // "Divu_Type" means S, where divergence U = S
 // "Dsdt_Type" means pd S/pd t, where S is as above
@@ -231,14 +234,16 @@ protected:
     // Get the forcing term.
     //
     void getForce (amrex::FArrayBox&       force,
-                   const amrex::Box&      bx,
-                   int              ngrow,
-                   int              strt_comp,
-                   int              num_comp,
+                   const amrex::Box&       bx,
+                   int                     ngrow,
+                   int                     strt_comp,
+                   int                     num_comp,
                    const amrex::Real       time,
                    const amrex::FArrayBox& Vel,
                    const amrex::FArrayBox& Scal,
-                   int              scalScomp);
+                         amrex::FArrayBox& rhs,
+                   int                     scalScomp,
+                   int                     level);
     //
     amrex::FluxRegister& getAdvFluxReg () {
         BL_ASSERT(advflux_reg);
@@ -463,7 +468,9 @@ protected:
     ////////////////////////////////////////////////////////////////////////////
 
 #ifdef AMREX_PARTICLES
-    static amrex::AmrTracerParticleContainer* theNSPC ();
+  //    static amrex::AmrTracerParticleContainer* theNSPC ();
+    static amrex::AmrActiveParticleContainer* theNSPC ();
+  //    static amrex::ActiveParticleContainer* theNSPC ();
     static void read_particle_params ();
 
     void initParticleData ();
@@ -770,8 +777,8 @@ protected:
     //
     // swh: for particles
     //
-    static amrex::Real particle_Rep;
-    static amrex::Real particle_tau;
+  //    static amrex::Real particle_Rep;
+  //    static amrex::Real particle_tau;
     static int particle_extra_reals;
     static int particle_extra_ints;
     //

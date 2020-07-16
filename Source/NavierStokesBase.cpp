@@ -95,9 +95,9 @@ std::string NavierStokesBase::LES_model                 = "Smagorinsky";
 Real        NavierStokesBase::smago_Cs_cst              = 0.18;
 Real        NavierStokesBase::sigma_Cs_cst              = 1.5;
 
-Real        NavierStokesBase::particle_Rep              = 1.0;
-Real        NavierStokesBase::particle_tau              = 1.0;
-int         NavierStokesBase::particle_extra_reals      = 0;
+//Real        NavierStokesBase::particle_Rep              = 1.0;
+//Real        NavierStokesBase::particle_tau              = 1.0;
+int         NavierStokesBase::particle_extra_reals      = 9;
 int         NavierStokesBase::particle_extra_ints       = 0;
 
 
@@ -153,7 +153,9 @@ namespace
     //
     // There's really only one of these.
     //
-    AmrTracerParticleContainer* NSPC = 0;
+  //    AmrTracerParticleContainer* NSPC = 0;
+    AmrActiveParticleContainer* NSPC = 0;
+  //    ActiveParticleContainer* NSPC = 0;
 
     std::string      timestamp_dir                   ("Timestamps");
     std::vector<int> timestamp_indices;
@@ -164,7 +166,9 @@ namespace
     int              pverbose                         = 2;
 }
 
-AmrTracerParticleContainer* NavierStokesBase::theNSPC () { return NSPC; }
+//AmrTracerParticleContainer* NavierStokesBase::theNSPC () { return NSPC; }
+AmrActiveParticleContainer* NavierStokesBase::theNSPC () { return NSPC; }
+//ActiveParticleContainer* NavierStokesBase::theNSPC () { return NSPC; }
 #endif
 
 int NavierStokesBase::DoTrac2() {return NavierStokesBase::do_trac2;}
@@ -979,11 +983,16 @@ NavierStokesBase::computeInitialDt (int                   finest_level,
     Real dt_0    = 1.0e+100;
     int n_factor = 1;
     ///TODO/DEBUG: This will need to change for optimal subcycling.
+    //      std::cout << "  checkpoint 0\n";
     for (i = 0; i <= finest_level; i++)
     {
+      //      std::cout << "  checkpoint " << i+1 << "a... \n";
         dt_level[i] = getLevel(i).initialTimeStep();
+	//      std::cout << "  checkpoint " << i+1 << "b... \n";
         n_factor   *= n_cycle[i];
+	//      std::cout << "  checkpoint " << i+1 << "c... \n";
         dt_0        = std::min(dt_0,n_factor*dt_level[i]);
+	//      std::cout << "  checkpoint " << i+1 << "d... \n";
     }
 
     //
@@ -996,12 +1005,17 @@ NavierStokesBase::computeInitialDt (int                   finest_level,
         if ((cur_time + dt_0) > (stop_time - eps))
             dt_0 = stop_time - cur_time;
     }
+    //      std::cout << "  checkpoint " << "e" <<  "\n";
 
     n_factor = 1;
-    for (i = 0; i <= finest_level; i++)
+    //      std::cout << "  finest level " << finest_level <<  "\n";
+    for (i = 0; i <= finest_level; i++) 
     {
+      //      std::cout << "  checkpoint f" << i <<  "a... \n";
         n_factor   *= n_cycle[i];
+	//      std::cout << "  checkpoint f" << i <<  "b... \n";
         dt_level[i] = dt_0/( (Real)n_factor );
+	//      std::cout << "  checkpoint f" << i <<  "c... \n";
     }
 }
 
@@ -1026,10 +1040,12 @@ NavierStokesBase::computeNewDt (int                   finest_level,
 
     Real dt_0     = 1.0e+100;
     int  n_factor = 1;
+    //    std::cout << "  checkpoint 0 \n";
     for (i = 0; i <= finest_level; i++)
     {
         NavierStokesBase& adv_level = getLevel(i);
         dt_min[i] = std::min(dt_min[i],adv_level.estTimeStep());
+	//	std::cout << "  checkpoint 1 \n";
     }
 
     if (fixed_dt <= 0.0)
@@ -1070,11 +1086,13 @@ NavierStokesBase::computeNewDt (int                   finest_level,
     //
     // Find the minimum over all levels
     //
+    //    std::cout << "  checkpoint 2 \n";
     for (i = 0; i <= finest_level; i++)
     {
         n_factor *= n_cycle[i];
         dt_0      = std::min(dt_0,n_factor*dt_min[i]);
     }
+    //    std::cout << "  checkpoint 3 \n";
 
     //
     // Limit dt's by the value of stop_time.
@@ -1086,6 +1104,7 @@ NavierStokesBase::computeNewDt (int                   finest_level,
         if ((cur_time + dt_0) > (stop_time - eps))
             dt_0 = stop_time - cur_time;
     }
+    //    std::cout << "  checkpoint 4 \n";
 
     //
     // Set dt at each level of refinement
@@ -1096,6 +1115,8 @@ NavierStokesBase::computeNewDt (int                   finest_level,
         n_factor   *= n_cycle[i];
         dt_level[i] = dt_0/( (Real)n_factor );
     }
+    //    std::cout << "  checkpoint 5 \n";
+
 }
 
 void
@@ -1413,6 +1434,14 @@ NavierStokesBase::estTimeStep ()
 #pragma omp parallel if (Gpu::notInLaunchRegion())
 #endif
     {
+
+      const BoxArray& ba = U_new.boxArray();
+      const DistributionMapping& dm = U_new.DistributionMap();
+      int ncomp = U_new.nComp();
+      int ngrow = U_new.nGrow();
+      MultiFab rhs(ba,dm,ncomp,ngrow);
+      rhs.setVal(0.0);
+
         FArrayBox tforces_fab;
         for (MFIter mfi(rho_ctime,true); mfi.isValid(); ++mfi)
         {
@@ -1420,11 +1449,31 @@ NavierStokesBase::estTimeStep ()
             const auto  cur_time = state[State_Type].curTime();
 
             if (getForceVerbose)
-                amrex::Print() << "---" << '\n'
+                amrex::Print() << "------------------" << '\n'
                                << "H - est Time Step:" << '\n'
-                               << "Calling getForce..." << '\n';
+                               << "------------------" << '\n';
+	    //                               << " (commented out tforce portion for now)..." << '\n';
 
-            getForce(tforces_fab,bx,n_grow,Xvel,AMREX_SPACEDIM,cur_time,U_new[mfi],U_new[mfi],Density);
+
+
+#ifdef AMREX_PARTICLES
+	    /*
+	    theNSPC()->getDrag(rhs[mfi],U_new[mfi],U_new[mfi],visc_coef[0],1,level);
+	    std::cout << " *** get forcing okay\n";
+            //rhs.SumBoundary(Geom().periodicity()); 
+	    rhs.SumBoundary(0, ncomp, IntVect(1), Geom().periodicity()); 
+	    */
+#endif
+
+
+
+	    //getForce(tforces_fab,bx,n_grow,Xvel,AMREX_SPACEDIM,cur_time,U_new[mfi],U_new[mfi],Density);
+	    // cut out for now
+            getForce(tforces_fab,bx,0,Xvel,AMREX_SPACEDIM,cur_time,U_new[mfi],U_new[mfi],rhs[mfi],Density,level);
+	    rhs.SumBoundary(Geom().periodicity());
+	    //rhs.FillBoundary(Geom().periodicity());
+            if (getForceVerbose) std::cout << "...and done\n";            
+	    //	    getForce(tforces,bx,nGrowF,fscalar,num_scalars,prev_time,Umf[S_mfi],Smf[S_mfi],rhs[S_mfi],0,level)
             tforces[mfi].copy<RunOn::Host>(tforces_fab,bx,0,bx,0,AMREX_SPACEDIM);
         }
     }
@@ -2050,7 +2099,7 @@ NavierStokesBase::initialTimeStep ()
 {
     Real returnDt = init_shrink*estTimeStep();
 
-    amrex::Print() << "Multiplying dt by init_shrink: dt = "
+    amrex::Print() << " (HERE) Multiplying dt by init_shrink: dt = "
 		   << returnDt << '\n';
     return returnDt;
 }
@@ -2502,15 +2551,20 @@ NavierStokesBase::post_init_estDT (Real&        dt_init,
     dt_init = 1.0e+100;
 
     int  n_factor;
+    //    std::cout << "  checkpoint 0 \n";
     for (int k = 0; k <= finest_level; k++)
     {
+      //      std::cout << "  checkpoint " << k << "a... \n";
         nc_save[k] = parent->nCycle(k);
+	//      std::cout << "  checkpoint " << k << "b... \n";
         dt_save[k] = getLevel(k).initialTimeStep();
+	//      std::cout << "  checkpoint " << k << "c... \n";
 
         n_factor   = 1;
         for (int m = finest_level; m > k; m--)
              n_factor *= parent->nCycle(m);
         dt_init    = std::min( dt_init, dt_save[k]/((Real) n_factor) );
+	//      std::cout << "  checkpoint " << k << "d... \n";
     }
 
     Vector<Real> dt_level(finest_level+1,dt_init);
@@ -2998,6 +3052,14 @@ NavierStokesBase::scalar_advection_update (Real dt,
 {
         FArrayBox  tforces;
 
+
+               const BoxArray& ba = S_old.boxArray();
+	       const DistributionMapping& dm = S_old.DistributionMap();
+	       int ncomp = S_old.nComp();
+	       int ngrow = S_old.nGrow();
+	       MultiFab rhs(ba,dm,ncomp,ngrow);
+	       rhs.setVal(0.0);
+
         for (MFIter Rho_mfi(rho_halftime,true); Rho_mfi.isValid(); ++Rho_mfi)
         {
             const Box& bx = Rho_mfi.tilebox();
@@ -3006,7 +3068,11 @@ NavierStokesBase::scalar_advection_update (Real dt,
             {
                // Need to do some funky half-time stuff
                if (getForceVerbose)
-                  amrex::Print() << "---" << '\n' << "E - scalar advection update (half time):" << '\n';
+                  amrex::Print() << "----------------------------------------\n" 
+                                 << "E - scalar advection update (half time):\n"
+                                 << "----------------------------------------\n";
+	       //                                 << "(0)...\n";
+
 
                // Average the mac face velocities to get cell centred velocities
                const Real halftime = 0.5*(state[State_Type].curTime()+state[State_Type].prevTime());
@@ -3027,8 +3093,18 @@ NavierStokesBase::scalar_advection_update (Real dt,
                Scal.plus<RunOn::Host>(S_new[Rho_mfi],bx,Density,0,NUM_SCALARS);
                Scal.mult<RunOn::Host>(0.5,bx);
 
-               if (getForceVerbose) amrex::Print() << "Calling getForce..." << '\n';
-                  getForce(tforces,bx,0,sigma,1,halftime,Vel,Scal,0);
+#ifdef AMREX_PARTICLES
+	    theNSPC()->getTemp(rhs[Rho_mfi],Vel,Scal,visc_coef[0],ngrow,level);
+	    std::cout << " *** get forcing (temp) okay\n";
+            //rhs.SumBoundary(Geom().periodicity()); 
+	    rhs.SumBoundary(0, ncomp, IntVect(1), Geom().periodicity()); 
+#endif
+
+	       //                  getForce(tforces,bx,0,sigma,1,halftime,Vel,Scal,0);
+	       getForce(tforces,bx,0,sigma,1,halftime,Vel,Scal,rhs[Rho_mfi],0,level);
+	       rhs.SumBoundary(Geom().periodicity());
+	       //rhs.FillBoundary(Geom().periodicity());
+               if (getForceVerbose) std::cout << "...and done\n";            
 
                godunov->Add_aofs_tf(S_old[Rho_mfi],S_new[Rho_mfi],sigma,1,
                                     Aofs[Rho_mfi],sigma,tforces,0,bx,dt);
@@ -3635,6 +3711,14 @@ NavierStokesBase::velocity_advection (Real dt)
 #pragma omp parallel
 #endif
         {
+
+               const BoxArray& ba = Umf.boxArray();
+	       const DistributionMapping& dm = Umf.DistributionMap();
+	       int ncomp = Umf.nComp();
+	       int ngrow = Umf.nGrow();
+	       MultiFab rhs(ba,dm,ncomp,ngrow);
+	       rhs.setVal(0.0);
+
             Vector<int> bndry[AMREX_SPACEDIM];
             FArrayBox tforces;
             FArrayBox S;
@@ -3647,12 +3731,25 @@ NavierStokesBase::velocity_advection (Real dt)
 
                 if (getForceVerbose)
                 {
-                    amrex::Print() << "---" << '\n'
-                                   << "B - velocity advection:" << '\n'
-                                   << "Calling getForce..." << '\n';
+                    amrex::Print() << "-----------------------\n"
+                                   << "B - velocity advection:\n"
+                                   << "-----------------------\n";
+		    //                                   << "Calling getForce...(1)\n";
                 }
 
-                getForce(tforces,bx,1,Xvel,BL_SPACEDIM,prev_time,Umf[U_mfi],Smf[U_mfi],0);
+
+#ifdef AMREX_PARTICLES
+	    theNSPC()->getDrag(rhs[U_mfi],Umf[U_mfi],Smf[U_mfi],visc_coef[0],1,level);
+	    std::cout << " *** get forcing okay\n";
+            //rhs.SumBoundary(Geom().periodicity()); 
+	    rhs.SumBoundary(0, ncomp, IntVect(1), Geom().periodicity()); 
+#endif
+
+
+                getForce(tforces,bx,1,Xvel,BL_SPACEDIM,prev_time,Umf[U_mfi],Smf[U_mfi],rhs[U_mfi],0,level);
+		rhs.SumBoundary(Geom().periodicity());
+		rhs.FillBoundary(Geom().periodicity());
+                if (getForceVerbose) std::cout << "...and done\n";            
 
                 godunov->Sum_tf_gp_visc(tforces,visc_terms[U_mfi],Gp[U_mfi],rho_ptime[U_mfi]);
 
@@ -3853,6 +3950,14 @@ NavierStokesBase::velocity_advection_update (Real dt)
 {
 
     FArrayBox  tforces, S;
+               const BoxArray& ba = U_new.boxArray();
+	       const DistributionMapping& dm = U_new.DistributionMap();
+	       int ncomp = U_new.nComp();
+	       int ngrow = U_new.nGrow();
+	       MultiFab rhs(ba,dm,ncomp,ngrow);
+	       rhs.setVal(0.0);
+
+
     for (MFIter Rhohalf_mfi(halftime,true); Rhohalf_mfi.isValid(); ++Rhohalf_mfi)
     {
         const int i = Rhohalf_mfi.index();
@@ -3862,7 +3967,11 @@ NavierStokesBase::velocity_advection_update (Real dt)
         // Need to do some funky half-time stuff.
         //
         if (getForceVerbose)
-           amrex::Print() << "---" << '\n' << "F - velocity advection update (half time):" << '\n';
+           amrex::Print() << "------------------------------------------\n" 
+                          << "F - velocity advection update (half time):\n"
+        	          << "------------------------------------------\n";
+	//                          << "... ("<< "0" <<")\n";
+
         //
         // Average the mac face velocities to get cell centred velocities.
         //
@@ -3874,6 +3983,8 @@ NavierStokesBase::velocity_advection_update (Real dt)
                                  BL_TO_FORTRAN_ANYD(u_mac[2][Rhohalf_mfi]),
 #endif
                                  &getForceVerbose);
+
+
         //
         // Average the new and old time to get Crank-Nicholson half time approximation.
         //
@@ -3882,9 +3993,19 @@ NavierStokesBase::velocity_advection_update (Real dt)
         Scal.plus<RunOn::Host>(U_new[Rhohalf_mfi],bx,Density,0,NUM_SCALARS);
         Scal.mult<RunOn::Host>(0.5,bx,0,NUM_SCALARS);
 
-        if (getForceVerbose) amrex::Print() << "Calling getForce..." << '\n';
+#ifdef AMREX_PARTICLES
+	    theNSPC()->getDrag(rhs[Rhohalf_mfi],Vel,Scal,visc_coef[0],1,level);
+	    std::cout << " *** get forcing okay\n";
+            //rhs.SumBoundary(Geom().periodicity()); 
+	    rhs.SumBoundary(0, ncomp, IntVect(1), Geom().periodicity()); 
+#endif
+
+        if (getForceVerbose) amrex::Print() << "Calling getForce (NSbase)..." << '\n';
         const Real half_time = 0.5*(state[State_Type].prevTime()+state[State_Type].curTime());
-        getForce(tforces,bx,0,Xvel,BL_SPACEDIM,half_time,Vel,Scal,0);
+        getForce(tforces,bx,0,Xvel,BL_SPACEDIM,half_time,Vel,Scal,rhs[Rhohalf_mfi],0,level);
+	rhs.SumBoundary(Geom().periodicity());
+	//rhs.FillBoundary(Geom().periodicity());
+        if (getForceVerbose) std::cout << "...and done\n";            
 
         //
         // Do following only at initial iteration--per JBB.
@@ -3974,6 +4095,14 @@ NavierStokesBase::initial_velocity_diffusion_update (Real dt)
 #pragma omp parallel if (Gpu::notInLaunchRegion())
 #endif
         {
+
+               const BoxArray& ba = U_new.boxArray();
+	       const DistributionMapping& dm = U_new.DistributionMap();
+	       int ncomp = U_new.nComp();
+	       int ngrow = U_new.nGrow();
+	       MultiFab rhs(ba,dm,ncomp,ngrow);
+	       rhs.setVal(0.0);
+
             FArrayBox tforces_fab;
             for (MFIter mfi(tforces,TilingIfNotGPU()); mfi.isValid(); ++mfi)
             {
@@ -3981,12 +4110,28 @@ NavierStokesBase::initial_velocity_diffusion_update (Real dt)
 
                 if (getForceVerbose)
                 {
-                    amrex::Print() << "---" << '\n'
-                                   << "G - initial velocity diffusion update:" << '\n'
-                                   << "Calling getForce..." << '\n';
+                    amrex::Print() << "--------------------------------------\n"
+                                   << "G - initial velocity diffusion update:\n"
+                                   << "--------------------------------------\n";
+		    //                                   << "(" << ngrow << ") (getForce commented for now)...\n";
                 }
 
-                getForce(tforces_fab,bx,0,Xvel,AMREX_SPACEDIM,prev_time,U_old[mfi],U_old[mfi],Density);
+
+#ifdef AMREX_PARTICLES
+		/*
+	    theNSPC()->getDrag(rhs[mfi],U_olf[mfi],U_old[mfi],visc_coef[0],1,level);
+	    std::cout << " *** get forcing okay\n";
+            //rhs.SumBoundary(Geom().periodicity()); 
+	    rhs.SumBoundary(0, ncomp, IntVect(1), Geom().periodicity()); 
+		*/
+#endif
+
+		// just comment for now
+                getForce(tforces_fab,bx,ngrow,Xvel,AMREX_SPACEDIM,prev_time,U_old[mfi],U_old[mfi],rhs[mfi],Density,level);
+		rhs.SumBoundary(Geom().periodicity());
+		//rhs.FillBoundary(Geom().periodicity());
+                if (getForceVerbose) std::cout << "...and done\n";            
+
                 tforces[mfi].copy<RunOn::Host>(tforces_fab,bx,0,bx,0,AMREX_SPACEDIM);
             }
         }
@@ -4502,23 +4647,27 @@ NavierStokesBase::read_particle_params ()
     // Used in post_restart() to write out the file of particles.
     //
     ppp.query("particle_output_file", particle_output_file);
-    // swh
-    ppp.query("particle_Rep", particle_Rep);
-    ppp.query("particle_tau", particle_tau);
 
-    ppp.query("particle_extra_reals", particle_extra_reals);
-    ppp.query("particle_extra_ints", particle_extra_ints);
+    // swh
+    //    ppp.query("particle_Rep", particle_Rep);
+    //    ppp.query("particle_tau", particle_tau);
+    //    ppp.query("particle_extra_reals", particle_extra_reals);
+    //    ppp.query("particle_extra_ints", particle_extra_ints);
 
 }
 
 void
 NavierStokesBase::initParticleData ()
 {
+  //    std::cout << " ***IN initParticleData...\n";
     if (level == 0)
     {
         if (NSPC == 0)
         {
-            NSPC = new AmrTracerParticleContainer(parent);
+	  //            NSPC = new AmrTracerParticleContainer(parent);
+            NSPC = new AmrActiveParticleContainer(parent);
+	  //            NSPC = new AmrActiveParticleContainer(parent);
+	    //          std::cout << "    NSPC initialized...\n";
         }
 
         NSPC->SetVerbose(pverbose);
@@ -4527,6 +4676,7 @@ NavierStokesBase::initParticleData ()
         {
 	  //	  NSPC->InitFromAsciiFile(particle_init_file,0); // zero here should be number of extra reals beyond position (AMReX_ParticleInit.H)
 	  NSPC->InitFromAsciiFile(particle_init_file,particle_extra_reals);
+	  //          std::cout << "    NSPC inti from ASCII file...\n";
         }
     }
 }
@@ -4538,7 +4688,9 @@ NavierStokesBase::post_restart_particle ()
     {
         BL_ASSERT(NSPC == 0);
 
-        NSPC = new AmrTracerParticleContainer(parent);
+	//        NSPC = new AmrTracerParticleContainer(parent);
+        NSPC = new AmrActiveParticleContainer(parent);
+	//        NSPC = new AmrActiveParticleContainer(parent);
 
         NSPC->SetVerbose(pverbose);
         //

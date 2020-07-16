@@ -1,0 +1,5 @@
+CEXE_headers += activeParticles.H
+CEXE_sources += activeParticles.cpp
+
+FEXE_headers += drag_F.H probdata.H
+F90EXE_sources += drag.F90 PROB_$(DIM)D.F90 
