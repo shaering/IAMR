@@ -721,12 +721,23 @@ MacProj::mac_sync_compute (int                   level,
         FArrayBox tforces, tvelforces, U;
         FArrayBox flux[BL_SPACEDIM], Rho;
 
+
+	// From an already defined MultiFab
+	const BoxArray& ba = Smf.boxArray();
+	const DistributionMapping& dm = Smf.DistributionMap();
+	int ncomp = Smf.nComp();
+	int ngrow = Smf.nGrow();
+	MultiFab rhs(ba,dm,ncomp,ngrow);  // new MF with the same ncomp and ngrow                                                                          
+	rhs.setVal(0.0);
+
         for (MFIter Smfi(Smf,true); Smfi.isValid(); ++Smfi)
         {
             const int i     = Smfi.index();
             FArrayBox& S    = Smf[Smfi];
             FArrayBox& divu = (*divu_fp)[Smfi];
             const Box& bx = Smfi.tilebox();
+	    //
+	    //FArrayBox& rfab = rhs[Smfi];
             //
             // Step 1: compute ucorr = grad(phi)/rhonph -- Now done in mac_sync_solve()
             //
@@ -741,7 +752,10 @@ MacProj::mac_sync_compute (int                   level,
             //
             Rho.copy<RunOn::Host>(S,Density,0,1);
 
-            ns_level.getForce(tforces,bx,1,0,NUM_STATE,prev_time,Smf[Smfi],Smf[Smfi],Density);
+	    std::cout << " getForce call (MacProj 1) \n";
+            ns_level.getForce(tforces,bx,1,0,NUM_STATE,prev_time,Smf[Smfi],Smf[Smfi],rhs[Smfi],Density,level);
+	    //	    rhs.SumBoundary(geom().periodicity());
+	    std::cout << " ... and done \n";
 
             //
             // Compute total forcing terms.
@@ -751,7 +765,10 @@ MacProj::mac_sync_compute (int                   level,
                                       scal_visc_terms[Smfi], 0, divu, 0, Rho, 0, 1);
             if (use_forces_in_trans)
             {
-                ns_level.getForce(tvelforces,bx,1,Xvel,BL_SPACEDIM,prev_time,Smf[Smfi],Smf[Smfi],Density);
+  	      std::cout << "getForce call (MacProj 2) \n";
+	      ns_level.getForce(tvelforces,bx,1,Xvel,BL_SPACEDIM,prev_time,Smf[Smfi],Smf[Smfi],rhs[Smfi],Density,level);
+	      // 	      rhs.SumBoundary(geom().periodicity());
+  	      std::cout << " ... and done \n";
                 godunov->Sum_tf_gp_visc(tvelforces,0,vel_visc_terms[Smfi],0,Gp[Smfi],0,Rho,0);
             }
             //
@@ -1307,7 +1324,7 @@ MacProj::test_umac_periodic (int       level,
 
     mfcd.CollectData();
 
-    for (int i = 0; i < pirm.size(); i++)
+    for (int i = 0; i < pirm.size(); i++) // WTF IS THIS?
     {
         const int dim = pirm[i].m_dim;
 
@@ -1323,12 +1340,16 @@ MacProj::test_umac_periodic (int       level,
 
         const Real max_norm = diff.norm<RunOn::Host>(0);
 
-        if (max_norm > umac_periodic_test_Tol )
+        if (max_norm > umac_periodic_test_Tol ) // Segfault here
         {
-            amrex::Print() << "dir = "         << dim
-                           << ", diff norm = " << max_norm
-                           << " for region: "  << pirm[i].m_dstBox << std::endl;
-            amrex::Error("Periodic bust in u_mac");
+	  amrex::Print() << "\n";
+	  amrex::Print() << "Periodic bust in u_mac \n";
+	  amrex::Print() << "====================== \n";
+	  amrex::Print() << "dir = "         << dim << "\n"
+			 << "diff norm = " << max_norm << "\n"
+                         << "tol = " << umac_periodic_test_Tol << "\n"
+                         << "for region: "  << pirm[i].m_dstBox << std::endl;
+          amrex::Error("Periodic bust in u_mac");
         }
     }
 }
