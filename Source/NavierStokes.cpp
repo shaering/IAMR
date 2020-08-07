@@ -447,7 +447,7 @@ NavierStokes::advance (Real time,
       
       //      theNSPC()->myAdvectWithUmac(u_mac, level, dt, rho, temp, visc_coef[0]); // PARTICLES (particles) ADVANCED HERE
       theNSPC()->myAdvectWithUmac(u_mac, level, dt, rho, temp, visc_coef[0]); 
-      std::cout << "myAdvectWithUmac okay... \n";
+      //      std::cout << "myAdvectWithUmac okay... \n";
       
     }
 #endif
@@ -617,14 +617,13 @@ NavierStokes::predict_velocity (Real  dt, int level)
             if (getForceVerbose) {
                 Print() << "--------------------- \n "
                         << "A - Predict velocity: \n" 
-                        << "--------------------- \n "
-		        << "("<<"1"<<")...\n";
+                        << "--------------------- \n ";
             }
 
 
 #ifdef AMREX_PARTICLES
 	    theNSPC()->getDrag(rfab,Ufab,Sfab,visc_coef[0],1,level);
-	    std::cout << " *** get forcing okay\n";
+	    //	    std::cout << " *** get forcing okay\n";
 
             /* // may be an issue with uncommented sumbndry with different levels
 	    if (level > 0) {
@@ -643,15 +642,16 @@ NavierStokes::predict_velocity (Real  dt, int level)
 
             // Compute the total forcing (3:ngrow, 4:scomp, 5: ncomp) 4=0 / 5=3 => vel only 
             getForce(tforces,bx,1,Xvel,BL_SPACEDIM,prev_time,Ufab,Sfab,rfab,0,level);  // EDGE VEL
+	    rhs.SumBoundary(Geom().periodicity()); 
 
 	    // (int scomp, int ncomp, IntVect const& nghost, const Periodicity& period), sensitive to cell center and ngrow of MF
 	    // if only one arg (0, n_comp, IntVect(0), period);
             //rhs.SumBoundary(Geom().periodicity()); 
 	    //rhs.FillBoundary(Geom().periodicity());
 
-            if (getForceVerbose) {
-                Print() << "                                                    ... and done\n";
-            }
+	    //            if (getForceVerbose) {
+	    //                Print() << "                                                    ... and done\n";
+	    //            }
 
             godunov->Sum_tf_gp_visc(tforces,0,visc_terms[U_mfi],0,Gp[U_mfi],0,rho_ptime[U_mfi],0);
             //godunov->Sum_tf_gp_visc(rfab,0,visc_terms[U_mfi],0,Gp[U_mfi],0,rho_ptime[U_mfi],0);
@@ -816,7 +816,7 @@ NavierStokes::scalar_advection (Real dt,
 
 #ifdef AMREX_PARTICLES
 	    theNSPC()->getTemp(rhs[S_mfi],Umf[S_mfi],Smf[S_mfi],visc_coef[0],ngrow,level);
-	    std::cout << " *** get forcing (temp) okay\n";
+	    //	    std::cout << " *** get forcing (temp) okay\n";
             //rhs.SumBoundary(Geom().periodicity()); 
 	    rhs.SumBoundary(0, ncomp, IntVect(1), Geom().periodicity()); 
 #endif
@@ -825,8 +825,7 @@ NavierStokes::scalar_advection (Real dt,
                 if (getForceVerbose) {
                     Print() << "---------------------\n" 
                             << "C - Scalar advection:\n"
-                            << "---------------------\n"
-                            << " (1)..." << '\n';
+                            << "---------------------\n";
                 }
                 // Compute the total forcing (3:ngrow, 4:scomp, 5: ncomp) 4=3 / 5=n(1) => scalars(density only) 
 		//                getForce(tforces,bx,nGrowF,fscalar,num_scalars,prev_time,Umf[S_mfi],Smf[S_mfi],rhs[S_mfi],0,level); // arbitrary source terms?
@@ -834,9 +833,9 @@ NavierStokes::scalar_advection (Real dt,
   	        rhs.SumBoundary(Geom().periodicity()); 
   	        //rhs.FillBoundary(Geom().periodicity());
 
-                if (getForceVerbose) {
-                   Print() << "                        ... and done\n";
-	        }
+		//                if (getForceVerbose) {
+		//                   Print() << "                        ... and done\n";
+		//	        }
 
                 for (int d=0; d<BL_SPACEDIM; ++d)
                 {

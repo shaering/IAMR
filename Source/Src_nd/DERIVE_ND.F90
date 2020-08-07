@@ -652,10 +652,10 @@ contains
 
    end subroutine dermgvort
 
+   
 !=========================================================
 !  Compute the gradient-based cell Reynolds number (OLD)
 !=========================================================
-
    subroutine derregrad_old (e,   e_lo, e_hi, nv, &
                          dat, d_lo, d_hi, ncomp, &
                          lo, hi, domlo, domhi, delta, xlo, time, dt, bc, &
@@ -665,7 +665,7 @@ contains
 
       implicit none
 
-!  In/Out
+      !  In/Out
       integer, intent(in) :: lo(3), hi(3)
       integer, intent(in) :: e_lo(3), e_hi(3), nv
       integer, intent(in) :: d_lo(3), d_hi(3), ncomp
@@ -677,7 +677,7 @@ contains
       REAL_T, dimension(e_lo(1):e_hi(1),e_lo(2):e_hi(2),e_lo(3):e_hi(3)) :: r0
       integer, intent(in) :: level, grid_no
 
-!  Local
+      !  Local
       REAL_T :: ux, uy, uz, vx, vy, vz, wx, wy, wz, dx, dy, dz
       REAL_T :: uxcen, uycen, uzcen, uxlo, uxhi, uylo, uyhi, uzlo, uzhi
       REAL_T :: vxcen, vycen, vzcen, vxlo, vxhi, vylo, vyhi, vzlo, vzhi
@@ -1550,6 +1550,7 @@ contains
                wz = wzcen(i,j,k)
 #endif
 
+               ! MUST FIX CONTAINER
 !               if(time .LE. dt) then
                   e(i,j,k,1) = r0(i,j,k)
 !               else

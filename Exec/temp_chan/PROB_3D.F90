@@ -370,23 +370,25 @@ contains
                !print*, "MAKEFORCE//rho: ", rho
                !print*, "MAKEFORCE//temp: ", temp
 
-          ! this is terrible
-          if(scomp.eq.0) then ! velocity
+               ! this is terrible
+               if(scomp.eq.0) then ! velocity
 
-             ! basic forcing term 
-             force(i,j,k,0) = rho * Fx !0.d0 ! pass a read-in generic Fi
-             force(i,j,k,1) = rho * Fy !0.d0
-             force(i,j,k,2) = rho * Fz !0.d0
+                 ! basic forcing term 
+                 force(i,j,k,0) = rho * Fx !0.d0 ! pass a read-in generic Fi
+                 force(i,j,k,1) = rho * Fy !0.d0
+                 force(i,j,k,2) = rho * Fz !0.d0
 
-             ! Boussinesq term, hardcode to y-dir (1) fix for grav vector later
-             force(i,j,k,1) = force(i,j,k,1) + rho * gravity * alpha * (temp-Tref)
+                 ! Boussinesq term, hardcode to y-dir (1) fix for grav vector later
+                 force(i,j,k,1) = force(i,j,k,1) + rho * gravity * alpha * (temp-Tref)
 
 !             if(abs(rhs(i,j,k,0)).gt.0.0d0 .OR. abs(rhs(i,j,k,2)).gt.0.0d0 .OR. abs(rhs(i,j,k,2)).gt.0.0d0) then 
 !                print*, " >>> POINT: ", i,j,k
-!                print*, "     RHS: ", rhs(i,j,k,0),rhs(i,j,k,1),rhs(i,j,k,2)
-                force(i,j,k,0) = force(i,j,k,0) + rho * rhs(i,j,k,0)
-                force(i,j,k,1) = force(i,j,k,1) + rho * rhs(i,j,k,1)
-                force(i,j,k,2) = force(i,j,k,2) + rho * rhs(i,j,k,2)
+                 !                print*, "     RHS: ", rhs(i,j,k,0),rhs(i,j,k,1),rhs(i,j,k,2)
+                 
+                 force(i,j,k,0) = force(i,j,k,0) + rho * rhs(i,j,k,0)
+                 force(i,j,k,1) = force(i,j,k,1) + rho * rhs(i,j,k,1)
+                 force(i,j,k,2) = force(i,j,k,2) + rho * rhs(i,j,k,2)
+                 
 !             endif
 
              ! swap back to use sum boundary?

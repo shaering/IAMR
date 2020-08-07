@@ -1050,6 +1050,7 @@ NavierStokesBase::computeNewDt (int                   finest_level,
 
     if (fixed_dt <= 0.0)
     {
+      //       std::cout << "  checkpoint 2 \n";
        if (post_regrid_flag == 1)
        {
           //
@@ -1059,12 +1060,14 @@ NavierStokesBase::computeNewDt (int                   finest_level,
           {
               dt_min[i] = std::min(dt_min[i],dt_level[i]);
           }
+	  //          std::cout << "  checkpoint 2a \n";	  
        }
        else
        {
           //
           // Limit dt's by change_max * old dt
           //
+	 //          std::cout << "  checkpoint 2b \n";
           for (i = 0; i <= finest_level; i++)
           {
 	    if (verbose)
@@ -1086,7 +1089,7 @@ NavierStokesBase::computeNewDt (int                   finest_level,
     //
     // Find the minimum over all levels
     //
-    //    std::cout << "  checkpoint 2 \n";
+    //    std::cout << "  checkpoint 2c \n";
     for (i = 0; i <= finest_level; i++)
     {
         n_factor *= n_cycle[i];
@@ -1448,11 +1451,11 @@ NavierStokesBase::estTimeStep ()
             const auto& bx = mfi.tilebox();
             const auto  cur_time = state[State_Type].curTime();
 
-            if (getForceVerbose)
+            if (getForceVerbose) {
                 amrex::Print() << "------------------" << '\n'
                                << "H - est Time Step:" << '\n'
                                << "------------------" << '\n';
-	    //                               << " (commented out tforce portion for now)..." << '\n';
+	    }
 
 
 
@@ -1565,8 +1568,9 @@ NavierStokesBase::estTimeStep ()
 	  amrex::Print() << '\n';
 	}
 	Print()<<"estimated timestep: dt = "<<estdt<<std::endl;
+	//	int MPI_BARRIER(MPI_COMM_WORLD);
     }
-
+    //    std::cout<< " ...I AM HERE... \n ";
     return estdt;
 }
 
@@ -3067,12 +3071,11 @@ NavierStokesBase::scalar_advection_update (Real dt,
             for (int sigma = sComp; sigma <= last_scalar; sigma++)
             {
                // Need to do some funky half-time stuff
-               if (getForceVerbose)
+	      if (getForceVerbose) {
                   amrex::Print() << "----------------------------------------\n" 
                                  << "E - scalar advection update (half time):\n"
                                  << "----------------------------------------\n";
-	       //                                 << "(0)...\n";
-
+	      }
 
                // Average the mac face velocities to get cell centred velocities
                const Real halftime = 0.5*(state[State_Type].curTime()+state[State_Type].prevTime());
@@ -3095,7 +3098,7 @@ NavierStokesBase::scalar_advection_update (Real dt,
 
 #ifdef AMREX_PARTICLES
 	    theNSPC()->getTemp(rhs[Rho_mfi],Vel,Scal,visc_coef[0],ngrow,level);
-	    std::cout << " *** get forcing (temp) okay\n";
+	    //	    std::cout << " *** get forcing (temp) okay\n";
             //rhs.SumBoundary(Geom().periodicity()); 
 	    rhs.SumBoundary(0, ncomp, IntVect(1), Geom().periodicity()); 
 #endif
@@ -3734,13 +3737,12 @@ NavierStokesBase::velocity_advection (Real dt)
                     amrex::Print() << "-----------------------\n"
                                    << "B - velocity advection:\n"
                                    << "-----------------------\n";
-		    //                                   << "Calling getForce...(1)\n";
                 }
 
 
 #ifdef AMREX_PARTICLES
 	    theNSPC()->getDrag(rhs[U_mfi],Umf[U_mfi],Smf[U_mfi],visc_coef[0],1,level);
-	    std::cout << " *** get forcing okay\n";
+	    //	    std::cout << " *** get forcing okay\n";
             //rhs.SumBoundary(Geom().periodicity()); 
 	    rhs.SumBoundary(0, ncomp, IntVect(1), Geom().periodicity()); 
 #endif
@@ -3748,7 +3750,7 @@ NavierStokesBase::velocity_advection (Real dt)
 
                 getForce(tforces,bx,1,Xvel,BL_SPACEDIM,prev_time,Umf[U_mfi],Smf[U_mfi],rhs[U_mfi],0,level);
 		rhs.SumBoundary(Geom().periodicity());
-		rhs.FillBoundary(Geom().periodicity());
+		//rhs.FillBoundary(Geom().periodicity());
                 if (getForceVerbose) std::cout << "...and done\n";            
 
                 godunov->Sum_tf_gp_visc(tforces,visc_terms[U_mfi],Gp[U_mfi],rho_ptime[U_mfi]);
@@ -3995,7 +3997,7 @@ NavierStokesBase::velocity_advection_update (Real dt)
 
 #ifdef AMREX_PARTICLES
 	    theNSPC()->getDrag(rhs[Rhohalf_mfi],Vel,Scal,visc_coef[0],1,level);
-	    std::cout << " *** get forcing okay\n";
+	    //	    std::cout << " *** get forcing okay\n";
             //rhs.SumBoundary(Geom().periodicity()); 
 	    rhs.SumBoundary(0, ncomp, IntVect(1), Geom().periodicity()); 
 #endif
@@ -4113,7 +4115,6 @@ NavierStokesBase::initial_velocity_diffusion_update (Real dt)
                     amrex::Print() << "--------------------------------------\n"
                                    << "G - initial velocity diffusion update:\n"
                                    << "--------------------------------------\n";
-		    //                                   << "(" << ngrow << ") (getForce commented for now)...\n";
                 }
 
 

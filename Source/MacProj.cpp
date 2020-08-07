@@ -752,10 +752,10 @@ MacProj::mac_sync_compute (int                   level,
             //
             Rho.copy<RunOn::Host>(S,Density,0,1);
 
-	    std::cout << " getForce call (MacProj 1) \n";
+	    //	    std::cout << " getForce call (MacProj 1) \n";
             ns_level.getForce(tforces,bx,1,0,NUM_STATE,prev_time,Smf[Smfi],Smf[Smfi],rhs[Smfi],Density,level);
 	    //	    rhs.SumBoundary(geom().periodicity());
-	    std::cout << " ... and done \n";
+	    //	    std::cout << " ... and done \n";
 
             //
             // Compute total forcing terms.
@@ -765,10 +765,10 @@ MacProj::mac_sync_compute (int                   level,
                                       scal_visc_terms[Smfi], 0, divu, 0, Rho, 0, 1);
             if (use_forces_in_trans)
             {
-  	      std::cout << "getForce call (MacProj 2) \n";
+	      //  	      std::cout << "getForce call (MacProj 2) \n";
 	      ns_level.getForce(tvelforces,bx,1,Xvel,BL_SPACEDIM,prev_time,Smf[Smfi],Smf[Smfi],rhs[Smfi],Density,level);
 	      // 	      rhs.SumBoundary(geom().periodicity());
-  	      std::cout << " ... and done \n";
+	      //  	      std::cout << " ... and done \n";
                 godunov->Sum_tf_gp_visc(tvelforces,0,vel_visc_terms[Smfi],0,Gp[Smfi],0,Rho,0);
             }
             //
