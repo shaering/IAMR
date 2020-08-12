@@ -1473,7 +1473,7 @@ NavierStokesBase::estTimeStep ()
 	    //getForce(tforces_fab,bx,n_grow,Xvel,AMREX_SPACEDIM,cur_time,U_new[mfi],U_new[mfi],Density);
 	    // cut out for now
             getForce(tforces_fab,bx,0,Xvel,AMREX_SPACEDIM,cur_time,U_new[mfi],U_new[mfi],rhs[mfi],Density,level);
-	    rhs.SumBoundary(Geom().periodicity());
+	    //no necessary? rhs.SumBoundary(Geom().periodicity());
 	    //rhs.FillBoundary(Geom().periodicity());
             if (getForceVerbose) std::cout << "...and done\n";            
 	    //	    getForce(tforces,bx,nGrowF,fscalar,num_scalars,prev_time,Umf[S_mfi],Smf[S_mfi],rhs[S_mfi],0,level)
@@ -3056,13 +3056,41 @@ NavierStokesBase::scalar_advection_update (Real dt,
 {
         FArrayBox  tforces;
 
+	const BoxArray& ba = S_old.boxArray();
+        const DistributionMapping& dm = S_old.DistributionMap();
+	int ncomp = S_old.nComp();
+	int ngrow = S_old.nGrow();
+	MultiFab rhs(ba,dm,ncomp,ngrow);
+	rhs.setVal(0.0);
 
-               const BoxArray& ba = S_old.boxArray();
-	       const DistributionMapping& dm = S_old.DistributionMap();
-	       int ncomp = S_old.nComp();
-	       int ngrow = S_old.nGrow();
-	       MultiFab rhs(ba,dm,ncomp,ngrow);
-	       rhs.setVal(0.0);
+#ifdef AMREX_PARTICLES
+	for (MFIter Rho_mfi(rho_halftime,true); Rho_mfi.isValid(); ++Rho_mfi)
+        {
+            const Box& bx = Rho_mfi.tilebox();
+
+	    // Average the mac face velocities to get cell centred velocities
+            const Real halftime = 0.5*(state[State_Type].curTime()+state[State_Type].prevTime());
+            FArrayBox Vel(amrex::grow(bx,0),AMREX_SPACEDIM);
+            FORT_AVERAGE_EDGE_STATES(BL_TO_FORTRAN_ANYD(Vel),
+                                     BL_TO_FORTRAN_ANYD(u_mac[0][Rho_mfi]),
+                                     BL_TO_FORTRAN_ANYD(u_mac[1][Rho_mfi]),
+#if (AMREX_SPACEDIM==3)
+                                     BL_TO_FORTRAN_ANYD(u_mac[2][Rho_mfi]),
+#endif
+                                     &getForceVerbose);
+
+            // Average the new and old time to get Crank-Nicholson half time approximation.
+            FArrayBox Scal(amrex::grow(bx,0),NUM_SCALARS);
+            Scal.copy<RunOn::Host>(S_old[Rho_mfi],bx,Density,bx,0,NUM_SCALARS);
+            Scal.plus<RunOn::Host>(S_new[Rho_mfi],bx,Density,0,NUM_SCALARS);
+            Scal.mult<RunOn::Host>(0.5,bx);
+
+	    theNSPC()->getTemp(rhs[Rho_mfi],Vel,Scal,visc_coef[0],ngrow,level);
+	}
+#endif
+	rhs.SumBoundary(0, ncomp, IntVect(1), Geom().periodicity());
+
+	
 
         for (MFIter Rho_mfi(rho_halftime,true); Rho_mfi.isValid(); ++Rho_mfi)
         {
@@ -3096,16 +3124,15 @@ NavierStokesBase::scalar_advection_update (Real dt,
                Scal.plus<RunOn::Host>(S_new[Rho_mfi],bx,Density,0,NUM_SCALARS);
                Scal.mult<RunOn::Host>(0.5,bx);
 
-#ifdef AMREX_PARTICLES
-	    theNSPC()->getTemp(rhs[Rho_mfi],Vel,Scal,visc_coef[0],ngrow,level);
-	    //	    std::cout << " *** get forcing (temp) okay\n";
-            //rhs.SumBoundary(Geom().periodicity()); 
-	    rhs.SumBoundary(0, ncomp, IntVect(1), Geom().periodicity()); 
-#endif
+	       // moved up
+	       //#ifdef AMREX_PARTICLES
+	       //	    theNSPC()->getTemp(rhs[Rho_mfi],Vel,Scal,visc_coef[0],ngrow,level);
+	       //	    rhs.SumBoundary(0, ncomp, IntVect(1), Geom().periodicity()); 
+	       //#endif
 
 	       //                  getForce(tforces,bx,0,sigma,1,halftime,Vel,Scal,0);
 	       getForce(tforces,bx,0,sigma,1,halftime,Vel,Scal,rhs[Rho_mfi],0,level);
-	       rhs.SumBoundary(Geom().periodicity());
+	       // no necessary?  rhs.SumBoundary(Geom().periodicity());
 	       //rhs.FillBoundary(Geom().periodicity());
                if (getForceVerbose) std::cout << "...and done\n";            
 
@@ -3715,13 +3742,24 @@ NavierStokesBase::velocity_advection (Real dt)
 #endif
         {
 
-               const BoxArray& ba = Umf.boxArray();
-	       const DistributionMapping& dm = Umf.DistributionMap();
-	       int ncomp = Umf.nComp();
-	       int ngrow = Umf.nGrow();
-	       MultiFab rhs(ba,dm,ncomp,ngrow);
-	       rhs.setVal(0.0);
+           const BoxArray& ba = Umf.boxArray();
+           const DistributionMapping& dm = Umf.DistributionMap();
+	   int ncomp = Umf.nComp();
+	   int ngrow = Umf.nGrow();
+	   MultiFab rhs(ba,dm,ncomp,ngrow);
+	   rhs.setVal(0.0);
 
+#ifdef AMREX_PARTICLES	   
+           for (MFIter U_mfi(Umf,true); U_mfi.isValid(); ++U_mfi)
+           {
+  	      //               const Box& bx=U_mfi.tilebox();
+	      theNSPC()->getDrag(rhs[U_mfi],Umf[U_mfi],Smf[U_mfi],visc_coef[0],1,level);
+#endif
+	   }
+	   rhs.SumBoundary(0, ncomp, IntVect(1), Geom().periodicity()); 
+	   
+
+	   
             Vector<int> bndry[AMREX_SPACEDIM];
             FArrayBox tforces;
             FArrayBox S;
@@ -3739,17 +3777,15 @@ NavierStokesBase::velocity_advection (Real dt)
                                    << "-----------------------\n";
                 }
 
-
-#ifdef AMREX_PARTICLES
-	    theNSPC()->getDrag(rhs[U_mfi],Umf[U_mfi],Smf[U_mfi],visc_coef[0],1,level);
-	    //	    std::cout << " *** get forcing okay\n";
-            //rhs.SumBoundary(Geom().periodicity()); 
-	    rhs.SumBoundary(0, ncomp, IntVect(1), Geom().periodicity()); 
-#endif
+		// moved up
+		//#ifdef AMREX_PARTICLES
+		//	    theNSPC()->getDrag(rhs[U_mfi],Umf[U_mfi],Smf[U_mfi],visc_coef[0],1,level);
+		//	    rhs.SumBoundary(0, ncomp, IntVect(1), Geom().periodicity()); 
+		//#endif
 
 
                 getForce(tforces,bx,1,Xvel,BL_SPACEDIM,prev_time,Umf[U_mfi],Smf[U_mfi],rhs[U_mfi],0,level);
-		rhs.SumBoundary(Geom().periodicity());
+		//not necessary?		rhs.SumBoundary(Geom().periodicity());
 		//rhs.FillBoundary(Geom().periodicity());
                 if (getForceVerbose) std::cout << "...and done\n";            
 
@@ -3952,31 +3988,20 @@ NavierStokesBase::velocity_advection_update (Real dt)
 {
 
     FArrayBox  tforces, S;
-               const BoxArray& ba = U_new.boxArray();
-	       const DistributionMapping& dm = U_new.DistributionMap();
-	       int ncomp = U_new.nComp();
-	       int ngrow = U_new.nGrow();
-	       MultiFab rhs(ba,dm,ncomp,ngrow);
-	       rhs.setVal(0.0);
+    const BoxArray& ba = U_new.boxArray();
+    const DistributionMapping& dm = U_new.DistributionMap();
+    int ncomp = U_new.nComp();
+    int ngrow = U_new.nGrow();
+    MultiFab rhs(ba,dm,ncomp,ngrow);
+    rhs.setVal(0.0);
 
-
+#ifdef AMREX_PARTICLES
     for (MFIter Rhohalf_mfi(halftime,true); Rhohalf_mfi.isValid(); ++Rhohalf_mfi)
     {
-        const int i = Rhohalf_mfi.index();
+
         const Box& bx = Rhohalf_mfi.tilebox();
 
-        //
-        // Need to do some funky half-time stuff.
-        //
-        if (getForceVerbose)
-           amrex::Print() << "------------------------------------------\n" 
-                          << "F - velocity advection update (half time):\n"
-        	          << "------------------------------------------\n";
-	//                          << "... ("<< "0" <<")\n";
-
-        //
         // Average the mac face velocities to get cell centred velocities.
-        //
         FArrayBox Vel(amrex::grow(bx,0),BL_SPACEDIM);
         FORT_AVERAGE_EDGE_STATES(BL_TO_FORTRAN_ANYD(Vel),
                                  BL_TO_FORTRAN_ANYD(u_mac[0][Rhohalf_mfi]),
@@ -3986,26 +4011,56 @@ NavierStokesBase::velocity_advection_update (Real dt)
 #endif
                                  &getForceVerbose);
 
-
-        //
         // Average the new and old time to get Crank-Nicholson half time approximation.
-        //
+        FArrayBox Scal(amrex::grow(bx,0),NUM_SCALARS);
+        Scal.copy<RunOn::Host>(U_old[Rhohalf_mfi],bx,Density,bx,0,NUM_SCALARS);
+        Scal.plus<RunOn::Host>(U_new[Rhohalf_mfi],bx,Density,0,NUM_SCALARS);
+        Scal.mult<RunOn::Host>(0.5,bx,0,NUM_SCALARS);
+      
+       theNSPC()->getDrag(rhs[Rhohalf_mfi],Vel,Scal,visc_coef[0],1,level);      
+    }
+#endif
+    rhs.SumBoundary(0, ncomp, IntVect(1), Geom().periodicity());     
+    
+
+    for (MFIter Rhohalf_mfi(halftime,true); Rhohalf_mfi.isValid(); ++Rhohalf_mfi)
+    {
+        const int i = Rhohalf_mfi.index();
+        const Box& bx = Rhohalf_mfi.tilebox();
+
+        // Need to do some funky half-time stuff.
+        if (getForceVerbose)
+           amrex::Print() << "------------------------------------------\n" 
+                          << "F - velocity advection update (half time):\n"
+        	          << "------------------------------------------\n";
+
+
+        // Average the mac face velocities to get cell centred velocities.
+        FArrayBox Vel(amrex::grow(bx,0),BL_SPACEDIM);
+        FORT_AVERAGE_EDGE_STATES(BL_TO_FORTRAN_ANYD(Vel),
+                                 BL_TO_FORTRAN_ANYD(u_mac[0][Rhohalf_mfi]),
+                                 BL_TO_FORTRAN_ANYD(u_mac[1][Rhohalf_mfi]),
+#if (AMREX_SPACEDIM==3)
+                                 BL_TO_FORTRAN_ANYD(u_mac[2][Rhohalf_mfi]),
+#endif
+                                 &getForceVerbose);
+
+        // Average the new and old time to get Crank-Nicholson half time approximation.
         FArrayBox Scal(amrex::grow(bx,0),NUM_SCALARS);
         Scal.copy<RunOn::Host>(U_old[Rhohalf_mfi],bx,Density,bx,0,NUM_SCALARS);
         Scal.plus<RunOn::Host>(U_new[Rhohalf_mfi],bx,Density,0,NUM_SCALARS);
         Scal.mult<RunOn::Host>(0.5,bx,0,NUM_SCALARS);
 
-#ifdef AMREX_PARTICLES
-	    theNSPC()->getDrag(rhs[Rhohalf_mfi],Vel,Scal,visc_coef[0],1,level);
-	    //	    std::cout << " *** get forcing okay\n";
-            //rhs.SumBoundary(Geom().periodicity()); 
-	    rhs.SumBoundary(0, ncomp, IntVect(1), Geom().periodicity()); 
-#endif
+	// moved up
+	//#ifdef AMREX_PARTICLES
+	//	    theNSPC()->getDrag(rhs[Rhohalf_mfi],Vel,Scal,visc_coef[0],1,level);
+	//	    rhs.SumBoundary(0, ncomp, IntVect(1), Geom().periodicity()); 
+	//#endif
 
         if (getForceVerbose) amrex::Print() << "Calling getForce (NSbase)..." << '\n';
         const Real half_time = 0.5*(state[State_Type].prevTime()+state[State_Type].curTime());
         getForce(tforces,bx,0,Xvel,BL_SPACEDIM,half_time,Vel,Scal,rhs[Rhohalf_mfi],0,level);
-	rhs.SumBoundary(Geom().periodicity());
+	//not necessary? rhs.SumBoundary(Geom().periodicity());
 	//rhs.FillBoundary(Geom().periodicity());
         if (getForceVerbose) std::cout << "...and done\n";            
 
@@ -4098,13 +4153,24 @@ NavierStokesBase::initial_velocity_diffusion_update (Real dt)
 #endif
         {
 
-               const BoxArray& ba = U_new.boxArray();
-	       const DistributionMapping& dm = U_new.DistributionMap();
-	       int ncomp = U_new.nComp();
-	       int ngrow = U_new.nGrow();
-	       MultiFab rhs(ba,dm,ncomp,ngrow);
-	       rhs.setVal(0.0);
 
+           const BoxArray& ba = U_new.boxArray();
+           const DistributionMapping& dm = U_new.DistributionMap();
+	   int ncomp = U_new.nComp();
+	   int ngrow = U_new.nGrow();
+	   MultiFab rhs(ba,dm,ncomp,ngrow);
+	   rhs.setVal(0.0);
+
+#ifdef AMREX_PARTICLES	  	   
+           for (MFIter mfi(tforces,TilingIfNotGPU()); mfi.isValid(); ++mfi)
+           {
+	      theNSPC()->getDrag(rhs[mfi],U_old[mfi],U_old[mfi],visc_coef[0],1,level);
+           }	   
+#endif
+	   rhs.SumBoundary(0, ncomp, IntVect(1), Geom().periodicity());
+
+	    
+	    
             FArrayBox tforces_fab;
             for (MFIter mfi(tforces,TilingIfNotGPU()); mfi.isValid(); ++mfi)
             {
@@ -4118,18 +4184,18 @@ NavierStokesBase::initial_velocity_diffusion_update (Real dt)
                 }
 
 
-#ifdef AMREX_PARTICLES
+		//#ifdef AMREX_PARTICLES
 		/*
 	    theNSPC()->getDrag(rhs[mfi],U_olf[mfi],U_old[mfi],visc_coef[0],1,level);
 	    std::cout << " *** get forcing okay\n";
             //rhs.SumBoundary(Geom().periodicity()); 
 	    rhs.SumBoundary(0, ncomp, IntVect(1), Geom().periodicity()); 
 		*/
-#endif
+		//#endif
 
 		// just comment for now
                 getForce(tforces_fab,bx,ngrow,Xvel,AMREX_SPACEDIM,prev_time,U_old[mfi],U_old[mfi],rhs[mfi],Density,level);
-		rhs.SumBoundary(Geom().periodicity());
+		//not necessary?   rhs.SumBoundary(Geom().periodicity());
 		//rhs.FillBoundary(Geom().periodicity());
                 if (getForceVerbose) std::cout << "...and done\n";            
 

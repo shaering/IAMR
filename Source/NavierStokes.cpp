@@ -594,14 +594,36 @@ NavierStokes::predict_velocity (Real  dt, int level)
 
 
 
+
+#ifdef AMREX_PARTICLES
+        // loop to get all particle forces separate from other forces to enable sumboundary
+	//AMReX provides an iterator, MFIter for looping over the FArrayBoxes in MultiFabs
+        for (MFIter U_mfi(Umf,true); U_mfi.isValid(); ++U_mfi) // this iters over FArrayBoxes in the MultiFab
+        {
+            Box bx=U_mfi.tilebox();
+            FArrayBox& Ufab = Umf[U_mfi];
+            FArrayBox& Sfab = Smf[U_mfi];
+	    FArrayBox& rfab = rhs[U_mfi];
+
+	    theNSPC()->getDrag(rfab,Ufab,Sfab,visc_coef[0],1,level);
+	    rhs.SumBoundary(0, ncomp, IntVect(1), Geom().periodicity()); 
+
+        }
+	//    } // end OMP parallel region
+#endif
+    rhs.SumBoundary(0, ncomp, IntVect(1), Geom().periodicity());     
+    //rhs.SumBoundary(Geom().periodicity()); 	
+
+
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
     {
 
-      //        FArrayBox tforces(ba[0],ncomp+scomp);
+        //        FArrayBox tforces(ba[0],ncomp+scomp);
         FArrayBox tforces;
         Vector<int> bndry[BL_SPACEDIM];
+
 
 	//AMReX provides an iterator, MFIter for looping over the FArrayBoxes in MultiFabs
         for (MFIter U_mfi(Umf,true); U_mfi.isValid(); ++U_mfi) // this iters over FArrayBoxes in the MultiFab
@@ -620,29 +642,15 @@ NavierStokes::predict_velocity (Real  dt, int level)
                         << "--------------------- \n ";
             }
 
-
-#ifdef AMREX_PARTICLES
-	    theNSPC()->getDrag(rfab,Ufab,Sfab,visc_coef[0],1,level);
-	    //	    std::cout << " *** get forcing okay\n";
-
-            /* // may be an issue with uncommented sumbndry with different levels
-	    if (level > 0) {
-	      IntVect ghostVect(tmp_src_width*IntVect::TheUnitVector());
-              tmp_src_ptr->SumBoundary(0, tmp_src_ptr->nComp(), ghostVect, Geom(lev).periodicity());
-	    } 
-            else {
-              tmp_src_ptr->SumBoundary(Geom(lev).periodicity());
-	    }
-	    */
-
-            // seems to work
-	    rhs.SumBoundary(0, ncomp, IntVect(1), Geom().periodicity()); 
-#endif
-
+	    // moved up
+	    //#ifdef AMREX_PARTICLES
+	    //	    theNSPC()->getDrag(rfab,Ufab,Sfab,visc_coef[0],1,level);
+	    //	    rhs.SumBoundary(0, ncomp, IntVect(1), Geom().periodicity()); 
+	    //#endif
 
             // Compute the total forcing (3:ngrow, 4:scomp, 5: ncomp) 4=0 / 5=3 => vel only 
             getForce(tforces,bx,1,Xvel,BL_SPACEDIM,prev_time,Ufab,Sfab,rfab,0,level);  // EDGE VEL
-	    rhs.SumBoundary(Geom().periodicity()); 
+	    // not necessary? rhs.SumBoundary(Geom().periodicity()); 
 
 	    // (int scomp, int ncomp, IntVect const& nghost, const Periodicity& period), sensitive to cell center and ngrow of MF
 	    // if only one arg (0, n_comp, IntVect(0), period);
@@ -755,6 +763,18 @@ NavierStokes::scalar_advection (Real dt,
    rhs.setVal(0.0);
 
 
+#ifdef AMREX_PARTICLES   
+   for (MFIter S_mfi(Smf,true); S_mfi.isValid(); ++S_mfi)
+   {
+     //const Box bx = S_mfi.tilebox();
+     theNSPC()->getTemp(rhs[S_mfi],Umf[S_mfi],Smf[S_mfi],visc_coef[0],ngrow,level);
+#endif
+   }
+   rhs.SumBoundary(0, ncomp, IntVect(1), Geom().periodicity()); 	    
+   //        } // OMP parallel loop
+
+
+
 #ifdef AMREX_USE_EB
         //////////////////////////////////////////////////////////////////////////////
         //  EB ALGORITHM
@@ -812,14 +832,11 @@ NavierStokes::scalar_advection (Real dt,
             {
                 const Box bx = S_mfi.tilebox();
 
-
-
-#ifdef AMREX_PARTICLES
-	    theNSPC()->getTemp(rhs[S_mfi],Umf[S_mfi],Smf[S_mfi],visc_coef[0],ngrow,level);
-	    //	    std::cout << " *** get forcing (temp) okay\n";
-            //rhs.SumBoundary(Geom().periodicity()); 
-	    rhs.SumBoundary(0, ncomp, IntVect(1), Geom().periodicity()); 
-#endif
+		// moved up
+		//#ifdef AMREX_PARTICLES
+		//	    theNSPC()->getTemp(rhs[S_mfi],Umf[S_mfi],Smf[S_mfi],visc_coef[0],ngrow,level);
+		//	    rhs.SumBoundary(0, ncomp, IntVect(1), Geom().periodicity()); 
+		//#endif
 
 
                 if (getForceVerbose) {
@@ -830,7 +847,7 @@ NavierStokes::scalar_advection (Real dt,
                 // Compute the total forcing (3:ngrow, 4:scomp, 5: ncomp) 4=3 / 5=n(1) => scalars(density only) 
 		//                getForce(tforces,bx,nGrowF,fscalar,num_scalars,prev_time,Umf[S_mfi],Smf[S_mfi],rhs[S_mfi],0,level); // arbitrary source terms?
                 getForce(tforces,bx,1,fscalar,num_scalars,prev_time,Umf[S_mfi],Smf[S_mfi],rhs[S_mfi],0,level); // arbitrary source terms?
-  	        rhs.SumBoundary(Geom().periodicity()); 
+		//no needed?  	        rhs.SumBoundary(Geom().periodicity()); 
   	        //rhs.FillBoundary(Geom().periodicity());
 
 		//                if (getForceVerbose) {
