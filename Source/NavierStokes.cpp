@@ -606,7 +606,6 @@ NavierStokes::predict_velocity (Real  dt, int level)
 	    FArrayBox& rfab = rhs[U_mfi];
 
 	    theNSPC()->getDrag(rfab,Ufab,Sfab,visc_coef[0],1,level);
-	    rhs.SumBoundary(0, ncomp, IntVect(1), Geom().periodicity()); 
 
         }
 	//    } // end OMP parallel region
