@@ -176,7 +176,6 @@ public:
                           amrex::FArrayBox& gp,
                           const amrex::Box& gpbox_to_fill,
                           const amrex::Real* dx);
-protected:
     //
     // Read parameters from the input file.
     //
@@ -244,8 +243,6 @@ protected:
                                    amrex::MultiFab*    Sig_in,
                                    int          have_divu,
                                    amrex::Real         gravity);
-
-protected:
 
     void putDown(const amrex::Vector<amrex::MultiFab*>& phi, amrex::FArrayBox* phi_fine_strip,
 		 int c_lev, int f_lev, const amrex::Orientation* outFaces,

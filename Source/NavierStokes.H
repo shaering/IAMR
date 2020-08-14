@@ -103,8 +103,8 @@ public:
     // Predict face velocities (before projection), estimate current cfl
     // from t^n cell-centered velocities (plus cfl and change_max)
     //
-    // amrex::Real predict_velocity (amrex::Real dt);
-    amrex::Real predict_velocity (amrex::Real dt, int level);
+    amrex::Real predict_velocity (amrex::Real dt);
+  //OG    amrex::Real predict_velocity (amrex::Real dt, int level);
     //
     // Advect scalars.
     //

@@ -20,8 +20,8 @@ INCLUDE_LOCATIONS += $(Blocs)
 #These are the directories in BoxLib
 
 Pdirs   := Base AmrCore Amr Boundary
-Pdirs   += LinearSolvers/C_CellMG  LinearSolvers/C_TensorMG  \
-           LinearSolvers/MLMG LinearSolvers/Projections
+Pdirs   += LinearSolvers/MLMG LinearSolvers/Projections
+           
 
 ifeq ($(USE_PARTICLES),TRUE)
   Pdirs += Particle
@@ -33,6 +33,10 @@ endif
 
 ifeq ($(USE_HYPRE),TRUE)
   Pdirs += Extern/HYPRE
+endif
+
+ifeq ($(USE_SENSEI_INSITU),TRUE)
+    Pdirs += Extern/SENSEI
 endif
 
 Ppack   += $(foreach dir, $(Pdirs), $(AMREX_HOME)/Src/$(dir)/Make.package)

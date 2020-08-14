@@ -37,8 +37,8 @@ NavierStokesBase::getForce (FArrayBox&       force,
                             const FArrayBox& Scal,
                                   FArrayBox& rhs,
 			    //                            const FArrayBox& Drag,
-                            int              scalScomp,
-                            int              level) //,
+                            int              scalScomp) //,
+//                            int              level) //,
 			    //                            int              scalDensity)
 {
    if (ParallelDescriptor::IOProcessor() && getForceVerbose) {
@@ -175,7 +175,7 @@ NavierStokesBase::getForce (FArrayBox&       force,
       for (int n=0; n<NUM_SCALARS; n++) 
          amrex::Print() << "Scal " << n << " min/max " << scalmin[n] 
                         << " / " << scalmax[n] << std::endl;
-   }
+   } //end if(getForceVerbose)
 
    RealBox gridloc = RealBox(bx,geom.CellSize(),geom.ProbLo());
 
