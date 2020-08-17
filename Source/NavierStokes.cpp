@@ -764,23 +764,21 @@ NavierStokes::scalar_advection (Real dt,
    MultiFab rhs(ba,dm,ncomp,ngrow);  // new MF with the same ncomp and ngrow
    rhs.setVal(0.0);
 
-
+   
 #ifdef AMREX_PARTICLES   
    for (MFIter S_mfi(Smf,true); S_mfi.isValid(); ++S_mfi)
    {
-     //const Box bx = S_mfi.tilebox();
      theNSPC()->getTemp(rhs[S_mfi],Umf[S_mfi],Smf[S_mfi],visc_coef[0],ngrow,level);
-#endif
    }
-   rhs.SumBoundary(0, ncomp, IntVect(1), Geom().periodicity()); 	    
-   //        } // OMP parallel loop
+#endif   
+   rhs.SumBoundary(0, ncomp, IntVect(1), Geom().periodicity());
 
 
 
 #ifdef AMREX_USE_EB
-        //////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////
         //  EB ALGORITHM
-        //////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////
 
         const Box& domain = geom.Domain();
 
@@ -816,9 +814,9 @@ NavierStokes::scalar_advection (Real dt,
         }
 
 #else
-        //////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////
         //  NON-EB ALGORITHM
-        //////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////
 
 #ifdef _OPENMP
 #pragma omp parallel
@@ -834,13 +832,6 @@ NavierStokes::scalar_advection (Real dt,
             {
                 const Box bx = S_mfi.tilebox();
 
-		// moved up
-		//#ifdef AMREX_PARTICLES
-		//	    theNSPC()->getTemp(rhs[S_mfi],Umf[S_mfi],Smf[S_mfi],visc_coef[0],ngrow,level);
-		//	    rhs.SumBoundary(0, ncomp, IntVect(1), Geom().periodicity()); 
-		//#endif
-
-
                 if (getForceVerbose) {
                     Print() << "---------------------\n" 
                             << "C - Scalar advection:\n"
@@ -849,7 +840,15 @@ NavierStokes::scalar_advection (Real dt,
 
 		const Box& forcebx = grow(bx,1);
 		tforces.resize(forcebx,num_scalars);
+
+		// from upstream dev
+		//		std::cout << " ...FIRST CALL...\n";		
                 getForce(tforces,bx,nGrowF,fscalar,num_scalars,prev_time,Umf[S_mfi],Smf[S_mfi],rhs[S_mfi],0);
+
+		//		std::cout << " ...CALLING AGAIN TO CHECK MAX/MIN...\n";
+		//                getForce(tforces,bx,nGrowF,fscalar,num_scalars,prev_time,Umf[S_mfi],Smf[S_mfi],rhs[S_mfi],0);		
+
+		//                getForce(tforces,bx,1,fscalar,num_scalars,prev_time,Umf[S_mfi],Smf[S_mfi],rhs[S_mfi],0);		
   
                 // Compute the total forcing (3:ngrow, 4:scomp, 5: ncomp) 4=3 / 5=n(1) => scalars(density only) 
 		//                getForce(tforces,bx,nGrowF,fscalar,num_scalars,prev_time,Umf[S_mfi],Smf[S_mfi],rhs[S_mfi],0,level); // arbitrary source terms?
@@ -861,21 +860,26 @@ NavierStokes::scalar_advection (Real dt,
 		//                   Print() << "                        ... and done\n";
 		//	        }
 
+		/**/
                 for (int d=0; d<BL_SPACEDIM; ++d)
                 {
                     const Box& ebx = amrex::surroundingNodes(bx,d);
                     cfluxes[d].resize(ebx,num_scalars);
                     edgstate[d].resize(ebx,num_scalars);
                 }
-
+		/**/
+		
+		/**/
                 for (int i=0; i<num_scalars; ++i) { // FIXME: Loop rqd b/c function does not take array conserv_diff
                     int use_conserv_diff = (advectionType[fscalar+i] == Conservative) ? 1 : 0;
                     godunov->Sum_tf_divu_visc(Smf[S_mfi],i,tforces,i,1,visc_terms[S_mfi],i,
                                               (*divu_fp)[S_mfi],0,rho_ptime[S_mfi],0,use_conserv_diff);
                 }
+		/**/
 
                 state_bc = fetchBCArray(State_Type,bx,fscalar,num_scalars);
 
+		/**/
                 godunov->AdvectScalars(bx, dx, dt,
                                        D_DECL(  area[0][S_mfi],  area[1][S_mfi],  area[2][S_mfi]),
                                        D_DECL( u_mac[0][S_mfi], u_mac[1][S_mfi], u_mac[2][S_mfi]), 0,
@@ -883,13 +887,17 @@ NavierStokes::scalar_advection (Real dt,
                                        D_DECL(     edgstate[0],     edgstate[1],     edgstate[2]), 0,
                                        Smf[S_mfi], 0, num_scalars, tforces, 0, (*divu_fp)[S_mfi], 0,
                                        (*aofs)[S_mfi], fscalar, advectionType, state_bc, FPU, volume[S_mfi]);
-		// just add a hack with cfluxes zero for particle_vel scalar?
+		/**/
+		
+		/**/
                 if (do_reflux) {
                   for (int d=0; d<BL_SPACEDIM; ++d) {
                     const Box& ebx = S_mfi.nodaltilebox(d);
                     (fluxes[d])[S_mfi].copy<RunOn::Host>(cfluxes[d],ebx,0,ebx,0,num_scalars);
                   }
                 }
+		/**/
+		
             }
         } // OMP parallel loop
 #endif
@@ -911,6 +919,7 @@ NavierStokes::scalar_advection (Real dt,
         }
     }
 }
+
 
 //
 // This subroutine updates the scalars, before the velocity update
@@ -941,7 +950,7 @@ NavierStokes::scalar_update (Real dt,
     if (do_any_diffuse)
       scalar_diffusion_update(dt, first_scalar, last_scalar);
 
-    MultiFab&  S_new     = get_new_data(State_Type);
+    MultiFab&  S_new = get_new_data(State_Type);
 //#ifdef AMREX_USE_EB
 //  set_body_state(S_new);
 //#endif

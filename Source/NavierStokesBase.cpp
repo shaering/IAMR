@@ -1520,7 +1520,7 @@ NavierStokesBase::estTimeStep ()
 	    //OG            getForce(tforces_fab,bx,0,Xvel,AMREX_SPACEDIM,cur_time,U_new[mfi],U_new[mfi],rhs[mfi],Density,level);
 	    //no necessary? rhs.SumBoundary(Geom().periodicity());
 	    //rhs.FillBoundary(Geom().periodicity());
-            if (getForceVerbose) std::cout << "...and done\n";            
+            //if (getForceVerbose) std::cout << "...and done\n";            
 	    //	    getForce(tforces,bx,nGrowF,fscalar,num_scalars,prev_time,Umf[S_mfi],Smf[S_mfi],rhs[S_mfi],0,level)
             tforces[mfi].copy<RunOn::Host>(tforces_fab,bx,0,bx,0,AMREX_SPACEDIM);
 
@@ -3108,6 +3108,7 @@ NavierStokesBase::scalar_advection_update (Real dt,
 	MultiFab rhs(ba,dm,ncomp,ngrow);
 	rhs.setVal(0.0);
 
+	
 #ifdef AMREX_PARTICLES
 	for (MFIter Rho_mfi(rho_halftime,true); Rho_mfi.isValid(); ++Rho_mfi)
         {
@@ -4251,7 +4252,6 @@ NavierStokesBase::velocity_advection_update (Real dt)
         const Real half_time = 0.5*(state[State_Type].prevTime()+state[State_Type].curTime());
         tforces.resize(bx,AMREX_SPACEDIM);
 
-	// swh: this cant be correct, these FABS are empty
         getForce(tforces,bx,0,Xvel,AMREX_SPACEDIM,half_time,VelFAB,ScalFAB,rhsFAB,0);
 
   //OG        getForce(tforces,bx,0,Xvel,BL_SPACEDIM,half_time,Vel,Scal,rhs[Rhohalf_mfi],0,level);	

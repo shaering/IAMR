@@ -54,7 +54,7 @@ particles.timestamp_indices = 1
 #        ADAPTIVE MESH REFINEMENT       #
 #.......................................#
 amr.n_cell              =   64 32 32    # Grid cells at coarsest AMRlevel
-amr.max_level           =   1           # Max AMR level in hierarchy
+amr.max_level           =   0           # Max AMR level in hierarchy
 amr.grid_eff            =   0.7
 amr.n_error_buf         =   1
 amr.max_grid_size_x     =   1024
@@ -91,8 +91,8 @@ ns.hi_bc   	      	= 0 5 0
 #              VERBOSITY                #
 #.......................................#
 ns.v                    = 1 # NS solver
-proj.v                  = 0 # Nodal projection
-mac_proj.verbose        = 0 # MacProjector
-nodal_proj.verbose      = 0 # Nodal projection
-ns.getForceVerbose      = 0
-verbose                 = 0
+proj.v                  = 1 # Nodal projection
+mac_proj.verbose        = 1 # MacProjector
+nodal_proj.verbose      = 1 # Nodal projection
+ns.getForceVerbose      = 1
+verbose                 = 1
