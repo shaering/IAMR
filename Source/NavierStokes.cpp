@@ -322,13 +322,10 @@ NavierStokes::advance (Real time,
         printMaxValues(false);
     }
 
-    //
     // Compute traced states for normal comp of velocity at half time level.
-    //
     Real dt_test = predict_velocity(dt);
-    //
+
     // Do MAC projection and update edge velocities.
-    //
     if (do_mac_proj)
     {
 	// FIXME? rhs composed of divu and dSdt terms, which are FillPatch'ed
@@ -348,30 +345,27 @@ NavierStokes::advance (Real time,
     } else { 
 	create_umac_grown(umac_n_grow);	
     }
-    //
+
     // Advect velocities.
-    //
-    if (do_mom_diff == 0)
-        velocity_advection(dt);
-    //
+    if (do_mom_diff == 0) velocity_advection(dt);
+
     // Advect scalars.
-    //
     const int first_scalar = Density;
     const int last_scalar  = first_scalar + NUM_SCALARS - 1;
     scalar_advection(dt,first_scalar,last_scalar);
-    //
+
     // Update Rho.
-    //
     scalar_update(dt,first_scalar,first_scalar);
     make_rho_curr_time();
-    //
+
     // Advect momenta after rho^(n+1) has been created.
-    //
-    if (do_mom_diff == 1)
-        velocity_advection(dt);
-    //
+    if (do_mom_diff == 1) velocity_advection(dt);
+
+    // testing...
+    std::cout << ">>> CALLING SADVECT AGAIN <<<" << "\n";;
+    scalar_advection(dt,first_scalar,last_scalar);    
+
     // Add the advective and other terms to get scalars at t^{n+1}.
-    //
     if (do_scalar_update_in_order)
     {
 	for (int iComp=0; iComp<NUM_SCALARS-1; iComp++)
@@ -385,9 +379,8 @@ NavierStokes::advance (Real time,
     {
 	scalar_update(dt,first_scalar+1,last_scalar);
     }
-    //
+
     // S appears in rhs of the velocity update, so we better do it now.
-    //
     if (have_divu)
     {
         calc_divu(time+dt,dt,get_new_data(Divu_Type));
@@ -399,14 +392,11 @@ NavierStokes::advance (Real time,
                                get_new_data(Dsdt_Type),0,0,1,0);
         }
     }
-    //
+
     // Add the advective and other terms to get velocity at t^{n+1}.
-    //
     velocity_update(dt);
 
-    //
     // Increment rho average.
-    //
     if (!initial_step)
     {
         if (level > 0)
@@ -418,9 +408,7 @@ NavierStokes::advance (Real time,
             printMaxValues();
         }
 
-        //
         // Do a level project to update the pressure and velocity fields.
-        //
         if (projector)
             level_projector(dt,time,iteration);
         if (level > 0 && iteration == 1)
@@ -941,14 +929,56 @@ NavierStokes::scalar_update (Real dt,
 
     if (verbose) Print() << "... update scalars\n";
 
-    scalar_advection_update(dt, first_scalar, last_scalar);
+    MultiFab&  S_oldA = get_old_data(State_Type);
+    for (int sigma = first_scalar; sigma <= last_scalar; sigma++)
+    {
+       if (S_oldA.contains_nan(sigma,1,0))
+       {
+	 Print() << "Scalar (A) " << sigma << " contains Nans" << '\n';
+	 exit(0);
+       }
+    }
+
+    MultiFab&  S_newA = get_new_data(State_Type);
+    for (int sigma = first_scalar; sigma <= last_scalar; sigma++)
+    {
+       if (S_newA.contains_nan(sigma,1,0))
+       {
+	 Print() << "New scalar (A) " << sigma << " contains Nans" << '\n';
+	 exit(0);
+       }
+    }    
+    
+    scalar_advection_update(dt, first_scalar, last_scalar); // NaN culprit is here
+
+    MultiFab&  S_oldB = get_old_data(State_Type);
+    for (int sigma = first_scalar; sigma <= last_scalar; sigma++)
+    {
+       if (S_oldB.contains_nan(sigma,1,0))
+       {
+	 Print() << "Scalar (B) " << sigma << " contains Nans" << '\n';
+	 exit(0);
+       }
+    }
+
+    MultiFab&  S_newB = get_new_data(State_Type);
+    for (int sigma = first_scalar; sigma <= last_scalar; sigma++)
+    {
+       if (S_newB.contains_nan(sigma,1,0))
+       {
+	 Print() << "New scalar (B) " << sigma << " contains Nans" << '\n';
+	 exit(0);
+       }
+    }        
 
     bool do_any_diffuse = false;
-    for (int sigma = first_scalar; sigma <= last_scalar; sigma++)
+    for (int sigma = first_scalar; sigma <= last_scalar; sigma++) {
         if (is_diffusive[sigma]) do_any_diffuse = true;
+    }
 
-    if (do_any_diffuse)
+    if (do_any_diffuse) {
       scalar_diffusion_update(dt, first_scalar, last_scalar);
+    }
 
     MultiFab&  S_new = get_new_data(State_Type);
 //#ifdef AMREX_USE_EB
@@ -963,6 +993,8 @@ NavierStokes::scalar_update (Real dt,
        }
     }
 }
+
+
 
 void
 NavierStokes::scalar_diffusion_update (Real dt,

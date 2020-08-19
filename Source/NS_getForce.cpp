@@ -254,6 +254,6 @@ NavierStokesBase::getForce (FArrayBox&       force,
                         << " / " << forcemax[n] << std::endl;
 
       amrex::Print() << "NavierStokesBase::getForce(): Leaving..." 
-                     << std::endl << "---" << std::endl;
+                     << std::endl << "---\n" << std::endl;
    }
 }

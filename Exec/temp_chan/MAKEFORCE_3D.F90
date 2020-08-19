@@ -2,7 +2,6 @@
 #ifndef BL_LANG_FORT
 #define BL_LANG_FORT
 #endif
-
 #include <AMReX_REAL.H>
 #include <AMReX_CONSTANTS.H>
 #include <AMReX_BC_TYPES.H>
@@ -63,9 +62,36 @@ contains
       REAL_T, dimension(r_lo(1):r_hi(1),r_lo(2):r_hi(2),r_lo(3):r_hi(3),0:nscal-1)           :: rhs
 
       integer :: isioproc, n, i, j, k
+      integer :: ixlo, ixhi, iylo, iyhi, izlo, izhi
 
 
       force = zero
+
+      
+!      if(scomp.eq.0) then
+!         ixlo = max(f_lo(1),v_lo(1))
+!         ixhi = min(f_hi(1),v_hi(1))
+!         iylo = max(f_lo(2),v_lo(2))
+!         iyhi = min(f_hi(2),v_hi(2))
+!         izlo = max(f_lo(3),v_lo(3))
+!         izhi = min(f_hi(3),v_hi(3))
+!      else         
+!         ixlo = max(f_lo(1),s_lo(1))
+!         ixhi = min(f_hi(1),s_hi(1))
+!         iylo = max(f_lo(2),s_lo(2))
+!         iyhi = min(f_hi(2),s_hi(2))
+!         izlo = max(f_lo(3),s_lo(3))
+!         izhi = min(f_hi(3),s_hi(3))         
+!      endif
+
+         ixlo = f_lo(1)
+         ixhi = f_hi(1)
+         iylo = f_lo(2)
+         iyhi = f_hi(2)
+         izlo = f_lo(3)
+         izhi = f_hi(3)
+
+!         print*, " HERE I AM (1)!"
 
 !      return
 
@@ -104,34 +130,49 @@ contains
 
 
 
-      do k = f_lo(3), f_hi(3)
-         do j = f_lo(2), f_hi(2)
-            do i = f_lo(1), f_hi(1)
+      do k = izlo, izhi
+         do j = iylo, iyhi
+            do i = ixlo, ixhi
 
+
+!         print*, " HERE I AM (2)!"               
                ! static rho for now
                rho = scal(i,j,k,0)
                temp = scal(i,j,k,2) ! need to make these slots general
                !print*, "MAKEFORCE//rho: ", rho
                !print*, "MAKEFORCE//temp: ", temp
 
+!         print*, " HERE I AM (3)!"               
+
                ! this is terrible
                if(scomp.eq.0) then ! velocity
 
+!         print*, " HERE I AM (4)!", i, j, k, nscal
                  ! basic forcing term 
                  force(i,j,k,0) = rho * Fx !0.d0 ! pass a read-in generic Fi
                  force(i,j,k,1) = rho * Fy !0.d0
                  force(i,j,k,2) = rho * Fz !0.d0
 
+!         print*, " HERE I AM (4a)!"                 
+
                  ! Boussinesq term, hardcode to y-dir (1) fix for grav vector later
                  force(i,j,k,1) = force(i,j,k,1) + rho * gravity * alpha * (temp-Tref)
+
+!         print*, " HERE I AM (4b)!"          
 
 !             if(abs(rhs(i,j,k,0)).gt.0.0d0 .OR. abs(rhs(i,j,k,2)).gt.0.0d0 .OR. abs(rhs(i,j,k,2)).gt.0.0d0) then 
 !                print*, " >>> POINT: ", i,j,k
                  !                print*, "     RHS: ", rhs(i,j,k,0),rhs(i,j,k,1),rhs(i,j,k,2)
-                 
+
+!         print*, " HERE I AM (4b0):", rhs(i,j,k,0)
+!         print*, " HERE I AM (4b1):", rhs(i,j,k,1)
+!         print*, " HERE I AM (4b2):", rhs(i,j,k,2)         
+         
                  force(i,j,k,0) = force(i,j,k,0) + rho * rhs(i,j,k,0)
                  force(i,j,k,1) = force(i,j,k,1) + rho * rhs(i,j,k,1)
                  force(i,j,k,2) = force(i,j,k,2) + rho * rhs(i,j,k,2)
+
+!         print*, " HERE I AM (4c)!"                  
                  
 !             endif
 
@@ -146,9 +187,13 @@ contains
 
           elseif (scomp .EQ. 3 .AND. ncomp .EQ. 1) then ! rho only
 
+!             print*, " HERE I AM (5)!"
+             
              force(i,j,k,scomp) = 0.d0
 
           elseif (scomp .EQ. 3) then ! all scalars
+
+!             print*, " HERE I AM (6)!"             
 
              force(i,j,k,scomp  ) = 0.d0 ! density(ish)
              force(i,j,k,scomp+1) = 0.d0 ! tracer
@@ -158,9 +203,13 @@ contains
 
           elseif (scomp .EQ. 4) then ! tracer only
 
+!             print*, " HERE I AM (7)!"             
+
              force(i,j,k,scomp) = 0.d0
 
           elseif (scomp .EQ. 5) then ! temp only
+
+!             print*, " HERE I AM (8)!"             
 
              force(i,j,k,scomp) = 0.d0
              force(i,j,k,scomp) = force(i,j,k,scomp) + rhs(i,j,k,2)
@@ -170,6 +219,8 @@ contains
 !             endif
 
           else ! who knows
+
+!             print*, " HERE I AM (9)!"             
 
              force(i,j,k,scomp) = 0.d0 
 
@@ -194,7 +245,7 @@ contains
 
 !      call flush(6)
 
-!      print*, " DONE WITH FORT_MAKEFORCE"
+      print*, " DONE WITH FORT_MAKEFORCE"
 
    end subroutine FORT_MAKEFORCE
   

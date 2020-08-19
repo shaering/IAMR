@@ -2,8 +2,9 @@
 #            SIMULATION STOP            #
 #.......................................#
 #stop_time               =   100.0         # Max (simulated) time to evolve
-max_step                =  1000           # Max number of time steps
+max_step                =  2000           # Max number of time steps
 #max_step                =  2
+
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #           SOLVER SETTINGS             #
 #.......................................#
@@ -15,10 +16,12 @@ ns.visc_tol        = 1.0e-11   # tolerance for viscous solve
 #ns.do_vorticity_ref = 1
 ns.do_reg_ref      = 1
 nodal_proj.rtol    = 1.0e-13
+
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #         TIME STEP COMPUTATION         #
 #.......................................#
 ns.cfl               = 0.5
+
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #            INPUT AND OUTPUT           #
 #.......................................#
@@ -27,21 +30,23 @@ amr.plot_int            =   100          # Steps between plot files
 amr.check_int           =   1000        # Steps between checkpoint files
 amr.restart             =   "" # "chk01000.temp"  # Checkpoint to restart from
 amr.derive_plot_vars    = re_grad particle_count mag_vort
+
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #               PHYSICS                 #
 #.......................................#
 ns.do_temp          = 1
 #ns.gravity          =   182.  0.  0.
 #ns.gravity          =   9.81
-#ns.gravity          =   0.1
-ns.gravity          =   0.
-#ns.Fx               =   0.04167
-ns.Fx               =   0.
+ns.gravity          =   0.1
+#ns.gravity          =   0.0
+ns.Fx               =   0.04167
+#ns.Fx               =   0.
 ns.Fy               =   0.
 ns.Fz               =   0.
 ns.vel_visc_coef    = 3.5e-4
 ns.temp_cond_coef   = 2.0e-4
 ns.scal_diff_coefs  = 0.0
+
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #            PARTICLE INPUTS            #
 #.......................................#
@@ -50,6 +55,7 @@ particles.timestamp_dir = particle_dir
 particles.timestamp_indices = 1
 #particles.particle_Rep = 1.0
 #particles.particle_tau = 1.0
+
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #        ADAPTIVE MESH REFINEMENT       #
 #.......................................#
@@ -64,6 +70,7 @@ amr.blocking_factor     =   8
 amr.ref_ratio		=   2
 amr.regrid_int          =   100
 #amr.refine_grid_layout  =   1
+
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #              GEOMETRY                 #
 #.......................................#
@@ -86,6 +93,13 @@ ns.hi_bc   	      	= 0 5 0
 #eb2.cylinder_radius           = 0.05
 #eb2.cylinder_direction        = 2
 #eb2.cylinder_center           = 0.15  0.2  0.0
+
+#¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
+#              DEBUG                    #
+#.......................................#
+amrex.fpe_trap_invalid = 1
+amrex.fpe_trap_zero = 1
+amrex.fpe_trap_overflow = 1
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #              VERBOSITY                #
