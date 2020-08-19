@@ -2460,11 +2460,7 @@ NavierStokesBase::manual_tags_placement (TagBoxArray&    tags,
                 // Only refine if there are already tagged cells in the outflow
                 // region
                 //
-                bool hasTags = false;
-                for (MFIter tbi(tags); !hasTags && tbi.isValid(); ++tbi)
-                    if (tags[tbi].numTags(outflowBox) > 0)
-                        hasTags = true;
-		ParallelAllReduce::Or(hasTags, ParallelContext::CommunicatorSub());
+                bool hasTags = tags.hasTags(outflowBox);
                 if (hasTags)
                     tags.setVal(BoxArray(&outflowBox,1),TagBox::SET);
 	    }
@@ -4066,19 +4062,6 @@ NavierStokesBase::velocity_advection_update (Real dt)
 #ifdef AMREX_USE_EB
     MultiFab& Gp=*gradp;
     Gp.FillBoundary(geom.periodicity());
-    if (do_mom_diff == 1)
-      amrex::Abort("NavierStokesBase::velocity_advection_update(): do_mom_diff==1 not currently working with EB.");
-    // Changing Gp to a pointer causes problems for non-EB ...
-    // Think issue was need to use MultiFab::Copy; plain Copy was going someplace funny
-    // MultiFab* Gp;
-    // if (do_mom_diff == 1){
-    // 	//need to make a copy of gradp
-    // 	Gp->define(grids,dmap,BL_SPACEDIM,1);
-    // 	Copy(*Gp,*gradp,0,0,3,0);
-    // }
-    // else{
-    // 	Gp = gradp.get();
-    // }
 #else
     MultiFab Gp(grids,dmap,AMREX_SPACEDIM,1);
     getGradP(Gp, prev_pres_time);
@@ -4398,11 +4381,16 @@ NavierStokesBase::velocity_advection_update (Real dt)
         if (getForceVerbose) amrex::Print() << "Calling getForce..." << '\n';
         const Real half_time = 0.5*(state[State_Type].prevTime()+state[State_Type].curTime());
         tforces.resize(bx,AMREX_SPACEDIM);
+<<<<<<< HEAD
 
 	//        getForce(tforces,bx,0,Xvel,AMREX_SPACEDIM,half_time,VelFAB,ScalFAB,rhsFAB,0);
         getForce(tforces,bx,0,Xvel,AMREX_SPACEDIM,half_time,VelFAB,ScalFAB,rhs[mfi],0);	
 
   //OG        getForce(tforces,bx,0,Xvel,BL_SPACEDIM,half_time,Vel,Scal,rhs[Rhohalf_mfi],0,level);	
+=======
+        Elixir tf_i = tforces.elixir();
+        getForce(tforces,bx,0,Xvel,AMREX_SPACEDIM,half_time,VelFAB,ScalFAB,0);
+>>>>>>> upstream/development
 
         //
         // Do following only at initial iteration--per JBB.
@@ -4417,7 +4405,6 @@ NavierStokesBase::velocity_advection_update (Real dt)
         }
 
         // Update velocity
-        //why is this on a grown box?
         auto const& vel_old  = U_old.array(mfi);
         auto const& vel_new  = U_new.array(mfi);
         auto const& gradp    = Gp.array(mfi);
@@ -4433,16 +4420,18 @@ NavierStokesBase::velocity_advection_update (Real dt)
             Real velold = vel_old(i,j,k,n);
 
             if ( mom_diff ) {
-               gradp(i,j,k,n) *= rho_Half(i,j,k);
-               force(i,j,k,n) *= rho_Half(i,j,k);
                velold *= rho_old(i,j,k);
-            }
-            vel_new(i,j,k,n) = velold - dt * advec(i,j,k,n)
-                                      + dt * force(i,j,k,n) / rho_Half(i,j,k)
-                                      - dt * gradp(i,j,k,n) / rho_Half(i,j,k);
+	       vel_new(i,j,k,n) = velold - dt * advec(i,j,k,n)
+		                         + dt * force(i,j,k,n)
+		                         - dt * gradp(i,j,k,n);
 
-            if ( mom_diff ) {
-               vel_new(i,j,k,n) /= rho_new(i,j,k);
+	       vel_new(i,j,k,n) /= rho_new(i,j,k);
+            }
+	    else
+	    {
+	        vel_new(i,j,k,n) = velold - dt * advec(i,j,k,n)
+                                          + dt * force(i,j,k,n) / rho_Half(i,j,k)
+                                          - dt * gradp(i,j,k,n) / rho_Half(i,j,k);
             }
         });
     }
@@ -5217,7 +5206,7 @@ NavierStokesBase::post_timestep_particle (int crse_iteration)
                         const Box& box = mfi.growntilebox();
                         for (int i = 0; i < n; ++i)
                         {
-                          tfab.copy(sfab, box, timestamp_indices[i], box, i, 1);
+                          tfab.copy<RunOn::Host>(sfab, box, timestamp_indices[i], box, i, 1);
                         }
                       }
 		    }
