@@ -15,7 +15,7 @@ void
 ActiveParticleContainer::myAdvectWithUmac (MultiFab* umac, int lev, Real dt, MultiFab& rho, MultiFab& temp, Real nu_m)
 {
     BL_PROFILE("AmrActiveParticleContainer::myAdvectWithUmac()");
-    //    std::cout << " *** myAdvectWithUmac: lev " << lev << "\n";
+    std::cout << " *** myAdvectWithUmac: lev " << lev << "\n";
 
     AMREX_ASSERT(OK(lev, lev, umac[0].nGrow()-1)); // segfault
     AMREX_ASSERT(lev >= 0 && lev < GetParticles().size());
@@ -203,7 +203,7 @@ ActiveParticleContainer::myAdvectWithUmac (MultiFab* umac, int lev, Real dt, Mul
 
 
 
-		/*
+		/*		
                 std::cout << " *** myAdvectWithUmac: CP5 \n";
                 std::cout << "     Data (nu_m, d, rho_p, rho_f, T_f, vdiff, Re_p, tau_p, CT, wto) " 
                           << nu_m << " " 
@@ -240,6 +240,7 @@ ActiveParticleContainer::myAdvectWithUmac (MultiFab* umac, int lev, Real dt, Mul
 		std::cout << "(FTp)" <<  p.m_rdata.arr[15] << "\n";
 		*/
 
+		
 /*
 Predictor/corrector update of the position. Velocity field in the IAMR case 
 is face-centroid based (in PeleC, it is cell-centroid based).

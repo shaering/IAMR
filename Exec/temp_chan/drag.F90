@@ -77,6 +77,19 @@ contains
        Fp(3) = particles(15,n)
 
 
+       if(isnan(vp(1))) print*, " up NAN at:", n
+       if(isnan(vp(2))) print*, " vp NAN at:", n
+       if(isnan(vp(3))) print*, " wp NAN at:", n
+
+       if(isnan(dia_p)) print*, " diap NAN at:", n
+       if(isnan(rho_p)) print*, " rhop NAN at:", n
+
+       if(isnan(Fp(1))) print*, " Fpx NAN at:", n
+       if(isnan(Fp(2))) print*, " Fpy NAN at:", n
+       if(isnan(Fp(3))) print*, " Fpz NAN at:", n
+
+       
+
 !       print*, "... in drag_cic (lo_x, hi_x, ng): ", lo(1),hi(1),ng
 
 !       print*, " "
@@ -105,6 +118,11 @@ contains
        lx = (particles(1, n) - plo(1))*inv_dx(1)
        ly = (particles(2, n) - plo(2))*inv_dx(2)
        lz = (particles(3, n) - plo(3))*inv_dx(3)
+
+       if(isnan(lx)) print*, " lx NAN at:", n
+       if(isnan(ly)) print*, " ly NAN at:", n
+       if(isnan(lz)) print*, " lz NAN at:", n
+       
 
        ! get cell index which contains particle center
        i = floor(lx)
@@ -141,6 +159,7 @@ contains
 
 
 
+
        ! sum of drags, signs flips because this is action of particle on fluid
        do oo = 0,2
 
@@ -158,6 +177,9 @@ contains
           drg(i+1, j+1, k  ,oo) = drg(i+1, j+1, k  ,oo) + wx_hi*wy_hi*wz_lo*qp
           drg(i+1, j+1, k+1,oo) = drg(i+1, j+1, k+1,oo) + wx_hi*wy_hi*wz_hi*qp
 
+          if(isnan(qp)) print*, " qp NAN at:", n, oo
+
+          
 !          print*, ">>> DRAG_CIC:",oo
 !          print*, drg(i,   j,   k  ,oo)
 !          print*, drg(i,   j,   k+1,oo)

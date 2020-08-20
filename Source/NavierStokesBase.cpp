@@ -11,6 +11,7 @@
 #include <iamr_mol.H>
 #endif
 
+#include <NavierStokes.H>//
 #include <NavierStokesBase.H>
 #include <NAVIERSTOKES_F.H>
 #include <AMReX_filcc_f.H>
@@ -3184,10 +3185,13 @@ NavierStokesBase::scalar_advection_update (Real dt,
             Scal.plus<RunOn::Host>(S_new[Rho_mfi],bx,Density,0,NUM_SCALARS);
             Scal.mult<RunOn::Host>(0.5,bx);
 
+            if (NavierStokes::initial_iter != true) {	    
 	    theNSPC()->getTemp(rhs[Rho_mfi],Vel,Scal,visc_coef[0],ngrow,level);
+	    }
 	}
 #endif
-	rhs.SumBoundary(0, ncomp, IntVect(1), Geom().periodicity());
+	//	rhs.SumBoundary(0, ncomp, IntVect(1), Geom().periodicity());
+	rhs.SumBoundary(Geom().periodicity()); 	   	
 
 	
 
@@ -3829,15 +3833,16 @@ NavierStokesBase::velocity_advection (Real dt)
 #ifdef AMREX_PARTICLES	   
            for (MFIter U_mfi(Umf,true); U_mfi.isValid(); ++U_mfi)
            {
+ 	      if (NavierStokes::initial_iter != true) {	     
 	      theNSPC()->getDrag(rhs[U_mfi],Umf[U_mfi],Smf[U_mfi],visc_coef[0],1,level);
+	      }
 	   }
 #endif
-	   rhs.SumBoundary(0, ncomp, IntVect(1), Geom().periodicity()); 
+	   //	   rhs.SumBoundary(0, ncomp, IntVect(1), Geom().periodicity());
+	   rhs.SumBoundary(Geom().periodicity()); 	   
 
 
 	   // grow scal array to be at least forces?
-
-	   
             Vector<int> bndry[AMREX_SPACEDIM];
             FArrayBox tforces;
             FArrayBox S;
@@ -3863,8 +3868,9 @@ NavierStokesBase::velocity_advection (Real dt)
 		//	    rhs.SumBoundary(0, ncomp, IntVect(1), Geom().periodicity()); 
 		//#endif
 
-		// this fucks everything up...               const Box& forcebx = grow(bx,1);
-		const Box forcebx = grow(bx,0);
+
+		//		const Box forcebx = grow(bx,1); // this makes the forcing array 2cell halo
+		const Box forcebx = grow(bx,0);		
                 tforces.resize(forcebx,AMREX_SPACEDIM);
                 getForce(tforces,forcebx,1,Xvel,AMREX_SPACEDIM,prev_time,Umf[U_mfi],Smf[U_mfi],rhs[U_mfi],0);  
 
@@ -4321,11 +4327,14 @@ NavierStokesBase::velocity_advection_update (Real dt)
 
         if (getForceVerbose) amrex::Print() << "Calling getForce..." << '\n';
         const Real half_time = 0.5*(state[State_Type].prevTime()+state[State_Type].curTime());
-     
+
+       if (NavierStokes::initial_iter != true) {
        theNSPC()->getDrag(rhs[mfi],VelFAB,ScalFAB,visc_coef[0],1,level);
+       }
     }
 #endif
-    rhs.SumBoundary(0, ncomp, IntVect(1), Geom().periodicity()); 
+    //    rhs.SumBoundary(0, ncomp, IntVect(1), Geom().periodicity());
+    rhs.SumBoundary(Geom().periodicity()); 	       
     
 
 #ifdef _OPENMP
@@ -4499,10 +4508,13 @@ NavierStokesBase::initial_velocity_diffusion_update (Real dt)
 #ifdef AMREX_PARTICLES	  	   
            for (MFIter mfi(tforces,TilingIfNotGPU()); mfi.isValid(); ++mfi)
            {
+              if (NavierStokes::initial_iter != true) {	     
 	      theNSPC()->getDrag(rhs[mfi],U_old[mfi],U_old[mfi],visc_coef[0],1,level);
+	      }
            }	   
 #endif
-	   rhs.SumBoundary(0, ncomp, IntVect(1), Geom().periodicity());
+	   //	   rhs.SumBoundary(0, ncomp, IntVect(1), Geom().periodicity());
+	   rhs.SumBoundary(Geom().periodicity()); 	   	   
 
 	    
 	    

@@ -417,9 +417,10 @@ NavierStokes::advance (Real time,
 
 
 #ifdef AMREX_PARTICLES
-    if (theNSPC() != 0 and NavierStokes::initial_iter != true)
+    //    if (theNSPC() != 0 and NavierStokes::initial_iter != true)
     {
 
+      std::cout << " >>> CALLING myAdvectWithYUmac <<<\n"; 
       //      theNSPC()->basicAdvectWithUmac(u_mac, level, dt);
       
       MultiFab& Sstate = get_new_data(State_Type);
@@ -588,18 +589,20 @@ NavierStokes::predict_velocity (Real  dt)
 	//AMReX provides an iterator, MFIter for looping over the FArrayBoxes in MultiFabs
         for (MFIter U_mfi(Umf,true); U_mfi.isValid(); ++U_mfi) // this iters over FArrayBoxes in the MultiFab
         {
-            Box bx=U_mfi.tilebox();
+	  //Box bx=U_mfi.tilebox();
             FArrayBox& Ufab = Umf[U_mfi];
             FArrayBox& Sfab = Smf[U_mfi];
 	    FArrayBox& rfab = rhs[U_mfi];
 
+	    if (NavierStokes::initial_iter != true) {	    
 	    theNSPC()->getDrag(rfab,Ufab,Sfab,visc_coef[0],1,level);
+	    }
 
         }
 	//    } // end OMP parallel region
 #endif
-    rhs.SumBoundary(0, ncomp, IntVect(1), Geom().periodicity());     
-    //rhs.SumBoundary(Geom().periodicity()); 	
+	//    rhs.SumBoundary(0, ncomp, IntVect(1), Geom().periodicity());     
+    rhs.SumBoundary(Geom().periodicity()); 	
 
 
 #ifdef _OPENMP
@@ -756,10 +759,13 @@ NavierStokes::scalar_advection (Real dt,
 #ifdef AMREX_PARTICLES   
    for (MFIter S_mfi(Smf,true); S_mfi.isValid(); ++S_mfi)
    {
-     theNSPC()->getTemp(rhs[S_mfi],Umf[S_mfi],Smf[S_mfi],visc_coef[0],ngrow,level);
+      if (NavierStokes::initial_iter != true) {	         
+      theNSPC()->getTemp(rhs[S_mfi],Umf[S_mfi],Smf[S_mfi],visc_coef[0],ngrow,level);
+      }
    }
 #endif   
-   rhs.SumBoundary(0, ncomp, IntVect(1), Geom().periodicity());
+   //   rhs.SumBoundary(0, ncomp, IntVect(1), Geom().periodicity());
+    rhs.SumBoundary(Geom().periodicity()); 	   
 
 
 

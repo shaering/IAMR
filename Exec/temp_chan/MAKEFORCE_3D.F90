@@ -133,8 +133,7 @@ contains
       do k = izlo, izhi
          do j = iylo, iyhi
             do i = ixlo, ixhi
-
-
+               
 !         print*, " HERE I AM (2)!"               
                ! static rho for now
                rho = scal(i,j,k,0)
@@ -142,10 +141,22 @@ contains
                !print*, "MAKEFORCE//rho: ", rho
                !print*, "MAKEFORCE//temp: ", temp
 
-!         print*, " HERE I AM (3)!"               
+               !         print*, " HERE I AM (3)!"
+
+               if(isnan(rho)) print*, " RHO NAN at:", i,j,k
+               if(isnan(temp)) print*, " TEMP NAN at:", i,j,k
+
+               
 
                ! this is terrible
                if(scomp.eq.0) then ! velocity
+
+               if(isnan(force(i,j,k,0))) print*, " 1. F1 NAN at:", i,j,k
+               if(isnan(force(i,j,k,1))) print*, " 1. F2 NAN at:", i,j,k
+               if(isnan(force(i,j,k,2))) print*, " 1. F3 NAN at:", i,j,k
+               if(isnan(rhs(i,j,k,0))) print*, " 1. RHS1 NAN at:", i,j,k
+               if(isnan(rhs(i,j,k,1))) print*, " 1. RHS2 NAN at:", i,j,k
+               if(isnan(rhs(i,j,k,2))) print*, " 1. RHS3 NAN at:", i,j,k                  
 
 !         print*, " HERE I AM (4)!", i, j, k, nscal
                  ! basic forcing term 
@@ -153,10 +164,24 @@ contains
                  force(i,j,k,1) = rho * Fy !0.d0
                  force(i,j,k,2) = rho * Fz !0.d0
 
+               if(isnan(force(i,j,k,0))) print*, " 2. F1 NAN at:", i,j,k
+               if(isnan(force(i,j,k,1))) print*, " 2. F2 NAN at:", i,j,k
+               if(isnan(force(i,j,k,2))) print*, " 2. F3 NAN at:", i,j,k
+               if(isnan(rhs(i,j,k,0))) print*, " 2. RHS1 NAN at:", i,j,k
+               if(isnan(rhs(i,j,k,1))) print*, " 2. RHS2 NAN at:", i,j,k
+               if(isnan(rhs(i,j,k,2))) print*, " 2. RHS3 NAN at:", i,j,k                                   
+
 !         print*, " HERE I AM (4a)!"                 
 
                  ! Boussinesq term, hardcode to y-dir (1) fix for grav vector later
-                 force(i,j,k,1) = force(i,j,k,1) + rho * gravity * alpha * (temp-Tref)
+               force(i,j,k,1) = force(i,j,k,1) + rho * gravity * alpha * (temp-Tref)
+
+               if(isnan(force(i,j,k,0))) print*, " 3. F1 NAN at:", i,j,k
+               if(isnan(force(i,j,k,1))) print*, " 3. F2 NAN at:", i,j,k
+               if(isnan(force(i,j,k,2))) print*, " 3. F3 NAN at:", i,j,k
+               if(isnan(rhs(i,j,k,0))) print*, " 3. RHS1 NAN at:", i,j,k
+               if(isnan(rhs(i,j,k,1))) print*, " 3. RHS2 NAN at:", i,j,k
+               if(isnan(rhs(i,j,k,2))) print*, " 3. RHS3 NAN at:", i,j,k                                 
 
 !         print*, " HERE I AM (4b)!"          
 
@@ -183,13 +208,23 @@ contains
 
 !             if(rhs(i,j,k,0).gt.0.0d0) then
 !                print*, " <***> RHS (vel): ", rhs(i,j,k,0),rhs(i,j,k,1),rhs(i,j,k,2)
-!             endif
+                 !             endif
+
+               if(isnan(force(i,j,k,0))) print*, " 4. F1 NAN at:", i,j,k
+               if(isnan(force(i,j,k,1))) print*, " 4. F2 NAN at:", i,j,k
+               if(isnan(force(i,j,k,2))) print*, " 4. F3 NAN at:", i,j,k
+               if(isnan(rhs(i,j,k,0))) print*, " 4. RHS1 NAN at:", i,j,k
+               if(isnan(rhs(i,j,k,1))) print*, " 4. RHS2 NAN at:", i,j,k
+               if(isnan(rhs(i,j,k,2))) print*, " 4. RHS3 NAN at:", i,j,k                                   
 
           elseif (scomp .EQ. 3 .AND. ncomp .EQ. 1) then ! rho only
 
 !             print*, " HERE I AM (5)!"
              
              force(i,j,k,scomp) = 0.d0
+
+               if(isnan(force(i,j,k,scomp))) print*, " F NAN at:", i,j,k,scomp
+               if(isnan(rhs(i,j,k,scomp))) print*, " RHS NAN at:", i,j,k,scomp                                   
 
           elseif (scomp .EQ. 3) then ! all scalars
 
@@ -201,11 +236,21 @@ contains
 
              force(i,j,k,scomp+2) = force(i,j,k,scomp+2) + rhs(i,j,k,2)
 
+             if(isnan(force(i,j,k,scomp))) print*, " F NAN at:", i,j,k,scomp
+             if(isnan(force(i,j,k,scomp+1))) print*, " F NAN at:", i,j,k,scomp+1
+             if(isnan(force(i,j,k,scomp+2))) print*, " F NAN at:", i,j,k,scomp+2             
+             if(isnan(rhs(i,j,k,scomp))) print*, " RHS NAN at:", i,j,k,scomp
+             if(isnan(rhs(i,j,k,scomp+1))) print*, " RHS NAN at:", i,j,k,scomp+1
+             if(isnan(rhs(i,j,k,scomp+2))) print*, " RHS NAN at:", i,j,k,scomp+2             
+
           elseif (scomp .EQ. 4) then ! tracer only
 
 !             print*, " HERE I AM (7)!"             
 
              force(i,j,k,scomp) = 0.d0
+
+               if(isnan(force(i,j,k,scomp))) print*, " F NAN at:", i,j,k,scomp
+               if(isnan(rhs(i,j,k,scomp))) print*, " RHS NAN at:", i,j,k,scomp                                                
 
           elseif (scomp .EQ. 5) then ! temp only
 
@@ -216,7 +261,10 @@ contains
              
 !             if(rhs(i,j,k,2).gt.0.0d0) then
 !                print*, " <***> RHS (scalars): ", rhs(i,j,k,0),rhs(i,j,k,1),rhs(i,j,k,2)
-!             endif
+             !             endif
+
+               if(isnan(force(i,j,k,scomp))) print*, " F NAN at:", i,j,k,scomp
+               if(isnan(rhs(i,j,k,scomp))) print*, " RHS NAN at:", i,j,k,scomp                                                
 
           else ! who knows
 
