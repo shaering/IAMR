@@ -2,7 +2,7 @@
 #            SIMULATION STOP            #
 #.......................................#
 #stop_time               =   100.0         # Max (simulated) time to evolve
-max_step                =  2000           # Max number of time steps
+max_step                =  1000           # Max number of time steps
 #max_step                =  2
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
@@ -25,7 +25,7 @@ ns.cfl               = 0.5
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #            INPUT AND OUTPUT           #
 #.......................................#
-amr.plot_int            =   100          # Steps between plot files
+amr.plot_int            =   10          # Steps between plot files
 #amr.plot_per            =   5.0         # Time between plot files
 amr.check_int           =   1000        # Steps between checkpoint files
 amr.restart             =   "" # "chk01000.temp"  # Checkpoint to restart from

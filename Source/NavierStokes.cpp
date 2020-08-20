@@ -362,8 +362,8 @@ NavierStokes::advance (Real time,
     if (do_mom_diff == 1) velocity_advection(dt);
 
     // testing...
-    std::cout << ">>> CALLING SADVECT AGAIN <<<" << "\n";;
-    scalar_advection(dt,first_scalar,last_scalar);    
+    //    std::cout << ">>> CALLING SADVECT AGAIN <<<" << "\n";;
+    //    scalar_advection(dt,first_scalar,last_scalar);    
 
     // Add the advective and other terms to get scalars at t^{n+1}.
     if (do_scalar_update_in_order)

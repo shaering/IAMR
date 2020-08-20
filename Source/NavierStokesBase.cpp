@@ -3864,7 +3864,7 @@ NavierStokesBase::velocity_advection (Real dt)
 		//#endif
 
 		// this fucks everything up...               const Box& forcebx = grow(bx,1);
-		const Box& forcebx = grow(bx,0);
+		const Box forcebx = grow(bx,0);
                 tforces.resize(forcebx,AMREX_SPACEDIM);
                 getForce(tforces,forcebx,1,Xvel,AMREX_SPACEDIM,prev_time,Umf[U_mfi],Smf[U_mfi],rhs[U_mfi],0);  
 
@@ -4381,16 +4381,12 @@ NavierStokesBase::velocity_advection_update (Real dt)
         if (getForceVerbose) amrex::Print() << "Calling getForce..." << '\n';
         const Real half_time = 0.5*(state[State_Type].prevTime()+state[State_Type].curTime());
         tforces.resize(bx,AMREX_SPACEDIM);
-<<<<<<< HEAD
 
-	//        getForce(tforces,bx,0,Xvel,AMREX_SPACEDIM,half_time,VelFAB,ScalFAB,rhsFAB,0);
+	//        getForce(tforces,bx,0,Xvel,AMREX_SPACEDIM,half_time,VelFAB,ScalFAB,rhsFAB,0);	
+        Elixir tf_i = tforces.elixir();  
         getForce(tforces,bx,0,Xvel,AMREX_SPACEDIM,half_time,VelFAB,ScalFAB,rhs[mfi],0);	
 
   //OG        getForce(tforces,bx,0,Xvel,BL_SPACEDIM,half_time,Vel,Scal,rhs[Rhohalf_mfi],0,level);	
-=======
-        Elixir tf_i = tforces.elixir();
-        getForce(tforces,bx,0,Xvel,AMREX_SPACEDIM,half_time,VelFAB,ScalFAB,0);
->>>>>>> upstream/development
 
         //
         // Do following only at initial iteration--per JBB.
@@ -4437,7 +4433,7 @@ NavierStokesBase::velocity_advection_update (Real dt)
     }
 }
 
- std::cout << " OK HERE \n"; 
+// std::cout << " OK HERE \n"; 
     for (int sigma = 0; sigma < AMREX_SPACEDIM; sigma++)
     {
        if (U_old.contains_nan(sigma,1,0))
@@ -4560,12 +4556,16 @@ NavierStokesBase::initial_velocity_diffusion_update (Real dt)
 #ifdef _OPENMP
 #pragma omp parallel if (Gpu::notInLaunchRegion())
 #endif
+
+
+        FArrayBox tforces_fab;	
+	
         for (MFIter mfi(tforces,TilingIfNotGPU()); mfi.isValid(); ++mfi)
         {
 
-	  std::cout << "okay 1\n";
+	  //	  std::cout << "okay 1\n";
 	  
-           const Box& bx = mfi.tilebox();
+           const Box&  bx      = mfi.tilebox();
            auto const& force   = tforces.array(mfi);
            auto const& viscT   = visc_terms.array(mfi);
            auto const& gradp   = Gp.array(mfi);
@@ -4576,26 +4576,44 @@ NavierStokesBase::initial_velocity_diffusion_update (Real dt)
            auto const& vel_new = U_new.array(mfi,xvel);
            auto const& advT    = aofs->array(mfi,xvel);
 
-	  std::cout << "okay 2\n";
+           auto& tforces_fab = tforces[mfi];
+	   const int*  f_lo = tforces_fab.loVect();
+	   const int*  f_hi = tforces_fab.hiVect();
+ 	   //const int*  f_lo = force.loVect();
+	   //const int*  f_hi = force.hiVect();
+
+
+	   //	   std::cout << "okay 2 " << *(f_lo+0) << " " << *(f_lo+1) << " " << *(f_lo+2) << " " << *f_hi << "\n";
+
+	   const int lo1 = *(f_lo+0);
+	   const int lo2 = *(f_lo+1);
+	   const int lo3 = *(f_lo+2);
+	   const int hi1 = *(f_hi+0);
+	   const int hi2 = *(f_hi+1);
+	   const int hi3 = *(f_hi+2);	   	   
 	   
            int mom_diff = do_mom_diff;
-           amrex::ParallelFor(bx, AMREX_SPACEDIM, [force,viscT,gradp,rhohalf,advT,rho_old,rho_new,vel_old,vel_new,mom_diff,dt]
+           amrex::ParallelFor(bx, AMREX_SPACEDIM, [force,viscT,gradp,rhohalf,advT,rho_old,rho_new,vel_old,vel_new,mom_diff,dt,lo1,lo2,lo3,hi1,hi2,hi3]
            AMREX_GPU_DEVICE (int i, int j, int k, int n) noexcept
            {
 
-	  std::cout << "okay 3\n";
-	  
-              // Set force += (visc - Gp) / rho_half - aofs
-	  force(i,j,k,n) += viscT(i,j,k,n) - gradp(i,j,k,n); // force not same size as viscT and gradp
 
-	      std::cout << "okay 3a\n";
+	     //	     std::cout << "okay 3\n" << "(i,j,k): " << i << " " << j << " " << k << "\n";;
+	     //	     std::cout << "f: " << f_lo[0] << " " << j << " " << k << "\n";;	     
+
+	     if(i>=lo1 && i<=hi1 && j>=lo2 && j<=hi2 && k>=lo3 && k<=hi3) {
+	     
+              // Set force += (visc - Gp) / rho_half - aofs
+ 	      force(i,j,k,n) += viscT(i,j,k,n) - gradp(i,j,k,n); // force not same size as viscT and gradp
+
+	      //	      std::cout << "okay 3a\n";
 
               if ( !mom_diff ) {
-  	         std::cout << "okay 3b\n";		
+		//  	         std::cout << "okay 3b\n";		
                  force(i,j,k,n) /= rhohalf(i,j,k);
               }
 
-	  std::cout << "okay 4\n";
+	      //	  std::cout << "okay 4\n";
 	      
               force(i,j,k,n) -= advT(i,j,k,n);
               // if mom_diff : U_new = (force* dt + U_old * rho_old) / rho_new
@@ -4606,7 +4624,8 @@ NavierStokesBase::initial_velocity_diffusion_update (Real dt)
                  vel_new(i,j,k,n) = vel_old(i,j,k,n) + force(i,j,k,n) * dt;
               }
 
-	  std::cout << "okay 5\n";
+	      // 	  std::cout << "okay 5\n";
+	     };
 	      
            });
         }
