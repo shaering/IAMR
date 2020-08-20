@@ -224,7 +224,7 @@ contains
              force(i,j,k,scomp) = 0.d0
 
                if(isnan(force(i,j,k,scomp))) print*, " F NAN at:", i,j,k,scomp
-               if(isnan(rhs(i,j,k,scomp))) print*, " RHS NAN at:", i,j,k,scomp                                   
+               if(isnan(rhs(i,j,k,0))) print*, " RHS NAN at:", i,j,k
 
           elseif (scomp .EQ. 3) then ! all scalars
 
@@ -239,9 +239,9 @@ contains
              if(isnan(force(i,j,k,scomp))) print*, " F NAN at:", i,j,k,scomp
              if(isnan(force(i,j,k,scomp+1))) print*, " F NAN at:", i,j,k,scomp+1
              if(isnan(force(i,j,k,scomp+2))) print*, " F NAN at:", i,j,k,scomp+2             
-             if(isnan(rhs(i,j,k,scomp))) print*, " RHS NAN at:", i,j,k,scomp
-             if(isnan(rhs(i,j,k,scomp+1))) print*, " RHS NAN at:", i,j,k,scomp+1
-             if(isnan(rhs(i,j,k,scomp+2))) print*, " RHS NAN at:", i,j,k,scomp+2             
+             if(isnan(rhs(i,j,k,0))) print*, " RHS NAN at:", i,j,k
+             if(isnan(rhs(i,j,k,1))) print*, " RHS NAN at:", i,j,k
+             if(isnan(rhs(i,j,k,2))) print*, " RHS NAN at:", i,j,k
 
           elseif (scomp .EQ. 4) then ! tracer only
 
@@ -250,7 +250,7 @@ contains
              force(i,j,k,scomp) = 0.d0
 
                if(isnan(force(i,j,k,scomp))) print*, " F NAN at:", i,j,k,scomp
-               if(isnan(rhs(i,j,k,scomp))) print*, " RHS NAN at:", i,j,k,scomp                                                
+               if(isnan(rhs(i,j,k,0))) print*, " RHS NAN at:", i,j,k
 
           elseif (scomp .EQ. 5) then ! temp only
 
@@ -264,7 +264,7 @@ contains
              !             endif
 
                if(isnan(force(i,j,k,scomp))) print*, " F NAN at:", i,j,k,scomp
-               if(isnan(rhs(i,j,k,scomp))) print*, " RHS NAN at:", i,j,k,scomp                                                
+               if(isnan(rhs(i,j,k,0))) print*, " RHS NAN at:", i,j,k
 
           else ! who knows
 
