@@ -11,7 +11,7 @@
 #include <iamr_mol.H>
 #endif
 
-#include <NavierStokes.H>//
+#include <NavierStokes.H>// okay to have this here?
 #include <NavierStokesBase.H>
 #include <NAVIERSTOKES_F.H>
 #include <AMReX_filcc_f.H>
@@ -238,9 +238,8 @@ NavierStokesBase::NavierStokesBase (Amr&            papa,
     :
     AmrLevel(papa,lev,level_geom,bl,dm,time)
 {
-    //
+
     // 8/2020 - Neither MLMG nor IAMR fully support rz 
-    //
     if ( level_geom.IsRZ() )
       amrex::Abort("RZ geometry is not currently supported");
   
@@ -249,20 +248,18 @@ NavierStokesBase::NavierStokesBase (Amr&            papa,
     }
 
     const BoxArray& P_grids = state[Press_Type].boxArray();
-    //
+
     // Alloc old_time pressure.
-    //
     state[Press_Type].allocOldData();
-    //
+
     // Alloc space for density and temporary pressure variables.
-    //
     if (level > 0)
     {
         rho_avg.define(grids,dmap,1,1,MFInfo(),Factory());
         p_avg.define(P_grids,dmap,1,0,MFInfo(),Factory());
     }
 
-    //
+
     // rho_half is passed into level_project to be used as sigma in the MLMG
     // solve, but MLMG doesn't copy any ghost cells, it fills what it needs itself.
     // does rho_half still need any ghost cells?
@@ -271,10 +268,9 @@ NavierStokesBase::NavierStokesBase (Amr&            papa,
     rho_ctime.define(grids,dmap,1,1,MFInfo(),Factory());
     rho_qtime  = 0;
     rho_tqtime = 0;
-    //
+
     // Build metric coefficients for RZ calculations.
     // Build volume and areas.
-    //
     buildMetrics();
 
 
@@ -289,9 +285,8 @@ NavierStokesBase::NavierStokesBase (Amr&            papa,
     //FIXME --- this fn is really similar to restart()... work on that later
 #endif
 
-    //
+    
     // Set up reflux registers.
-    //
     sync_reg = 0;
     if (level > 0 && do_sync_proj)
     {
@@ -304,49 +299,59 @@ NavierStokesBase::NavierStokesBase (Amr&            papa,
         advflux_reg  = new FluxRegister(grids,dmap,crse_ratio,level,NUM_STATE);
         viscflux_reg = new FluxRegister(grids,dmap,crse_ratio,level,NUM_STATE);
     }
-    //
+
     // Initialize work multifabs.
-    //
     u_mac   = 0;
     aofs    = 0;
 
-    //
     // Set up the level projector.
-    //
     if (projector == 0)
     {
         projector = new Projection(parent,&phys_bc,do_sync_proj,
                                    parent->finestLevel(),radius_grow);
     }
+    //    std::cout << " Calling install_level 1 \n";
     projector->install_level(level,this,&radius);
-    //
+    //    std::cout << " Done install_level 1 \n";
+    //    std::cout << " \n";        
+
     // Set up the godunov box.
-    //
     SetGodunov();
-    //
+    //    std::cout << " Done godunov 1 \n";        
+    
     // Set up diffusion.
-    //
     diffusion = new Diffusion(parent,this,
                               (level > 0) ? getLevel(level-1).diffusion : 0,
                               NUM_STATE,viscflux_reg,is_diffusive,visc_coef);
-    //
+    //    std::cout << " Done diffusion 1 \n";            
+
     // Allocate the storage for variable viscosity and diffusivity
-    //
     diffn_cc = new MultiFab(grids, dmap, NUM_STATE-Density-1, 1, MFInfo(), Factory());
     diffnp1_cc = new MultiFab(grids, dmap, NUM_STATE-Density-1, 1, MFInfo(), Factory());
     viscn_cc = new MultiFab(grids, dmap, 1, 1, MFInfo(), Factory());
     viscnp1_cc = new MultiFab(grids, dmap, 1, 1, MFInfo(), Factory());
+    //    std::cout << " Done diff/visc 1 \n";            
 
-    //
     // Set up the mac projector.
-    //
     if (mac_projector == 0)
     {
         mac_projector = new MacProj(parent,parent->finestLevel(),
                                     &phys_bc,radius_grow);
     }
+    
+    //    std::cout << " Calling install_level 2 \n";    
     mac_projector->install_level(level,this);
+    //    std::cout << " Done install_level 2 \n";
+
+
+    amrex::AllPrint() << " xxxxx proc. = " << ParallelDescriptor::MyProc() << ", tag = " <<
+      ParallelDescriptor::SeqNum()
+		      << " file = " << __FILE__ << " function = " << __FUNCTION__
+		      << " line = " << __LINE__ << std::endl;
+    
+    
 }
+
 
 NavierStokesBase::~NavierStokesBase ()
 {
@@ -1515,6 +1520,7 @@ NavierStokesBase::estTimeStep ()
 #endif
 
 	    getForce(tforces_fab,bx,n_grow,0,AMREX_SPACEDIM,cur_time,S_new[mfi],S_new[mfi],rhs[mfi],Density);
+	    //	    std::cout << " okay 1\n";
 
 	    //getForce(tforces_fab,bx,n_grow,Xvel,AMREX_SPACEDIM,cur_time,U_new[mfi],U_new[mfi],Density);
 	    // cut out for now
@@ -1524,6 +1530,7 @@ NavierStokesBase::estTimeStep ()
             //if (getForceVerbose) std::cout << "...and done\n";            
 	    //	    getForce(tforces,bx,nGrowF,fscalar,num_scalars,prev_time,Umf[S_mfi],Smf[S_mfi],rhs[S_mfi],0,level)
             tforces[mfi].copy<RunOn::Host>(tforces_fab,bx,0,bx,0,AMREX_SPACEDIM);
+	    //	    std::cout << " okay 2\n";	    
 
 	    // added in UPSTREAM
 	    /*
@@ -1543,6 +1550,7 @@ NavierStokesBase::estTimeStep ()
 	    
         }
     }
+    //    std::cout << " okay 3\n";    
 
   // isnt this necessary? removed in UPSTREAM
 //OG
@@ -1551,14 +1559,12 @@ NavierStokesBase::estTimeStep ()
 //OG    for (int idim = 0; idim < AMREX_SPACEDIM; ++idim )
 //OG        MultiFab::Divide(tforces, rho_ctime, 0, idim, 1, 0);
 
-    //
-    // Find local max of tforces
-    //
-    //check bounds error    f_max = tforces.norm0({AMREX_D_DECL(0,1,2)},0,true,true);
 
-    //
+    // Find local max of tforces
+    //    f_max = tforces.norm0({AMREX_D_DECL(0,1,2)},0,true,true);    //check bounds error
+    //	    std::cout << " okay 4\n";
+
     // Compute local estdt
-    //
     const Real* dx = geom.CellSize();
 
     for (int idim = 0; idim < AMREX_SPACEDIM; ++idim)
@@ -1573,10 +1579,10 @@ NavierStokesBase::estTimeStep ()
             estdt = std::min(estdt, std::sqrt(2.0*dx[idim]/f_max[idim]));
         }
     }
+    //    std::cout << " okay 5\n";    
 
-    //
+
     // Reduce estimated dt by CFL factor and find global min
-    //
     ParallelDescriptor::ReduceRealMin(estdt);
 
     if ( estdt < 1.0e+20) {
@@ -1637,6 +1643,7 @@ NavierStokesBase::estTimeStep ()
     return estdt;
 }
 
+
 const MultiFab&
 NavierStokesBase::get_rho (Real time)
 {
@@ -1671,6 +1678,7 @@ NavierStokesBase::get_rho (Real time)
         return rho_ptime; // Got to return something to shut up compiler.
     }
 }
+
 
 MultiFab&
 NavierStokesBase::get_rho_half_time ()
@@ -2919,10 +2927,9 @@ NavierStokesBase::restart (Amr&          papa,
 #ifdef AMREX_USE_EB
     amrex::Warning("Restart not tested with EB yet.");
 #endif
-    //
+
     // Build metric coefficients for RZ calculations.
     // Build volume and areas.
-    //
     buildMetrics();
 
     if (projector == 0)
@@ -2930,10 +2937,11 @@ NavierStokesBase::restart (Amr&          papa,
         projector = new Projection(parent,&phys_bc,do_sync_proj,
                                    parent->finestLevel(),radius_grow);
     }
+    std::cout << " Calling install_level 3 \n";    
     projector->install_level(level, this, &radius);
-    //
+    std::cout << " Done install_level 3 \n";    
+
     // Set the godunov box.
-    //
     SetGodunov();
 
     if (mac_projector == 0)
@@ -2941,7 +2949,9 @@ NavierStokesBase::restart (Amr&          papa,
         mac_projector = new MacProj(parent,parent->finestLevel(),
                                     &phys_bc,radius_grow);
     }
+    std::cout << " Calling install_level 4 \n";    
     mac_projector->install_level(level,this);
+    std::cout << " Done install_level 4 \n";    
 
     const BoxArray& P_grids = state[Press_Type].boxArray();
 #ifdef AMREX_USE_EB
