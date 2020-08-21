@@ -143,10 +143,9 @@ Projection::~Projection ()
   if (verbose) amrex::Print() << "Deleting projector\n";
 }
 
-//
-// Install a level of the projection.
-//
 
+
+// Install a level of the projection.
 void
 Projection::install_level (int                   level,
                            AmrLevel*             level_data,
@@ -170,12 +169,15 @@ Projection::install_level (int                   level,
     LevelData[level] = level_data;
     radius[level] = _radius;
 
+    
 #ifdef AMREX_USE_EB
     const auto& _ebfactory =
       dynamic_cast<EBFArrayBoxFactory const&>(LevelData[level]->Factory());
     ebfactory[level] = &_ebfactory;
-#endif
+#endi
+    f
 }
+
 
 void
 Projection::install_anelastic_coefficient (int                   level,

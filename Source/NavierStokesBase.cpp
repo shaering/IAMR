@@ -2964,9 +2964,8 @@ NavierStokesBase::restart (Amr&          papa,
     VisMF::Read(*gradp, gradp_mf_fullpath, faHeader);
 #endif
 
-    //
+    
     // Alloc space for density and temporary pressure variables.
-    //
     if (level > 0)
     {
         rho_avg.define(grids,dmap,1,1,MFInfo(),Factory());
@@ -3869,17 +3868,17 @@ NavierStokesBase::velocity_advection (Real dt)
 		//#endif
 
 
-		//		const Box forcebx = grow(bx,1); // this makes the forcing array 2cell halo
-		const Box forcebx = grow(bx,0);		
+		const Box forcebx = grow(bx,1); 
                 tforces.resize(forcebx,AMREX_SPACEDIM);
-                getForce(tforces,forcebx,1,Xvel,AMREX_SPACEDIM,prev_time,Umf[U_mfi],Smf[U_mfi],rhs[U_mfi],0);  
+                getForce(tforces,forcebx,0,Xvel,AMREX_SPACEDIM,prev_time,Umf[U_mfi],Smf[U_mfi],rhs[U_mfi],0);  
 
   //OG                getForce(tforces,bx,1,Xvel,BL_SPACEDIM,prev_time,Umf[U_mfi],Smf[U_mfi],rhs[U_mfi],0,level);
 		//not necessary?		rhs.SumBoundary(Geom().periodicity());
 		//rhs.FillBoundary(Geom().periodicity());
-                if (getForceVerbose) std::cout << "...and done\n";            
+		//                if (getForceVerbose) std::cout << "...and done\n";            
 
                 godunov->Sum_tf_gp_visc(tforces,visc_terms[U_mfi],Gp[U_mfi],rho_ptime[U_mfi]);
+		//                godunov->Sum_tf_gp_visc(tforces,visc_terms[U_mfi],Gp[U_mfi],Rmf[U_mfi]);		
 
                 D_TERM(bndry[0] = fetchBCArray(State_Type,bx,0,1);,
                        bndry[1] = fetchBCArray(State_Type,bx,1,1);,

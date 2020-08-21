@@ -60,7 +60,7 @@ particles.timestamp_indices = 1
 #        ADAPTIVE MESH REFINEMENT       #
 #.......................................#
 amr.n_cell              =   64 32 32    # Grid cells at coarsest AMRlevel
-amr.max_level           =   0           # Max AMR level in hierarchy
+amr.max_level           =   1           # Max AMR level in hierarchy
 amr.grid_eff            =   0.7
 amr.n_error_buf         =   1
 amr.max_grid_size_x     =   1024
@@ -68,7 +68,7 @@ amr.max_grid_size_y     =   512
 amr.max_grid_size_z     =   512
 amr.blocking_factor     =   8
 amr.ref_ratio		=   2
-amr.regrid_int          =   100
+amr.regrid_int          =   10
 #amr.refine_grid_layout  =   1
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
@@ -97,9 +97,9 @@ ns.hi_bc   	      	= 0 5 0
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #              DEBUG                    #
 #.......................................#
-amrex.fpe_trap_invalid = 1
-amrex.fpe_trap_zero = 1
-amrex.fpe_trap_overflow = 1
+#amrex.fpe_trap_invalid = 1
+#amrex.fpe_trap_zero = 1
+#amrex.fpe_trap_overflow = 1
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #              VERBOSITY                #

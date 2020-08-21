@@ -288,12 +288,8 @@ contains
       end do
       end do
 
-
-
-
 !      call flush(6)
-
-      print*, " DONE WITH FORT_MAKEFORCE"
+!      print*, " DONE WITH FORT_MAKEFORCE"
 
    end subroutine FORT_MAKEFORCE
   

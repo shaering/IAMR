@@ -627,6 +627,7 @@ NavierStokes::predict_velocity (Real  dt)
 	    //            FArrayBox& tforces = Umf[U_mfi];
 
             if (getForceVerbose) {
+	      //	        std::cout << " *** Time: " << amrptr->cumTime() << "\n" << "\n";
                 Print() << "--------------------- \n "
                         << "A - Predict velocity: \n" 
                         << "--------------------- \n ";
@@ -837,7 +838,8 @@ NavierStokes::scalar_advection (Real dt,
 
 		// from upstream dev
 		//		std::cout << " ...FIRST CALL...\n";		
-                getForce(tforces,bx,nGrowF,fscalar,num_scalars,prev_time,Umf[S_mfi],Smf[S_mfi],rhs[S_mfi],0);
+		//                getForce(tforces,bx,nGrowF,fscalar,num_scalars,prev_time,Umf[S_mfi],Smf[S_mfi],rhs[S_mfi],0);
+                getForce(tforces,bx,1,fscalar,num_scalars,prev_time,Umf[S_mfi],Smf[S_mfi],rhs[S_mfi],0);		
 
 		//		std::cout << " ...CALLING AGAIN TO CHECK MAX/MIN...\n";
 		//                getForce(tforces,bx,nGrowF,fscalar,num_scalars,prev_time,Umf[S_mfi],Smf[S_mfi],rhs[S_mfi],0);		

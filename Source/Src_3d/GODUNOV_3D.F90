@@ -6880,16 +6880,18 @@ contains
       end do
       end subroutine fort_sum_tf_gp
 
+      
+!---------------------------------------------------------
+!     sum pressure forcing and viscous forcing into
+!     tforces
+!---------------------------------------------------------      
       subroutine fort_sum_tf_gp_visc( &
           tforces,DIMS(tf), &
           visc,DIMS(visc), &
           gp,DIMS(gp), &
           rho,DIMS(rho), &
           lo,hi ) bind(C,name="fort_sum_tf_gp_visc")
-!c
-!c     sum pressure forcing and viscous forcing into
-!c     tforces
-!c
+
       implicit none
       integer i, j, k, n
       integer DIMDEC(tf)

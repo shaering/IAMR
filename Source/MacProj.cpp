@@ -760,7 +760,8 @@ MacProj::mac_sync_compute (int                   level,
 
             const Box& forcebx = grow(bx,1);
             tforces.resize(forcebx,NUM_STATE);
-            ns_level.getForce(tforces,forcebx,1,0,NUM_STATE,prev_time,Smf[Smfi],Smf[Smfi],rhs[Smfi],Density);
+	    //            ns_level.getForce(tforces,forcebx,1,0,NUM_STATE,prev_time,Smf[Smfi],Smf[Smfi],rhs[Smfi],Density);	
+            ns_level.getForce(tforces,forcebx,0,0,NUM_STATE,prev_time,Smf[Smfi],Smf[Smfi],rhs[Smfi],Density);    
   
 	    //	    std::cout << " getForce call (MacProj 1) \n";
 	    //OG            ns_level.getForce(tforces,bx,1,0,NUM_STATE,prev_time,Smf[Smfi],Smf[Smfi],rhs[Smfi],Density,level);

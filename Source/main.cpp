@@ -96,8 +96,11 @@ main (int   argc,
             max_step = std::min(max_step, num_steps + amrptr->levelSteps(0));
         }
 
-	amrex::Print() << "Using effective max_step = " << max_step << '\n';
+	amrex::Print() << "Using effective max_step = " << max_step << '\n';	
     }
+
+    std::cout << " *** Time: " << amrptr->cumTime() << "\n" << "\n";
+    
     //
     // If we set the regrid_on_restart flag and if we are *not* going to take
     // a time step then we want to go ahead and regrid here.
