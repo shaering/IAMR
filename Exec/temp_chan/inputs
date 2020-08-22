@@ -27,8 +27,9 @@ ns.cfl               = 0.5
 #.......................................#
 amr.plot_int            =   10          # Steps between plot files
 #amr.plot_per            =   5.0         # Time between plot files
-amr.check_int           =   1000        # Steps between checkpoint files
-amr.restart             =   "" # "chk01000.temp"  # Checkpoint to restart from
+amr.check_int           =   100        # Steps between checkpoint files
+amr.restart             =   ""         # Checkpoint to restart from
+#amr.restart             =   "chk00100.temp"
 amr.derive_plot_vars    = re_grad particle_count mag_vort
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#

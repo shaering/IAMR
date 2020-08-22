@@ -157,23 +157,23 @@ Projection::install_level (int                   level,
 
     if (level > LevelData.size() - 1)
     {
-      std::cout << "okay 1\n";
+      //      std::cout << "okay 1\n";
         LevelData.resize(finest_level+1);
         radius.resize(finest_level+1);
-      std::cout << "okay 2\n";	
+	//      std::cout << "okay 2\n";	
     }
 
     if (level > anel_coeff.size()-1) {
-      std::cout << "okay 3\n";      
+      //      std::cout << "okay 3\n";      
        anel_coeff.resize(level+1);
        anel_coeff[level] = 0;
-      std::cout << "okay 4\n";       
+       //      std::cout << "okay 4\n";       
     }
 
-      std::cout << "okay 5\n";    
+    //      std::cout << "okay 5\n";    
     LevelData[level] = level_data;
     radius[level] = _radius;
-      std::cout << "okay 6\n";    
+    //      std::cout << "okay 6\n";    
 
     
 #ifdef AMREX_USE_EB

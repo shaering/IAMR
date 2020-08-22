@@ -290,6 +290,12 @@ NavierStokes::advance (Real time,
 {
     BL_PROFILE("NavierStokes::advance()");
 
+
+      amrex::AllPrint() << " aaaaa proc. = " << ParallelDescriptor::MyProc() << ", tag = " <<
+      ParallelDescriptor::SeqNum()
+		      << " file = " << __FILE__ << " function = " << __FUNCTION__
+		      << " line = " << __LINE__ << std::endl;
+    
     if (verbose)
     {
         Print() << "Advancing grids at level " << level
@@ -322,6 +328,11 @@ NavierStokes::advance (Real time,
         printMaxValues(false);
     }
 
+      amrex::AllPrint() << " aaaaa proc. = " << ParallelDescriptor::MyProc() << ", tag = " <<
+      ParallelDescriptor::SeqNum()
+		      << " file = " << __FILE__ << " function = " << __FUNCTION__
+		      << " line = " << __LINE__ << std::endl;    
+
     // Compute traced states for normal comp of velocity at half time level.
     Real dt_test = predict_velocity(dt);
 
@@ -353,13 +364,16 @@ NavierStokes::advance (Real time,
     const int first_scalar = Density;
     const int last_scalar  = first_scalar + NUM_SCALARS - 1;
     scalar_advection(dt,first_scalar,last_scalar);
+    //    std::cout << "okay 1\n";
 
     // Update Rho.
     scalar_update(dt,first_scalar,first_scalar);
     make_rho_curr_time();
+		 //    std::cout << "okay 2\n";		 
 
     // Advect momenta after rho^(n+1) has been created.
     if (do_mom_diff == 1) velocity_advection(dt);
+		 //    std::cout << "okay 3\n";		 
 
     // testing...
     //    std::cout << ">>> CALLING SADVECT AGAIN <<<" << "\n";;
@@ -379,6 +393,7 @@ NavierStokes::advance (Real time,
     {
 	scalar_update(dt,first_scalar+1,last_scalar);
     }
+					      //    std::cout << "okay 4\n";					      
 
     // S appears in rhs of the velocity update, so we better do it now.
     if (have_divu)
@@ -392,9 +407,11 @@ NavierStokes::advance (Real time,
                                get_new_data(Dsdt_Type),0,0,1,0);
         }
     }
+		 //    std::cout << "okay 5\n";		 
 
     // Add the advective and other terms to get velocity at t^{n+1}.
     velocity_update(dt);
+		 //    std::cout << "okay 6\n";		 
 
     // Increment rho average.
     if (!initial_step)
@@ -414,6 +431,7 @@ NavierStokes::advance (Real time,
         if (level > 0 && iteration == 1)
            p_avg.setVal(0);
     }
+		       //    std::cout << "okay 7\n";		       
 
 
 #ifdef AMREX_PARTICLES
@@ -465,6 +483,14 @@ Real
 NavierStokes::predict_velocity (Real  dt)
 {
     BL_PROFILE("NavierStokes::predict_velocity()");
+
+      amrex::AllPrint() << " xxxxx1 proc. = " << ParallelDescriptor::MyProc() << ", tag = " <<
+      ParallelDescriptor::SeqNum()
+		      << " file = " << __FILE__ << " function = " << __FUNCTION__
+		      << " line = " << __LINE__ << std::endl;
+	
+
+    
 
     if (verbose) Print() << "... predict edge velocities\n";
     //
@@ -614,6 +640,11 @@ NavierStokes::predict_velocity (Real  dt)
         FArrayBox tforces;
         Vector<int> bndry[BL_SPACEDIM];
 
+      amrex::AllPrint() << " xxxxx2 proc. = " << ParallelDescriptor::MyProc() << ", tag = " <<
+      ParallelDescriptor::SeqNum()
+		      << " file = " << __FILE__ << " function = " << __FUNCTION__
+		      << " line = " << __LINE__ << std::endl;
+	
 
 	//AMReX provides an iterator, MFIter for looping over the FArrayBoxes in MultiFabs
         for (MFIter U_mfi(Umf,true); U_mfi.isValid(); ++U_mfi) // this iters over FArrayBoxes in the MultiFab
@@ -686,18 +717,16 @@ NavierStokes::scalar_advection (Real dt,
 {
     BL_PROFILE("NavierStokes::scalar_advection()");
 
-    if (verbose) Print() << "... advect scalars\n";
-    //
+    if (verbose) Print() << "... advect scalars\n";   
+    
     // Get simulation parameters.
-    //
     const int   num_scalars    = lscalar - fscalar + 1;
     const Real* dx             = geom.CellSize();
     const Real  prev_time      = state[State_Type].prevTime();
 
-    //
     // Get the viscous terms.
-    //
     MultiFab visc_terms(grids,dmap,num_scalars,1,MFInfo(),Factory());
+    //    std::cout << "okay A\n";     
 
     if (be_cn_theta != 1.0)
     {
@@ -707,27 +736,30 @@ NavierStokes::scalar_advection (Real dt,
     {
         visc_terms.setVal(0.0,1);
     }
+    //    std::cout << "okay B\n";         
 
     int nGrowF = 1;
     MultiFab* divu_fp = getDivCond(nGrowF,prev_time);
     MultiFab* dsdt    = getDsdt(nGrowF,prev_time);
     MultiFab::Saxpy(*divu_fp, 0.5*dt, *dsdt, 0, 0, 1, nGrowF);
     delete dsdt;
+    //    std::cout << "okay C\n";         
 
     MultiFab fluxes[BL_SPACEDIM];
+    //    std::cout << "okay D\n";     
 
     for (int i = 0; i < BL_SPACEDIM; i++)
     {
         const BoxArray& ba = getEdgeBoxArray(i);
         fluxes[i].define(ba, dmap, num_scalars, 0, MFInfo(), Factory());
     }
+    //    std::cout << "okay E\n";         
 
-    //
     // Compute the advective forcing.
-    //
     {
         FillPatchIterator S_fpi(*this,visc_terms,Godunov::hypgrow(),prev_time,State_Type,fscalar,num_scalars);
         MultiFab& Smf=S_fpi.get_mf();
+	//        std::cout << "okay E1\n";
 
         // Floor small values of states to be extrapolated
 #ifdef _OPENMP
@@ -735,26 +767,35 @@ NavierStokes::scalar_advection (Real dt,
 #endif
         for (MFIter mfi(Smf,true); mfi.isValid(); ++mfi)
         {
+	  //        std::cout << "okay E1a\n";
             Box gbx=mfi.growntilebox(Godunov::hypgrow());
             auto fab = Smf.array(mfi);
+	    //        std::cout << "okay E1b\n";	    
             AMREX_HOST_DEVICE_FOR_4D ( gbx, num_scalars, i, j, k, n,
             {
+	      //        std::cout << "okay E1c\n";	      
                 auto& val = fab(i,j,k,n);
-                val = std::abs(val) > 1.e-20 ? val : 0;
+		//        std::cout << "okay E1d\n";	      		
+	//	val = std::abs(val) > 1.e-20 ? val : 0; //fpe_trap doesn't like this line
+  	    val = std::abs(val);
             });
+	    //        std::cout << "okay E1e\n";	    
         }
+	//        std::cout << "okay E2\n";         	
 
         FillPatchIterator U_fpi(*this,visc_terms,Godunov::hypgrow(),prev_time,State_Type,Xvel,BL_SPACEDIM);
         const MultiFab& Umf=U_fpi.get_mf();
+	//        std::cout << "okay E3\n";		
 
 
-   // From an already defined MultiFab
-   const BoxArray& ba = Smf.boxArray();
-   const DistributionMapping& dm = Smf.DistributionMap();
-   int ncomp = Smf.nComp();
-   int ngrow = Smf.nGrow();
-   MultiFab rhs(ba,dm,ncomp,ngrow);  // new MF with the same ncomp and ngrow
-   rhs.setVal(0.0);
+        // From an already defined MultiFab
+        const BoxArray& ba = Smf.boxArray();
+        const DistributionMapping& dm = Smf.DistributionMap();
+        int ncomp = Smf.nComp();
+        int ngrow = Smf.nGrow();
+        MultiFab rhs(ba,dm,ncomp,ngrow);  // new MF with the same ncomp and ngrow
+        rhs.setVal(0.0);
+	//        std::cout << "okay F\n";      
 
    
 #ifdef AMREX_PARTICLES   
@@ -767,8 +808,15 @@ NavierStokes::scalar_advection (Real dt,
 #endif   
    //   rhs.SumBoundary(0, ncomp, IntVect(1), Geom().periodicity());
     rhs.SumBoundary(Geom().periodicity()); 	   
+    //    std::cout << "okay G\n";         
 
 
+      amrex::AllPrint() << " xxxxx2 proc. = " << ParallelDescriptor::MyProc() << ", tag = " <<
+      ParallelDescriptor::SeqNum()
+		      << " file = " << __FILE__ << " function = " << __FUNCTION__
+		      << " line = " << __LINE__ << std::endl;
+
+    
 
 #ifdef AMREX_USE_EB
         /////////////////////////////////////////////////////////////////////
@@ -1789,9 +1837,8 @@ NavierStokes::post_init_press (Real&        dt_init,
                 << std::endl;
     }
 
-    //
+
     // Iterate over the advance function.
-    //
     for (int iter = 0; iter < init_iter; iter++)
     {
 
@@ -1804,12 +1851,12 @@ NavierStokes::post_init_press (Real&        dt_init,
 
         for (int k = 0; k <= finest_level; k++ )
         {
+	  //std::cout << " calling advance for getLevel in NS.cpp\n";
             getLevel(k).advance(strt_time,dt_init,1,1);
         }
 
-        //
+
         // This constructs a guess at P, also sets p_old == p_new.
-        //
         Vector<MultiFab*> sig(finest_level+1, nullptr);
 
         for (int k = 0; k <= finest_level; k++)
@@ -2533,6 +2580,8 @@ NavierStokes::getViscTerms (MultiFab& visc_terms,
         // is nonzero.  If const-visc, term is mu.Div(u)/3, else
         // it's -Div(mu.Div(u).I)*2/3
         //
+
+	/* // swh: this is incompressible, this is pointless
         if (have_divu && S_in_vel_diffusion)
         {
             MultiFab divmusi(grids,dmap,BL_SPACEDIM,1,MFInfo(),Factory());
@@ -2542,6 +2591,8 @@ NavierStokes::getViscTerms (MultiFab& visc_terms,
 
             visc_terms.plus(divmusi,Xvel,BL_SPACEDIM,0);
         }
+	*/
+	
     }
     //
     // Get Scalar Diffusive Terms
