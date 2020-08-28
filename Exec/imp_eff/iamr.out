@@ -1,0 +1,4954 @@
+MPI initialized with 2 MPI processes
+MPI initialized with thread support level 0
+AMReX (20.08-68-g547e0f040a8e-dirty) initialized
+Temp ID:5
+ NUM_STATE1 = 4
+Temp ID:5
+ NUM_STATE1 = 4
+ NUM_STATE2 = 5
+ NUM_STATE3 = 5
+ NUM_STATE4 = 6
+ NUM_STATE = 6
+ NUM_STATE2 = 5
+ NUM_STATE3 = 5
+ NUM_STATE4 = 6
+ NUM_STATE = 6
+ NUM_SCALARS = 3
+ DENSITY = 3
+ TEMP = 5
+ DO_TRAC2 = 0
+ NUM_SCALARS = 3
+ DENSITY = 3
+ TEMP = 5
+ DO_TRAC2 = 0
+ DO_TEMP = 1
+Trac: 4
+Temp: 5
+ DO_TEMP = 1
+Trac: 4
+Temp: 5
+Refining on RE_GRAD
+&FORTIN
+ RGERR=  100.00000000000000     ,
+ /
+ bbbbb proc. = 1, tag = 1000 file = ../../Source/NavierStokesBase.cpp function = NavierStokesBase line = 350
+NavierStokesBase::init_additional_state_types()::have_divu = 1
+NavierStokesBase::init_additional_state_types()::have_dsdt = 1
+NavierStokesBase::init_additional_state_types: num_state_type = 4
+Creating projector
+Installing projector level 0
+ bbbbb proc. = 0, tag = 1000 file = ../../Source/NavierStokesBase.cpp function = NavierStokesBase line = 350
+Redistributing from processor 0 to 0
+ParticleContainer byte spread across MPI nodes: [0 (0) ... 288 (2)] total particles: (2)
+ParticleContainer::Redistribute() time: 0.0139699
+
+Redistributing from processor 1 to 1
+ParticleContainer byte spread across MPI nodes: [0 (0) ... 576 (4)] total particles: (4)
+ParticleContainer::Redistribute() time: 3.9e-05
+
+ *** initParticleData okay
+Total number of particles: 4
+ParticleContainer byte spread across MPI nodes: [0 (0) ... 576 (4)] total particles: (4)
+InitFromAsciiFile() time: 0.0159372
+ *** initParticleData okay
+ xxxxx proc. = 1, tag = 1010 file = ../../Source/NavierStokesBase.cpp function = estTimeStep line = 1492
+ xxxxx proc. = 0, tag = 1010 file = ../../Source/NavierStokesBase.cpp function = estTimeStep line = 1492
+------------------
+H - est Time Step:
+------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 3
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(0,0,0) - (63,7,7)
+Vel Domain:
+(-1,-1,-1) - (64,32,32)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max 0 / 1.171985818
+Vel  1 min/max -0.2956871012 / 0.2956871037
+Vel  2 min/max -0.1971247358 / 0.1971247358
+Scal 0 min/max 0 / 1.171985818
+Scal 1 min/max -0.2956871012 / 0.2956871037
+Scal 2 min/max -0.1971247358 / 0.1971247358
+Force 0 min/max 0.005062087365 / 0.04629309271
+Force 1 min/max -0.1220613981 / -0.01334716279
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+------------------
+H - est Time Step:
+------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 3
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(0,8,0) - (63,15,7)
+Vel Domain:
+(-1,-1,-1) - (64,32,32)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max 0 / 1.171985818
+Vel  1 min/max -0.2956871012 / 0.2956871037
+Vel  2 min/max -0.1971247358 / 0.1971247358
+Scal 0 min/max 0 / 1.171985818
+Scal 1 min/max -0.2956871012 / 0.2956871037
+Scal 2 min/max -0.1971247358 / 0.1971247358
+Force 0 min/max 0.0395169067 / 0.04883664898
+Force 1 min/max -0.1287679282 / -0.1041933367
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+------------------
+H - est Time Step:
+------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 3
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(0,16,0) - (63,23,7)
+Vel Domain:
+(-1,-1,-1) - (64,32,32)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max 0 / 1.171985818
+Vel  1 min/max -0.2956871012 / 0.2956871037
+Vel  2 min/max -0.1971247358 / 0.1971247358
+Scal 0 min/max 0 / 1.171985818
+Scal 1 min/max -0.2956871012 / 0.2956871037
+Scal 2 min/max -0.1971247358 / 0.1971247358
+Force 0 min/max 0.03951690674 / 0.04883664901
+Force 1 min/max -0.1287679283 / -0.1041933368
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+------------------
+H - est Time Step:
+------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 3
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(0,24,0) - (63,31,7)
+Vel Domain:
+(-1,-1,-1) - (64,32,32)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max 0 / 1.171985818
+Vel  1 min/max -0.2956871012 / 0.2956871037
+Vel  2 min/max -0.1971247358 / 0.1971247358
+Scal 0 min/max 0 / 1.171985818
+Scal 1 min/max -0.2956871012 / 0.2956871037
+Scal 2 min/max -0.1971247358 / 0.1971247358
+Force 0 min/max 0.005062087369 / 0.04629309275
+Force 1 min/max -0.1220613982 / -0.0133471628
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+------------------
+H - est Time Step:
+------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 3
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(0,0,8) - (63,7,15)
+Vel Domain:
+(-1,-1,-1) - (64,32,32)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max 0 / 1.171985818
+Vel  1 min/max -0.2956871012 / 0.2956871037
+Vel  2 min/max -0.1971247358 / 0.1971247358
+Scal 0 min/max 0 / 1.171985818
+Scal 1 min/max -0.2956871012 / 0.2956871037
+Scal 2 min/max -0.1971247358 / 0.1971247358
+Force 0 min/max 0.005062087369 / 0.04629309268
+Force 1 min/max -0.1220613976 / -0.01334716284
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+------------------
+H - est Time Step:
+------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 3
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(0,8,8) - (63,15,15)
+Vel Domain:
+(-1,-1,-1) - (64,32,32)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max 0 / 1.171985818
+Vel  1 min/max -0.2956871012 / 0.2956871037
+Vel  2 min/max -0.1971247358 / 0.1971247358
+Scal 0 min/max 0 / 1.171985818
+Scal 1 min/max -0.2956871012 / 0.2956871037
+Scal 2 min/max -0.1971247358 / 0.1971247358
+Force 0 min/max 0.03951690674 / 0.04883664895
+Force 1 min/max -0.1287679278 / -0.1041933372
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+------------------
+H - est Time Step:
+------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 3
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(0,16,8) - (63,23,15)
+Vel Domain:
+(-1,-1,-1) - (64,32,32)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max 0 / 1.171985818
+Vel  1 min/max -0.2956871012 / 0.2956871037
+Vel  2 min/max -0.1971247358 / 0.1971247358
+Scal 0 min/max 0 / 1.171985818
+Scal 1 min/max -0.2956871012 / 0.2956871037
+Scal 2 min/max -0.1971247358 / 0.1971247358
+Force 0 min/max 0.03951690677 / 0.04883664898
+Force 1 min/max -0.1287679279 / -0.1041933372
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+------------------
+H - est Time Step:
+------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 3
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(0,24,8) - (63,31,15)
+Vel Domain:
+(-1,-1,-1) - (64,32,32)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max 0 / 1.171985818
+Vel  1 min/max -0.2956871012 / 0.2956871037
+Vel  2 min/max -0.1971247358 / 0.1971247358
+Scal 0 min/max 0 / 1.171985818
+Scal 1 min/max -0.2956871012 / 0.2956871037
+Scal 2 min/max -0.1971247358 / 0.1971247358
+Force 0 min/max 0.005062087372 / 0.04629309271
+Force 1 min/max -0.1220613977 / -0.01334716285
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+------------------
+H - est Time Step:
+------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 3
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(0,0,16) - (63,7,23)
+Vel Domain:
+(-1,-1,-1) - (64,32,32)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max 0 / 1.171985818
+Vel  1 min/max -0.2956871012 / 0.2956871037
+Vel  2 min/max -0.1971247358 / 0.1971247358
+Scal 0 min/max 0 / 1.171985818
+Scal 1 min/max -0.2956871012 / 0.2956871037
+Scal 2 min/max -0.1971247358 / 0.1971247358
+Force 0 min/max 0.005062087365 / 0.04629309279
+Force 1 min/max -0.1220613983 / -0.01334716279
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+------------------
+H - est Time Step:
+------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 3
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(0,8,16) - (63,15,23)
+Vel Domain:
+(-1,-1,-1) - (64,32,32)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max 0 / 1.171985818
+Vel  1 min/max -0.2956871012 / 0.2956871037
+Vel  2 min/max -0.1971247358 / 0.1971247358
+Scal 0 min/max 0 / 1.171985818
+Scal 1 min/max -0.2956871012 / 0.2956871037
+Scal 2 min/max -0.1971247358 / 0.1971247358
+Force 0 min/max 0.0395169067 / 0.04883664904
+Force 1 min/max -0.1287679284 / -0.1041933367
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+------------------
+H - est Time Step:
+------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 3
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(0,16,16) - (63,23,23)
+Vel Domain:
+(-1,-1,-1) - (64,32,32)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max 0 / 1.171985818
+Vel  1 min/max -0.2956871012 / 0.2956871037
+Vel  2 min/max -0.1971247358 / 0.1971247358
+Scal 0 min/max 0 / 1.171985818
+Scal 1 min/max -0.2956871012 / 0.2956871037
+Scal 2 min/max -0.1971247358 / 0.1971247358
+Force 0 min/max 0.03951690667 / 0.04883664901
+Force 1 min/max -0.1287679283 / -0.1041933366
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+------------------
+H - est Time Step:
+------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 3
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(0,24,16) - (63,31,23)
+Vel Domain:
+(-1,-1,-1) - (64,32,32)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max 0 / 1.171985818
+Vel  1 min/max -0.2956871012 / 0.2956871037
+Vel  2 min/max -0.1971247358 / 0.1971247358
+Scal 0 min/max 0 / 1.171985818
+Scal 1 min/max -0.2956871012 / 0.2956871037
+Scal 2 min/max -0.1971247358 / 0.1971247358
+Force 0 min/max 0.005062087362 / 0.04629309275
+Force 1 min/max -0.1220613982 / -0.01334716279
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+------------------
+H - est Time Step:
+------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 3
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(0,0,24) - (63,7,31)
+Vel Domain:
+(-1,-1,-1) - (64,32,32)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max 0 / 1.171985818
+Vel  1 min/max -0.2956871012 / 0.2956871037
+Vel  2 min/max -0.1971247358 / 0.1971247358
+Scal 0 min/max 0 / 1.171985818
+Scal 1 min/max -0.2956871012 / 0.2956871037
+Scal 2 min/max -0.1971247358 / 0.1971247358
+Force 0 min/max 0.005062087376 / 0.04629309268
+Force 1 min/max -0.1220613976 / -0.01334716286
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+------------------
+H - est Time Step:
+------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 3
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(0,8,24) - (63,15,31)
+Vel Domain:
+(-1,-1,-1) - (64,32,32)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max 0 / 1.171985818
+Vel  1 min/max -0.2956871012 / 0.2956871037
+Vel  2 min/max -0.1971247358 / 0.1971247358
+Scal 0 min/max 0 / 1.171985818
+Scal 1 min/max -0.2956871012 / 0.2956871037
+Scal 2 min/max -0.1971247358 / 0.1971247358
+Force 0 min/max 0.03951690681 / 0.04883664895
+Force 1 min/max -0.1287679278 / -0.1041933373
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+------------------
+H - est Time Step:
+------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 3
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(0,16,24) - (63,23,31)
+Vel Domain:
+(-1,-1,-1) - (64,32,32)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max 0 / 1.171985818
+Vel  1 min/max -0.2956871012 / 0.2956871037
+Vel  2 min/max -0.1971247358 / 0.1971247358
+Scal 0 min/max 0 / 1.171985818
+Scal 1 min/max -0.2956871012 / 0.2956871037
+Scal 2 min/max -0.1971247358 / 0.1971247358
+Force 0 min/max 0.03951690677 / 0.04883664892
+Force 1 min/max -0.1287679277 / -0.1041933372
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+------------------
+H - est Time Step:
+------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 3
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(0,24,24) - (63,31,31)
+Vel Domain:
+(-1,-1,-1) - (64,32,32)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max 0 / 1.171985818
+Vel  1 min/max -0.2956871012 / 0.2956871037
+Vel  2 min/max -0.1971247358 / 0.1971247358
+Scal 0 min/max 0 / 1.171985818
+Scal 1 min/max -0.2956871012 / 0.2956871037
+Scal 2 min/max -0.1971247358 / 0.1971247358
+Force 0 min/max 0.005062087372 / 0.04629309264
+Force 1 min/max -0.1220613975 / -0.01334716285
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+estTimeStep :: 
+LEV = 0 UMAX = 1.171985818  0.2956871037  0.1971247358   xxxxx proc. = 1, tag = 1011 file = ../../Source/NavierStokesBase.cpp function = estTimeStep line = 1676
+
+        FMAX = 0  0  0  
+estimated timestep: dt = 0.02666414518
+ xxxxx proc. = 0, tag = 1011 file = ../../Source/NavierStokesBase.cpp function = estTimeStep line = 1676
+Multiplying dt by init_shrink: dt = 0.002666414518
+ >>> In Amr::regrid <<<
+ >>> In Amr::regrid <<<
+ ... Regrid 1 ...
+ ... Regrid 2 ...
+ ... Regrid 3 ...
+ ... Regrid 4 ...
+ ... Regrid 5 ...
+ ... Regrid 1 ...
+ ... Regrid 2 ...
+ ... Regrid 3 ...
+ ... Regrid 4 ...
+ ... Regrid 5 ...
+ rrrrr1 proc. = 0, tag = 1016 file = ../../Source/NavierStokesBase.cpp function = post_regrid line = 2790
+ rrrrr1 proc. = 1, tag = 1016 file = ../../Source/NavierStokesBase.cpp function = post_regrid line = 2790
+ rrrrr2 proc. = 1, tag = 1018 file = ../../Source/NavierStokesBase.cpp function = post_regrid line = 2804
+ ... Regrid 6 ...
+ParticleContainer byte spread across MPI nodes: [0 (0) ... 576 (4)] total particles: (4)
+ParticleContainer::Redistribute() time: 2.51e-05
+
+ rrrrr2 proc. = 0, tag = 1018 file = ../../Source/NavierStokesBase.cpp function = post_regrid line = 2804
+ ... Regrid 6 ...
+ >>> Done with Amr::regrid <<<
+ rrrrr1 proc. = 0, tag = 1019 file = ../../Source/NavierStokesBase.cpp function = post_regrid line = 2790
+ >>> Done with Amr::regrid <<<
+ rrrrr1 proc. = 1, tag = 1019 file = ../../Source/NavierStokesBase.cpp function = post_regrid line = 2790
+ParticleContainer byte spread across MPI nodes: [0 (0) ... 576 (4)] total particles: (4)
+ParticleContainer::Redistribute() time: 5.11e-05
+
+ rrrrr2 proc. = 0, tag = 1021 file = ../../Source/NavierStokesBase.cpp function = post_regrid line = 2804
+ rrrrr2 proc. = 1, tag = 1021 file = ../../Source/NavierStokesBase.cpp function = post_regrid line = 2804
+calling initialVelocityProject
+Projection::initialVelocityProject(): levels = 0-0
+CONSTANT DENSITY INITIAL VELOCITY PROJECTION
+
+Projection::initialVelocityProject(): iteration 0
+Nodal Projection:
+ >> Before projection:
+  * On lev 0 max(abs(rhs)) = 9.553773953
+
+MLMG: Initial rhs               = 9.553773949
+MLMG: Initial residual (resid0) = 9.553773949
+MLMG: Final Iter. 6 resid, resid/bnorm = 2.348318707e-12, 2.45800112e-13
+MLMG: Timers: Solve = 0.1187934 Iter = 0.1160805 Bottom = 0.0003372
+ >> After projection:
+  * On lev 0 max(abs(rhs)) = 0.1111486433
+
+After nodal projection:
+  lev 0: max(abs(u,v,w)) = 1.161826573 0.3026042415 0.1776950588
+
+Projection::initialVelocityProject(): iteration 1
+Nodal Projection:
+ >> Before projection:
+  * On lev 0 max(abs(rhs)) = 0.1111486433
+
+MLMG: Initial rhs               = 0.1111486386
+MLMG: Initial residual (resid0) = 0.1111486386
+MLMG: Final Iter. 6 resid, resid/bnorm = 1.246354456e-14, 1.121340281e-13
+MLMG: Timers: Solve = 0.1233779 Iter = 0.1203593 Bottom = 0.0003514
+ >> After projection:
+  * On lev 0 max(abs(rhs)) = 0.001339791643
+
+After nodal projection:
+  lev 0: max(abs(u,v,w)) = 1.161876633 0.302544322 0.1777549002
+
+Projection::initialVelocityProject(): iteration 2
+Nodal Projection:
+ >> Before projection:
+  * On lev 0 max(abs(rhs)) = 0.001339791643
+
+MLMG: Initial rhs               = 0.00133978692
+MLMG: Initial residual (resid0) = 0.00133978692
+MLMG: Final Iter. 6 resid, resid/bnorm = 8.9489193e-17, 6.679360105e-14
+MLMG: Timers: Solve = 0.1156605 Iter = 0.1132088 Bottom = 0.0004129
+ >> After projection:
+  * On lev 0 max(abs(rhs)) = 1.642727206e-05
+
+After nodal projection:
+  lev 0: max(abs(u,v,w)) = 1.161877373 0.3025435917 0.1777562852
+
+Projection::initialVelocityProject(): iteration 3
+Nodal Projection:
+ >> Before projection:
+  * On lev 0 max(abs(rhs)) = 1.642727206e-05
+
+MLMG: Initial rhs               = 1.642254873e-05
+MLMG: Initial residual (resid0) = 1.642254873e-05
+MLMG: Final Iter. 6 resid, resid/bnorm = 8.15354812e-19, 4.964849401e-14
+MLMG: Timers: Solve = 0.1135994 Iter = 0.1110448 Bottom = 0.0002972
+ >> After projection:
+  * On lev 0 max(abs(rhs)) = 2.078069052e-07
+
+After nodal projection:
+  lev 0: max(abs(u,v,w)) = 1.161877379 0.3025435872 0.1777562997
+
+Projection::initialVelocityProject(): iteration 4
+Nodal Projection:
+ >> Before projection:
+  * On lev 0 max(abs(rhs)) = 2.078069052e-07
+
+MLMG: Initial rhs               = 2.03083567e-07
+MLMG: Initial residual (resid0) = 2.03083567e-07
+MLMG: Final Iter. 5 resid, resid/bnorm = 1.104421384e-18, 5.438260714e-12
+MLMG: Timers: Solve = 0.0953787 Iter = 0.0929377 Bottom = 0.0002537
+ >> After projection:
+  * On lev 0 max(abs(rhs)) = 1.881918908e-08
+
+After nodal projection:
+  lev 0: max(abs(u,v,w)) = 1.161877379 0.3025435872 0.1777562998
+Projection::initialVelocityProject(): time: 0.5969674
+done calling initialVelocityProject
+calling initialPressureProject
+Projection::initialPressureProject(): levels = 0  0
+Nodal Projection:
+ >> Before projection:
+  * On lev 0 max(abs(rhs)) = 1.110223025e-16
+
+MLMG: Initial rhs               = 1.075528555e-16
+MLMG: Initial residual (resid0) = 1.075528555e-16
+MLMG: Final Iter. 1 resid, resid/bnorm = 1.428465507e-18, 0.01328152098
+MLMG: Timers: Solve = 0.0231655 Iter = 0.0198599 Bottom = 4.97e-05
+ >> After projection:
+  * On lev 0 max(abs(rhs)) = 1.077596583e-16
+
+ xxxxx proc. = 1, tag = 2360 file = ../../Source/NavierStokesBase.cpp function = estTimeStep line = 1492
+Projection::initialPressureProject(): time: 0.0279684
+done calling initialPressureProject
+ xxxxx proc. = 0, tag = 2360 file = ../../Source/NavierStokesBase.cpp function = estTimeStep line = 1492
+------------------
+H - est Time Step:
+------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 3
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(0,0,0) - (63,7,7)
+Vel Domain:
+(-1,-1,-1) - (64,32,32)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max -0.04435041073 / 1.161877379
+Scal 1 min/max -0.3025435872 / 0.3025435216
+Scal 2 min/max -0.1777562998 / 0.1777562998
+Force 0 min/max -0.001848081568 / 0.04521785291
+Force 1 min/max -0.1192262117 / 0.004872847419
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+------------------
+H - est Time Step:
+------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 3
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(0,8,0) - (63,15,7)
+Vel Domain:
+(-1,-1,-1) - (64,32,32)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max -0.04435041073 / 1.161877379
+Scal 1 min/max -0.3025435872 / 0.3025435216
+Scal 2 min/max -0.1777562998 / 0.1777562998
+Force 0 min/max 0.04032398939 / 0.04841543032
+Force 1 min/max -0.1276571855 / -0.1063214152
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+------------------
+H - est Time Step:
+------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 3
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(0,16,0) - (63,23,7)
+Vel Domain:
+(-1,-1,-1) - (64,32,32)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max -0.04435041073 / 1.161877379
+Scal 1 min/max -0.3025435872 / 0.3025435216
+Scal 2 min/max -0.1777562998 / 0.1777562998
+Force 0 min/max 0.04032398945 / 0.04841543035
+Force 1 min/max -0.1276571856 / -0.1063214154
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+------------------
+H - est Time Step:
+------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 3
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(0,24,0) - (63,31,7)
+Vel Domain:
+(-1,-1,-1) - (64,32,32)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max -0.04435041073 / 1.161877379
+Scal 1 min/max -0.3025435872 / 0.3025435216
+Scal 2 min/max -0.1777562998 / 0.1777562998
+Force 0 min/max -0.001848081484 / 0.045217853
+Force 1 min/max -0.1192262119 / 0.004872847198
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+------------------
+H - est Time Step:
+------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 3
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(0,0,8) - (63,7,15)
+Vel Domain:
+(-1,-1,-1) - (64,32,32)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max -0.04435041073 / 1.161877379
+Scal 1 min/max -0.3025435872 / 0.3025435216
+Scal 2 min/max -0.1777562998 / 0.1777562998
+Force 0 min/max -0.001848081489 / 0.04521785289
+Force 1 min/max -0.1192262113 / 0.004872847875
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+------------------
+H - est Time Step:
+------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 3
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(0,8,8) - (63,15,15)
+Vel Domain:
+(-1,-1,-1) - (64,32,32)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max -0.04435041073 / 1.161877379
+Scal 1 min/max -0.3025435872 / 0.3025435216
+Scal 2 min/max -0.1777562998 / 0.1777562998
+Force 0 min/max 0.04032398941 / 0.04841543029
+Force 1 min/max -0.1276571852 / -0.1063214156
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+------------------
+H - est Time Step:
+------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 3
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(0,16,8) - (63,23,15)
+Vel Domain:
+(-1,-1,-1) - (64,32,32)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max -0.04435041073 / 1.161877379
+Scal 1 min/max -0.3025435872 / 0.3025435216
+Scal 2 min/max -0.1777562998 / 0.1777562998
+Force 0 min/max 0.04032398948 / 0.04841543033
+Force 1 min/max -0.1276571853 / -0.1063214158
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+------------------
+H - est Time Step:
+------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 3
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(0,24,8) - (63,31,15)
+Vel Domain:
+(-1,-1,-1) - (64,32,32)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max -0.04435041073 / 1.161877379
+Scal 1 min/max -0.3025435872 / 0.3025435216
+Scal 2 min/max -0.1777562998 / 0.1777562998
+Force 0 min/max -0.001848081405 / 0.04521785298
+Force 1 min/max -0.1192262116 / 0.004872847653
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+------------------
+H - est Time Step:
+------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 3
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(0,0,16) - (63,7,23)
+Vel Domain:
+(-1,-1,-1) - (64,32,32)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max -0.04435041073 / 1.161877379
+Scal 1 min/max -0.3025435872 / 0.3025435216
+Scal 2 min/max -0.1777562998 / 0.1777562998
+Force 0 min/max -0.001848081531 / 0.04521785303
+Force 1 min/max -0.119226212 / 0.004872847321
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+------------------
+H - est Time Step:
+------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 3
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(0,8,16) - (63,15,23)
+Vel Domain:
+(-1,-1,-1) - (64,32,32)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max -0.04435041073 / 1.161877379
+Scal 1 min/max -0.3025435872 / 0.3025435216
+Scal 2 min/max -0.1777562998 / 0.1777562998
+Force 0 min/max 0.04032398942 / 0.04841543038
+Force 1 min/max -0.1276571856 / -0.1063214153
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+------------------
+H - est Time Step:
+------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 3
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(0,16,16) - (63,23,23)
+Vel Domain:
+(-1,-1,-1) - (64,32,32)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max -0.04435041073 / 1.161877379
+Scal 1 min/max -0.3025435872 / 0.3025435216
+Scal 2 min/max -0.1777562998 / 0.1777562998
+Force 0 min/max 0.04032398936 / 0.04841543034
+Force 1 min/max -0.1276571856 / -0.1063214151
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+------------------
+H - est Time Step:
+------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 3
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(0,24,16) - (63,31,23)
+Vel Domain:
+(-1,-1,-1) - (64,32,32)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max -0.04435041073 / 1.161877379
+Scal 1 min/max -0.3025435872 / 0.3025435216
+Scal 2 min/max -0.1777562998 / 0.1777562998
+Force 0 min/max -0.001848081615 / 0.04521785295
+Force 1 min/max -0.1192262117 / 0.004872847543
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+------------------
+H - est Time Step:
+------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 3
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(0,0,24) - (63,7,31)
+Vel Domain:
+(-1,-1,-1) - (64,32,32)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max -0.04435041073 / 1.161877379
+Scal 1 min/max -0.3025435872 / 0.3025435216
+Scal 2 min/max -0.1777562998 / 0.1777562998
+Force 0 min/max -0.001848081358 / 0.04521785295
+Force 1 min/max -0.1192262115 / 0.00487284753
+Force 2 min/max -0 / -0
+NavierStokesBase::getForce(): Leaving...
+---
+
+------------------
+H - est Time Step:
+------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 3
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(0,8,24) - (63,15,31)
+Vel Domain:
+(-1,-1,-1) - (64,32,32)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max -0.04435041073 / 1.161877379
+Scal 1 min/max -0.3025435872 / 0.3025435216
+Scal 2 min/max -0.1777562998 / 0.1777562998
+Force 0 min/max 0.04032398951 / 0.0484154303
+Force 1 min/max -0.1276571852 / -0.1063214158
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+------------------
+H - est Time Step:
+------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 3
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(0,16,24) - (63,23,31)
+Vel Domain:
+(-1,-1,-1) - (64,32,32)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max -0.04435041073 / 1.161877379
+Scal 1 min/max -0.3025435872 / 0.3025435216
+Scal 2 min/max -0.1777562998 / 0.1777562998
+Force 0 min/max 0.04032398945 / 0.04841543027
+Force 1 min/max -0.1276571851 / -0.1063214157
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+------------------
+H - est Time Step:
+------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 3
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(0,24,24) - (63,31,31)
+Vel Domain:
+(-1,-1,-1) - (64,32,32)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max -0.04435041073 / 1.161877379
+Scal 1 min/max -0.3025435872 / 0.3025435216
+Scal 2 min/max -0.1777562998 / 0.1777562998
+Force 0 min/max -0.001848081442 / 0.04521785286
+Force 1 min/max -0.1192262112 / 0.004872847752
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+estTimeStep :: 
+LEV = 0 UMAX = 1.161877379   xxxxx proc. = 1, tag = 2361 file = ../../Source/NavierStokesBase.cpp function = estTimeStep line = 1676
+0.3025435872  0.1777562998  
+ aaaaa proc. = 1, tag = 2362 file = ../../Source/NavierStokes.cpp function = advance line = 297
+        FMAX = 0  0  0  
+estimated timestep: dt = 0.02689612568
+ xxxxx proc. = 0, tag = 2361 file = ../../Source/NavierStokesBase.cpp function = estTimeStep line = 1676
+Multiplying dt by init_shrink: dt = 0.002689612568
+
+post_init_press(): doing initial pressure iterations with dt = 0.002689612568
+
+post_init_press(): iter = 0
+ aaaaa proc. = 0, tag = 2362 file = ../../Source/NavierStokes.cpp function = advance line = 297
+Advancing grids at level 0 : starting time = 0 with dt = 0.002689612568
+NavierStokes::advance(): before velocity update:
+max(abs(u/v/w))  = 1.161877379  0.3025435872  0.1777562998
+ aaaaa proc. = 1, tag = 2365 file = ../../Source/NavierStokes.cpp function = advance line = 334
+ xxxxx1 proc. = 1, tag = 2366 file = ../../Source/NavierStokes.cpp function = predict_velocity line = 490
+max(abs(gpx/gpy/gpz/p)) = 1.332685459e-20  3.347788078e-18  3.048578796e-20  1.103035834e-18
+ aaaaa proc. = 0, tag = 2365 file = ../../Source/NavierStokes.cpp function = advance line = 334
+ xxxxx1 proc. = 0, tag = 2366 file = ../../Source/NavierStokes.cpp function = predict_velocity line = 490
+... predict edge velocities
+ xxxxx2 proc. = 1, tag = 2375 file = ../../Source/NavierStokes.cpp function = predict_velocity line = 646
+ xxxxx2 proc. = 0, tag = 2375 file = ../../Source/NavierStokes.cpp function = predict_velocity line = 646
+--------------------- 
+ A - Predict velocity: 
+--------------------- 
+ NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 1
+scalScomp = 0
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(-1,-1,-1) - (64,8,8)
+Vel Domain:
+(-3,-3,-3) - (66,34,34)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-3,-3,-3) - (66,34,34)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 274.7124939 / 371.5874939
+Force 0 min/max 0.04167 / 0.04167
+Force 1 min/max 0.007968750106 / 0.01646875022
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+--------------------- 
+ A - Predict velocity: 
+--------------------- 
+ NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 1
+scalScomp = 0
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(-1,7,-1) - (64,16,8)
+Vel Domain:
+(-3,-3,-3) - (66,34,34)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-3,-3,-3) - (66,34,34)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 274.7124939 / 371.5874939
+Force 0 min/max 0.04167 / 0.04167
+Force 1 min/max -0.000531250007 / 0.00903125012
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+--------------------- 
+ A - Predict velocity: 
+--------------------- 
+ NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 1
+scalScomp = 0
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(-1,15,-1) - (64,24,8)
+Vel Domain:
+(-3,-3,-3) - (66,34,34)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-3,-3,-3) - (66,34,34)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 274.7124939 / 371.5874939
+Force 0 min/max 0.04167 / 0.04167
+Force 1 min/max -0.00903125012 / 0.000531250007
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+--------------------- 
+ A - Predict velocity: 
+--------------------- 
+ NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 1
+scalScomp = 0
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(-1,23,-1) - (64,32,8)
+Vel Domain:
+(-3,-3,-3) - (66,34,34)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-3,-3,-3) - (66,34,34)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 274.7124939 / 371.5874939
+Force 0 min/max 0.04167 / 0.04167
+Force 1 min/max -0.01646875022 / -0.007968750106
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+--------------------- 
+ A - Predict velocity: 
+--------------------- 
+ NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 1
+scalScomp = 0
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(-1,-1,7) - (64,8,16)
+Vel Domain:
+(-3,-3,-3) - (66,34,34)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-3,-3,-3) - (66,34,34)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 274.7124939 / 371.5874939
+Force 0 min/max 0.04167 / 0.04167
+Force 1 min/max 0.007968750106 / 0.01646875022
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+--------------------- 
+ A - Predict velocity: 
+--------------------- 
+ NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 1
+scalScomp = 0
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(-1,7,7) - (64,16,16)
+Vel Domain:
+(-3,-3,-3) - (66,34,34)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-3,-3,-3) - (66,34,34)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 274.7124939 / 371.5874939
+Force 0 min/max 0.04167 / 0.04167
+Force 1 min/max -0.000531250007 / 0.00903125012
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+--------------------- 
+ A - Predict velocity: 
+--------------------- 
+ NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 1
+scalScomp = 0
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(-1,15,7) - (64,24,16)
+Vel Domain:
+(-3,-3,-3) - (66,34,34)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-3,-3,-3) - (66,34,34)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 274.7124939 / 371.5874939
+Force 0 min/max 0.04167 / 0.04167
+Force 1 min/max -0.00903125012 / 0.000531250007
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+--------------------- 
+ A - Predict velocity: 
+--------------------- 
+ NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 1
+scalScomp = 0
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(-1,23,7) - (64,32,16)
+Vel Domain:
+(-3,-3,-3) - (66,34,34)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-3,-3,-3) - (66,34,34)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 274.7124939 / 371.5874939
+Force 0 min/max 0.04167 / 0.04167
+Force 1 min/max -0.01646875022 / -0.007968750106
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+--------------------- 
+ A - Predict velocity: 
+--------------------- 
+ NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 1
+scalScomp = 0
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(-1,-1,15) - (64,8,24)
+Vel Domain:
+(-3,-3,-3) - (66,34,34)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-3,-3,-3) - (66,34,34)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 274.7124939 / 371.5874939
+Force 0 min/max 0.04167 / 0.04167
+Force 1 min/max 0.007968750106 / 0.01646875022
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+--------------------- 
+ A - Predict velocity: 
+--------------------- 
+ NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 1
+scalScomp = 0
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(-1,7,15) - (64,16,24)
+Vel Domain:
+(-3,-3,-3) - (66,34,34)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-3,-3,-3) - (66,34,34)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 274.7124939 / 371.5874939
+Force 0 min/max 0.04167 / 0.04167
+Force 1 min/max -0.000531250007 / 0.00903125012
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+--------------------- 
+ A - Predict velocity: 
+--------------------- 
+ NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 1
+scalScomp = 0
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(-1,15,15) - (64,24,24)
+Vel Domain:
+(-3,-3,-3) - (66,34,34)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-3,-3,-3) - (66,34,34)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 274.7124939 / 371.5874939
+Force 0 min/max 0.04167 / 0.04167
+Force 1 min/max -0.00903125012 / 0.000531250007
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+--------------------- 
+ A - Predict velocity: 
+--------------------- 
+ NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 1
+scalScomp = 0
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(-1,23,15) - (64,32,24)
+Vel Domain:
+(-3,-3,-3) - (66,34,34)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-3,-3,-3) - (66,34,34)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 274.7124939 / 371.5874939
+Force 0 min/max 0.04167 / 0.04167
+Force 1 min/max -0.01646875022 / -0.007968750106
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+--------------------- 
+ A - Predict velocity: 
+--------------------- 
+ NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 1
+scalScomp = 0
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(-1,-1,23) - (64,8,32)
+Vel Domain:
+(-3,-3,-3) - (66,34,34)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-3,-3,-3) - (66,34,34)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 274.7124939 / 371.5874939
+Force 0 min/max 0.04167 / 0.04167
+Force 1 min/max 0.007968750106 / 0.01646875022
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+--------------------- 
+ A - Predict velocity: 
+--------------------- 
+ NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 1
+scalScomp = 0
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(-1,7,23) - (64,16,32)
+Vel Domain:
+(-3,-3,-3) - (66,34,34)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-3,-3,-3) - (66,34,34)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 274.7124939 / 371.5874939
+Force 0 min/max 0.04167 / 0.04167
+Force 1 min/max -0.000531250007 / 0.00903125012
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+--------------------- 
+ A - Predict velocity: 
+--------------------- 
+ NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 1
+scalScomp = 0
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(-1,15,23) - (64,24,32)
+Vel Domain:
+(-3,-3,-3) - (66,34,34)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-3,-3,-3) - (66,34,34)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 274.7124939 / 371.5874939
+Force 0 min/max 0.04167 / 0.04167
+Force 1 min/max -0.00903125012 / 0.000531250007
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+--------------------- 
+ A - Predict velocity: 
+--------------------- 
+ NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 1
+scalScomp = 0
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(-1,23,23) - (64,32,32)
+Vel Domain:
+(-3,-3,-3) - (66,34,34)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-3,-3,-3) - (66,34,34)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 274.7124939 / 371.5874939
+Force 0 min/max 0.04167 / 0.04167
+Force 1 min/max -0.01646875022 / -0.007968750106
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+... mac_projection
+ xxxxx proc. = 1, tag = 2769 file = ../../Source/NavierStokesBase.cpp function = velocity_advection line = 3900
+ xxxxx2 proc. = 1, tag = 2779 file = ../../Source/NavierStokes.cpp function = scalar_advection line = 817
+NavierStokesBase:mac_project(): lev: 0, time: 0.0965971
+... advect velocities
+ xxxxx proc. = 0, tag = 2769 file = ../../Source/NavierStokesBase.cpp function = velocity_advection line = 3900
+-----------------------
+B - velocity advection:
+-----------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 0
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(-1,-1,-1) - (64,8,8)
+Vel Domain:
+(-3,-3,-3) - (66,34,34)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-3,-3,-3) - (66,34,34)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 274.7124939 / 371.5874939
+Force 0 min/max 0.04167 / 0.04167
+Force 1 min/max 0.007968750106 / 0.01646875022
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+-----------------------
+B - velocity advection:
+-----------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 0
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(-1,7,-1) - (64,16,8)
+Vel Domain:
+(-3,-3,-3) - (66,34,34)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-3,-3,-3) - (66,34,34)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 274.7124939 / 371.5874939
+Force 0 min/max 0.04167 / 0.04167
+Force 1 min/max -0.000531250007 / 0.00903125012
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+-----------------------
+B - velocity advection:
+-----------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 0
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(-1,15,-1) - (64,24,8)
+Vel Domain:
+(-3,-3,-3) - (66,34,34)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-3,-3,-3) - (66,34,34)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 274.7124939 / 371.5874939
+Force 0 min/max 0.04167 / 0.04167
+Force 1 min/max -0.00903125012 / 0.000531250007
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+-----------------------
+B - velocity advection:
+-----------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 0
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(-1,23,-1) - (64,32,8)
+Vel Domain:
+(-3,-3,-3) - (66,34,34)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-3,-3,-3) - (66,34,34)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 274.7124939 / 371.5874939
+Force 0 min/max 0.04167 / 0.04167
+Force 1 min/max -0.01646875022 / -0.007968750106
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+-----------------------
+B - velocity advection:
+-----------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 0
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(-1,-1,7) - (64,8,16)
+Vel Domain:
+(-3,-3,-3) - (66,34,34)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-3,-3,-3) - (66,34,34)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 274.7124939 / 371.5874939
+Force 0 min/max 0.04167 / 0.04167
+Force 1 min/max 0.007968750106 / 0.01646875022
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+-----------------------
+B - velocity advection:
+-----------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 0
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(-1,7,7) - (64,16,16)
+Vel Domain:
+(-3,-3,-3) - (66,34,34)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-3,-3,-3) - (66,34,34)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 274.7124939 / 371.5874939
+Force 0 min/max 0.04167 / 0.04167
+Force 1 min/max -0.000531250007 / 0.00903125012
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+-----------------------
+B - velocity advection:
+-----------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 0
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(-1,15,7) - (64,24,16)
+Vel Domain:
+(-3,-3,-3) - (66,34,34)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-3,-3,-3) - (66,34,34)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 274.7124939 / 371.5874939
+Force 0 min/max 0.04167 / 0.04167
+Force 1 min/max -0.00903125012 / 0.000531250007
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+-----------------------
+B - velocity advection:
+-----------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 0
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(-1,23,7) - (64,32,16)
+Vel Domain:
+(-3,-3,-3) - (66,34,34)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-3,-3,-3) - (66,34,34)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 274.7124939 / 371.5874939
+Force 0 min/max 0.04167 / 0.04167
+Force 1 min/max -0.01646875022 / -0.007968750106
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+-----------------------
+B - velocity advection:
+-----------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 0
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(-1,-1,15) - (64,8,24)
+Vel Domain:
+(-3,-3,-3) - (66,34,34)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-3,-3,-3) - (66,34,34)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 274.7124939 / 371.5874939
+Force 0 min/max 0.04167 / 0.04167
+Force 1 min/max 0.007968750106 / 0.01646875022
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+-----------------------
+B - velocity advection:
+-----------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 0
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(-1,7,15) - (64,16,24)
+Vel Domain:
+(-3,-3,-3) - (66,34,34)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-3,-3,-3) - (66,34,34)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 274.7124939 / 371.5874939
+Force 0 min/max 0.04167 / 0.04167
+Force 1 min/max -0.000531250007 / 0.00903125012
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+-----------------------
+B - velocity advection:
+-----------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 0
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(-1,15,15) - (64,24,24)
+Vel Domain:
+(-3,-3,-3) - (66,34,34)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-3,-3,-3) - (66,34,34)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 274.7124939 / 371.5874939
+Force 0 min/max 0.04167 / 0.04167
+Force 1 min/max -0.00903125012 / 0.000531250007
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+-----------------------
+B - velocity advection:
+-----------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 0
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(-1,23,15) - (64,32,24)
+Vel Domain:
+(-3,-3,-3) - (66,34,34)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-3,-3,-3) - (66,34,34)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 274.7124939 / 371.5874939
+Force 0 min/max 0.04167 / 0.04167
+Force 1 min/max -0.01646875022 / -0.007968750106
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+-----------------------
+B - velocity advection:
+-----------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 0
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(-1,-1,23) - (64,8,32)
+Vel Domain:
+(-3,-3,-3) - (66,34,34)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-3,-3,-3) - (66,34,34)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 274.7124939 / 371.5874939
+Force 0 min/max 0.04167 / 0.04167
+Force 1 min/max 0.007968750106 / 0.01646875022
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+-----------------------
+B - velocity advection:
+-----------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 0
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(-1,7,23) - (64,16,32)
+Vel Domain:
+(-3,-3,-3) - (66,34,34)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-3,-3,-3) - (66,34,34)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 274.7124939 / 371.5874939
+Force 0 min/max 0.04167 / 0.04167
+Force 1 min/max -0.000531250007 / 0.00903125012
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+-----------------------
+B - velocity advection:
+-----------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 0
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(-1,15,23) - (64,24,32)
+Vel Domain:
+(-3,-3,-3) - (66,34,34)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-3,-3,-3) - (66,34,34)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 274.7124939 / 371.5874939
+Force 0 min/max 0.04167 / 0.04167
+Force 1 min/max -0.00903125012 / 0.000531250007
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+-----------------------
+B - velocity advection:
+-----------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 0
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(-1,23,23) - (64,32,32)
+Vel Domain:
+(-3,-3,-3) - (66,34,34)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-3,-3,-3) - (66,34,34)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 274.7124939 / 371.5874939
+Force 0 min/max 0.04167 / 0.04167
+Force 1 min/max -0.01646875022 / -0.007968750106
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+... advect scalars
+ xxxxx2 proc. = 0, tag = 2779 file = ../../Source/NavierStokes.cpp function = scalar_advection line = 817
+---------------------
+C - Scalar advection:
+---------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 3
+ncomp     = 3
+ngrow     = 1
+scalScomp = 0
+Doing all scalars
+NavierStokesBase::getForce()
+Force Domain:
+(-1,-1,-1) - (64,8,8)
+Vel Domain:
+(-3,-3,-3) - (66,34,34)
+Scal Domain:
+(-3,-3,-3) - (66,34,34)
+rhs Domain:
+(-3,-3,-3) - (66,34,34)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 274.7124939 / 371.5874939
+Force 3 min/max 0 / 0
+Force 4 min/max 0 / 0
+Force 5 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+---------------------
+C - Scalar advection:
+---------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 3
+ncomp     = 3
+ngrow     = 1
+scalScomp = 0
+Doing all scalars
+NavierStokesBase::getForce()
+Force Domain:
+(-1,7,-1) - (64,16,8)
+Vel Domain:
+(-3,-3,-3) - (66,34,34)
+Scal Domain:
+(-3,-3,-3) - (66,34,34)
+rhs Domain:
+(-3,-3,-3) - (66,34,34)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 274.7124939 / 371.5874939
+Force 3 min/max 0 / 0
+Force 4 min/max 0 / 0
+Force 5 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+---------------------
+C - Scalar advection:
+---------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 3
+ncomp     = 3
+ngrow     = 1
+scalScomp = 0
+Doing all scalars
+NavierStokesBase::getForce()
+Force Domain:
+(-1,15,-1) - (64,24,8)
+Vel Domain:
+(-3,-3,-3) - (66,34,34)
+Scal Domain:
+(-3,-3,-3) - (66,34,34)
+rhs Domain:
+(-3,-3,-3) - (66,34,34)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 274.7124939 / 371.5874939
+Force 3 min/max 0 / 0
+Force 4 min/max 0 / 0
+Force 5 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+---------------------
+C - Scalar advection:
+---------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 3
+ncomp     = 3
+ngrow     = 1
+scalScomp = 0
+Doing all scalars
+NavierStokesBase::getForce()
+Force Domain:
+(-1,23,-1) - (64,32,8)
+Vel Domain:
+(-3,-3,-3) - (66,34,34)
+Scal Domain:
+(-3,-3,-3) - (66,34,34)
+rhs Domain:
+(-3,-3,-3) - (66,34,34)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 274.7124939 / 371.5874939
+Force 3 min/max 0 / 0
+Force 4 min/max 0 / 0
+Force 5 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+---------------------
+C - Scalar advection:
+---------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 3
+ncomp     = 3
+ngrow     = 1
+scalScomp = 0
+Doing all scalars
+NavierStokesBase::getForce()
+Force Domain:
+(-1,-1,7) - (64,8,16)
+Vel Domain:
+(-3,-3,-3) - (66,34,34)
+Scal Domain:
+(-3,-3,-3) - (66,34,34)
+rhs Domain:
+(-3,-3,-3) - (66,34,34)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 274.7124939 / 371.5874939
+Force 3 min/max 0 / 0
+Force 4 min/max 0 / 0
+Force 5 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+---------------------
+C - Scalar advection:
+---------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 3
+ncomp     = 3
+ngrow     = 1
+scalScomp = 0
+Doing all scalars
+NavierStokesBase::getForce()
+Force Domain:
+(-1,7,7) - (64,16,16)
+Vel Domain:
+(-3,-3,-3) - (66,34,34)
+Scal Domain:
+(-3,-3,-3) - (66,34,34)
+rhs Domain:
+(-3,-3,-3) - (66,34,34)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 274.7124939 / 371.5874939
+Force 3 min/max 0 / 0
+Force 4 min/max 0 / 0
+Force 5 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+---------------------
+C - Scalar advection:
+---------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 3
+ncomp     = 3
+ngrow     = 1
+scalScomp = 0
+Doing all scalars
+NavierStokesBase::getForce()
+Force Domain:
+(-1,15,7) - (64,24,16)
+Vel Domain:
+(-3,-3,-3) - (66,34,34)
+Scal Domain:
+(-3,-3,-3) - (66,34,34)
+rhs Domain:
+(-3,-3,-3) - (66,34,34)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 274.7124939 / 371.5874939
+Force 3 min/max 0 / 0
+Force 4 min/max 0 / 0
+Force 5 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+---------------------
+C - Scalar advection:
+---------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 3
+ncomp     = 3
+ngrow     = 1
+scalScomp = 0
+Doing all scalars
+NavierStokesBase::getForce()
+Force Domain:
+(-1,23,7) - (64,32,16)
+Vel Domain:
+(-3,-3,-3) - (66,34,34)
+Scal Domain:
+(-3,-3,-3) - (66,34,34)
+rhs Domain:
+(-3,-3,-3) - (66,34,34)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 274.7124939 / 371.5874939
+Force 3 min/max 0 / 0
+Force 4 min/max 0 / 0
+Force 5 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+---------------------
+C - Scalar advection:
+---------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 3
+ncomp     = 3
+ngrow     = 1
+scalScomp = 0
+Doing all scalars
+NavierStokesBase::getForce()
+Force Domain:
+(-1,-1,15) - (64,8,24)
+Vel Domain:
+(-3,-3,-3) - (66,34,34)
+Scal Domain:
+(-3,-3,-3) - (66,34,34)
+rhs Domain:
+(-3,-3,-3) - (66,34,34)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 274.7124939 / 371.5874939
+Force 3 min/max 0 / 0
+Force 4 min/max 0 / 0
+Force 5 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+---------------------
+C - Scalar advection:
+---------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 3
+ncomp     = 3
+ngrow     = 1
+scalScomp = 0
+Doing all scalars
+NavierStokesBase::getForce()
+Force Domain:
+(-1,7,15) - (64,16,24)
+Vel Domain:
+(-3,-3,-3) - (66,34,34)
+Scal Domain:
+(-3,-3,-3) - (66,34,34)
+rhs Domain:
+(-3,-3,-3) - (66,34,34)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 274.7124939 / 371.5874939
+Force 3 min/max 0 / 0
+Force 4 min/max 0 / 0
+Force 5 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+---------------------
+C - Scalar advection:
+---------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 3
+ncomp     = 3
+ngrow     = 1
+scalScomp = 0
+Doing all scalars
+NavierStokesBase::getForce()
+Force Domain:
+(-1,15,15) - (64,24,24)
+Vel Domain:
+(-3,-3,-3) - (66,34,34)
+Scal Domain:
+(-3,-3,-3) - (66,34,34)
+rhs Domain:
+(-3,-3,-3) - (66,34,34)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 274.7124939 / 371.5874939
+Force 3 min/max 0 / 0
+Force 4 min/max 0 / 0
+Force 5 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+---------------------
+C - Scalar advection:
+---------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 3
+ncomp     = 3
+ngrow     = 1
+scalScomp = 0
+Doing all scalars
+NavierStokesBase::getForce()
+Force Domain:
+(-1,23,15) - (64,32,24)
+Vel Domain:
+(-3,-3,-3) - (66,34,34)
+Scal Domain:
+(-3,-3,-3) - (66,34,34)
+rhs Domain:
+(-3,-3,-3) - (66,34,34)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 274.7124939 / 371.5874939
+Force 3 min/max 0 / 0
+Force 4 min/max 0 / 0
+Force 5 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+---------------------
+C - Scalar advection:
+---------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 3
+ncomp     = 3
+ngrow     = 1
+scalScomp = 0
+Doing all scalars
+NavierStokesBase::getForce()
+Force Domain:
+(-1,-1,23) - (64,8,32)
+Vel Domain:
+(-3,-3,-3) - (66,34,34)
+Scal Domain:
+(-3,-3,-3) - (66,34,34)
+rhs Domain:
+(-3,-3,-3) - (66,34,34)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 274.7124939 / 371.5874939
+Force 3 min/max 0 / 0
+Force 4 min/max 0 / 0
+Force 5 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+---------------------
+C - Scalar advection:
+---------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 3
+ncomp     = 3
+ngrow     = 1
+scalScomp = 0
+Doing all scalars
+NavierStokesBase::getForce()
+Force Domain:
+(-1,7,23) - (64,16,32)
+Vel Domain:
+(-3,-3,-3) - (66,34,34)
+Scal Domain:
+(-3,-3,-3) - (66,34,34)
+rhs Domain:
+(-3,-3,-3) - (66,34,34)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 274.7124939 / 371.5874939
+Force 3 min/max 0 / 0
+Force 4 min/max 0 / 0
+Force 5 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+---------------------
+C - Scalar advection:
+---------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 3
+ncomp     = 3
+ngrow     = 1
+scalScomp = 0
+Doing all scalars
+NavierStokesBase::getForce()
+Force Domain:
+(-1,15,23) - (64,24,32)
+Vel Domain:
+(-3,-3,-3) - (66,34,34)
+Scal Domain:
+(-3,-3,-3) - (66,34,34)
+rhs Domain:
+(-3,-3,-3) - (66,34,34)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 274.7124939 / 371.5874939
+Force 3 min/max 0 / 0
+Force 4 min/max 0 / 0
+Force 5 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+---------------------
+C - Scalar advection:
+---------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 3
+ncomp     = 3
+ngrow     = 1
+scalScomp = 0
+Doing all scalars
+NavierStokesBase::getForce()
+Force Domain:
+(-1,23,23) - (64,32,32)
+Vel Domain:
+(-3,-3,-3) - (66,34,34)
+Scal Domain:
+(-3,-3,-3) - (66,34,34)
+rhs Domain:
+(-3,-3,-3) - (66,34,34)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 274.7124939 / 371.5874939
+Force 3 min/max 0 / 0
+Force 4 min/max 0 / 0
+Force 5 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+... update scalars
+... update scalars
+ xxxxx proc. = 1, tag = 2781 file = ../../Source/NavierStokesBase.cpp function = scalar_advection_update line = 3224
+ xxxxx proc. = 0, tag = 2781 file = ../../Source/NavierStokesBase.cpp function = scalar_advection_update line = 3224
+ mac velmin (           1 ) =   -4.4046560326999787E-002
+ mac velmax (           1 ) =    1.0853338643733856     
+ mac velmin (           2 ) =  -0.11645333092468479     
+ mac velmax (           2 ) =   0.11659727517871850     
+ mac velmin (           3 ) =  -0.17129834759590140     
+ mac velmax (           3 ) =   0.17130471474053682     
+ mac velmin (           1 ) =   0.96783995528110167     
+ mac velmax (           1 ) =    1.1619531606823514     
+ mac velmin (           2 ) =  -0.30253191384122430     
+ mac velmax (           2 ) =   0.30245608531577139     
+ mac velmin (           3 ) =  -0.17771575444859733     
+ mac velmax (           3 ) =   0.17774047445746199     
+ mac velmin (           1 ) =   0.96783996732014699     
+ mac velmax (           1 ) =    1.1619531657718036     
+ mac velmin (           2 ) =  -0.30245615094783096     
+ mac velmax (           2 ) =   0.30253184794989707     
+ mac velmin (           3 ) =  -0.17771575737401563     
+ mac velmax (           3 ) =   0.17774047722316738     
+ mac velmin (           1 ) =   -4.4046095059749081E-002
+ mac velmax (           1 ) =    1.0853338849656367     
+ mac velmin (           2 ) =  -0.11659734652834945     
+ mac velmax (           2 ) =   0.11645341258212707     
+ mac velmin (           3 ) =  -0.17129835198666882     
+ mac velmax (           3 ) =   0.17130471825619578     
+ mac velmin (           1 ) =   -4.4046557141775737E-002
+ mac velmax (           1 ) =    1.0853338627769369     
+ mac velmin (           2 ) =  -0.11645333221345401     
+ mac velmax (           2 ) =   0.11659727646479726     
+ mac velmin (           3 ) =  -0.17130471569926858     
+ mac velmax (           3 ) =   0.17129834846121947     
+ mac velmin (           1 ) =   0.96783995704065218     
+ mac velmax (           1 ) =    1.1619531591167207     
+ mac velmin (           2 ) =  -0.30253191254984113     
+ mac velmax (           2 ) =   0.30245608402562646     
+ mac velmin (           3 ) =  -0.17774047576949692     
+ mac velmax (           3 ) =   0.17771575569590051     
+ mac velmin (           1 ) =   0.96783996907969883     
+ mac velmax (           1 ) =    1.1619531642061736     
+ mac velmin (           2 ) =  -0.30245614965768608     
+ mac velmax (           2 ) =   0.30253184665851385     
+ mac velmin (           3 ) =  -0.17774047853520120     
+ mac velmax (           3 ) =   0.17771575862131694     
+ mac velmin (           1 ) =   -4.4046091874527224E-002
+ mac velmax (           1 ) =    1.0853338833691892     
+ mac velmin (           2 ) =  -0.11659734781442671     
+ mac velmax (           2 ) =   0.11645341387089364     
+ mac velmin (           3 ) =  -0.17130471921492574     
+ mac velmax (           3 ) =   0.17129835285198391     
+ mac velmin (           1 ) =   -4.4046560106150004E-002
+ mac velmax (           1 ) =    1.0853338685956633     
+ mac velmin (           2 ) =  -0.11645333032631355     
+ mac velmax (           2 ) =   0.11659727461008455     
+ mac velmin (           3 ) =  -0.17129834579326103     
+ mac velmax (           3 ) =   0.17130471269768066     
+ mac velmin (           1 ) =   0.96783995462165917     
+ mac velmax (           1 ) =    1.1619531632012405     
+ mac velmin (           2 ) =  -0.30253191188410700     
+ mac velmax (           2 ) =   0.30245608947895031     
+ mac velmin (           3 ) =  -0.17771575263447956     
+ mac velmax (           3 ) =   0.17774047295489154     
+ mac velmin (           1 ) =   0.96783996354548973     
+ mac velmax (           1 ) =    1.1619531667911405     
+ mac velmin (           2 ) =  -0.30245614898927886     
+ mac velmax (           2 ) =   0.30253185211331823     
+ mac velmin (           3 ) =  -0.17771575582528293     
+ mac velmax (           3 ) =   0.17774047545565816     
+ mac velmin (           1 ) =   -4.4046098811956688E-002
+ mac velmax (           1 ) =    1.0853338850851526     
+ mac velmin (           2 ) =  -0.11659734592483899     
+ mac velmax (           2 ) =   0.11645341200829024     
+ mac velmin (           3 ) =  -0.17129834990009496     
+ mac velmax (           3 ) =   0.17130471649528789     
+ mac velmin (           1 ) =   -4.4046553389470638E-002
+ mac velmax (           1 ) =    1.0853338626573525     
+ mac velmin (           2 ) =  -0.11645333278692832     
+ mac velmax (           2 ) =   0.11659727706850334     
+ mac velmin (           3 ) =  -0.17130471746017734     
+ mac velmax (           3 ) =   0.17129835054778247     
+ mac velmin (           1 ) =   0.96783996081538071     
+ mac velmax (           1 ) =    1.1619531580973530     
+ mac velmin (           2 ) =  -0.30253190838648575     
+ mac velmax (           2 ) =   0.30245608598375362     
+ mac velmin (           3 ) =  -0.17774047753700717     
+ mac velmax (           3 ) =   0.17771575724462424     
+ mac velmin (           1 ) =   0.96783996973920838     
+ mac velmax (           1 ) =    1.1619531616872503     
+ mac velmin (           2 ) =  -0.30245614549408206     
+ mac velmax (           2 ) =   0.30253184861569693     
+ mac velmin (           3 ) =  -0.17774048003777571     
+ mac velmax (           3 ) =   0.17771576043542897     
+ mac velmin (           1 ) =   -4.4046092095290770E-002
+ mac velmax (           1 ) =    1.0853338791468388     
+ mac velmin (           2 ) =  -0.11659734838325836     
+ mac velmax (           2 ) =   0.11645341446890020     
+ mac velmin (           3 ) =  -0.17130472125778767     
+ mac velmax (           3 ) =   0.17129835465461857     
+----------------------------------------
+E - scalar advection update (half time):
+----------------------------------------
+ mac velmin (           1 ) =   -4.4046560326999787E-002
+ mac velmax (           1 ) =    1.0853338643733856     
+ mac velmin (           2 ) =  -0.11645333092468479     
+ mac velmax (           2 ) =   0.11659727517871850     
+ mac velmin (           3 ) =  -0.17129834759590140     
+ mac velmax (           3 ) =   0.17130471474053682     
+NavierStokesBase::getForce(): Entered...
+time      = 0.001344806284
+scomp     = 4
+ncomp     = 1
+ngrow     = 0
+scalScomp = 0
+Doing tracer only
+NavierStokesBase::getForce()
+Force Domain:
+(0,0,0) - (63,7,7)
+Vel Domain:
+(0,0,0) - (63,7,7)
+Scal Domain:
+(0,0,0) - (63,7,7)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max -0.04404656033 / 1.085333864
+Vel  1 min/max -0.1164533309 / 0.1165972752
+Vel  2 min/max -0.1712983476 / 0.1713047147
+Scal 0 min/max 1 / 1.000000001
+Scal 1 min/max 0 / 0
+Scal 2 min/max 349.7124939 / 371.5874939
+Force 4 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+----------------------------------------
+E - scalar advection update (half time):
+----------------------------------------
+ mac velmin (           1 ) =   -4.4046560326999787E-002
+ mac velmax (           1 ) =    1.0853338643733856     
+ mac velmin (           2 ) =  -0.11645333092468479     
+ mac velmax (           2 ) =   0.11659727517871850     
+ mac velmin (           3 ) =  -0.17129834759590140     
+ mac velmax (           3 ) =   0.17130471474053682     
+NavierStokesBase::getForce(): Entered...
+time      = 0.001344806284
+scomp     = 5
+ncomp     = 1
+ngrow     = 0
+scalScomp = 0
+Doing individual scalar: 5 
+NavierStokesBase::getForce()
+Force Domain:
+(0,0,0) - (63,7,7)
+Vel Domain:
+(0,0,0) - (63,7,7)
+Scal Domain:
+(0,0,0) - (63,7,7)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max -0.04404656033 / 1.085333864
+Vel  1 min/max -0.1164533309 / 0.1165972752
+Vel  2 min/max -0.1712983476 / 0.1713047147
+Scal 0 min/max 1 / 1.000000001
+Scal 1 min/max 0 / 0
+Scal 2 min/max 349.7124939 / 371.5874939
+Force 5 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+----------------------------------------
+E - scalar advection update (half time):
+----------------------------------------
+ mac velmin (           1 ) =   0.96783995528110167     
+ mac velmax (           1 ) =    1.1619531606823514     
+ mac velmin (           2 ) =  -0.30253191384122430     
+ mac velmax (           2 ) =   0.30245608531577139     
+ mac velmin (           3 ) =  -0.17771575444859733     
+ mac velmax (           3 ) =   0.17774047445746199     
+NavierStokesBase::getForce(): Entered...
+time      = 0.001344806284
+scomp     = 4
+ncomp     = 1
+ngrow     = 0
+scalScomp = 0
+Doing tracer only
+NavierStokesBase::getForce()
+Force Domain:
+(0,8,0) - (63,15,7)
+Vel Domain:
+(0,8,0) - (63,15,7)
+Scal Domain:
+(0,8,0) - (63,15,7)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max 0.9678399553 / 1.161953161
+Vel  1 min/max -0.3025319138 / 0.3024560853
+Vel  2 min/max -0.1777157544 / 0.1777404745
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 324.7124939 / 346.5874939
+Force 4 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+----------------------------------------
+E - scalar advection update (half time):
+----------------------------------------
+ mac velmin (           1 ) =   0.96783995528110167     
+ mac velmax (           1 ) =    1.1619531606823514     
+ mac velmin (           2 ) =  -0.30253191384122430     
+ mac velmax (           2 ) =   0.30245608531577139     
+ mac velmin (           3 ) =  -0.17771575444859733     
+ mac velmax (           3 ) =   0.17774047445746199     
+NavierStokesBase::getForce(): Entered...
+time      = 0.001344806284
+scomp     = 5
+ncomp     = 1
+ngrow     = 0
+scalScomp = 0
+Doing individual scalar: 5 
+NavierStokesBase::getForce()
+Force Domain:
+(0,8,0) - (63,15,7)
+Vel Domain:
+(0,8,0) - (63,15,7)
+Scal Domain:
+(0,8,0) - (63,15,7)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max 0.9678399553 / 1.161953161
+Vel  1 min/max -0.3025319138 / 0.3024560853
+Vel  2 min/max -0.1777157544 / 0.1777404745
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 324.7124939 / 346.5874939
+Force 5 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+----------------------------------------
+E - scalar advection update (half time):
+----------------------------------------
+ mac velmin (           1 ) =   0.96783996732014699     
+ mac velmax (           1 ) =    1.1619531657718036     
+ mac velmin (           2 ) =  -0.30245615094783096     
+ mac velmax (           2 ) =   0.30253184794989707     
+ mac velmin (           3 ) =  -0.17771575737401563     
+ mac velmax (           3 ) =   0.17774047722316738     
+NavierStokesBase::getForce(): Entered...
+time      = 0.001344806284
+scomp     = 4
+ncomp     = 1
+ngrow     = 0
+scalScomp = 0
+Doing tracer only
+NavierStokesBase::getForce()
+Force Domain:
+(0,16,0) - (63,23,7)
+Vel Domain:
+(0,16,0) - (63,23,7)
+Scal Domain:
+(0,16,0) - (63,23,7)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max 0.9678399673 / 1.161953166
+Vel  1 min/max -0.3024561509 / 0.3025318479
+Vel  2 min/max -0.1777157574 / 0.1777404772
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 299.7124939 / 321.5874939
+Force 4 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+----------------------------------------
+E - scalar advection update (half time):
+----------------------------------------
+ mac velmin (           1 ) =   0.96783996732014699     
+ mac velmax (           1 ) =    1.1619531657718036     
+ mac velmin (           2 ) =  -0.30245615094783096     
+ mac velmax (           2 ) =   0.30253184794989707     
+ mac velmin (           3 ) =  -0.17771575737401563     
+ mac velmax (           3 ) =   0.17774047722316738     
+NavierStokesBase::getForce(): Entered...
+time      = 0.001344806284
+scomp     = 5
+ncomp     = 1
+ngrow     = 0
+scalScomp = 0
+Doing individual scalar: 5 
+NavierStokesBase::getForce()
+Force Domain:
+(0,16,0) - (63,23,7)
+Vel Domain:
+(0,16,0) - (63,23,7)
+Scal Domain:
+(0,16,0) - (63,23,7)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max 0.9678399673 / 1.161953166
+Vel  1 min/max -0.3024561509 / 0.3025318479
+Vel  2 min/max -0.1777157574 / 0.1777404772
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 299.7124939 / 321.5874939
+Force 5 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+----------------------------------------
+E - scalar advection update (half time):
+----------------------------------------
+ mac velmin (           1 ) =   -4.4046095059749081E-002
+ mac velmax (           1 ) =    1.0853338849656367     
+ mac velmin (           2 ) =  -0.11659734652834945     
+ mac velmax (           2 ) =   0.11645341258212707     
+ mac velmin (           3 ) =  -0.17129835198666882     
+ mac velmax (           3 ) =   0.17130471825619578     
+NavierStokesBase::getForce(): Entered...
+time      = 0.001344806284
+scomp     = 4
+ncomp     = 1
+ngrow     = 0
+scalScomp = 0
+Doing tracer only
+NavierStokesBase::getForce()
+Force Domain:
+(0,24,0) - (63,31,7)
+Vel Domain:
+(0,24,0) - (63,31,7)
+Scal Domain:
+(0,24,0) - (63,31,7)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max -0.04404609506 / 1.085333885
+Vel  1 min/max -0.1165973465 / 0.1164534126
+Vel  2 min/max -0.171298352 / 0.1713047183
+Scal 0 min/max 0.9999999992 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 274.7124939 / 296.5874939
+Force 4 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+----------------------------------------
+E - scalar advection update (half time):
+----------------------------------------
+ mac velmin (           1 ) =   -4.4046095059749081E-002
+ mac velmax (           1 ) =    1.0853338849656367     
+ mac velmin (           2 ) =  -0.11659734652834945     
+ mac velmax (           2 ) =   0.11645341258212707     
+ mac velmin (           3 ) =  -0.17129835198666882     
+ mac velmax (           3 ) =   0.17130471825619578     
+NavierStokesBase::getForce(): Entered...
+time      = 0.001344806284
+scomp     = 5
+ncomp     = 1
+ngrow     = 0
+scalScomp = 0
+Doing individual scalar: 5 
+NavierStokesBase::getForce()
+Force Domain:
+(0,24,0) - (63,31,7)
+Vel Domain:
+(0,24,0) - (63,31,7)
+Scal Domain:
+(0,24,0) - (63,31,7)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max -0.04404609506 / 1.085333885
+Vel  1 min/max -0.1165973465 / 0.1164534126
+Vel  2 min/max -0.171298352 / 0.1713047183
+Scal 0 min/max 0.9999999992 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 274.7124939 / 296.5874939
+Force 5 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+----------------------------------------
+E - scalar advection update (half time):
+----------------------------------------
+ mac velmin (           1 ) =   -4.4046557141775737E-002
+ mac velmax (           1 ) =    1.0853338627769369     
+ mac velmin (           2 ) =  -0.11645333221345401     
+ mac velmax (           2 ) =   0.11659727646479726     
+ mac velmin (           3 ) =  -0.17130471569926858     
+ mac velmax (           3 ) =   0.17129834846121947     
+NavierStokesBase::getForce(): Entered...
+time      = 0.001344806284
+scomp     = 4
+ncomp     = 1
+ngrow     = 0
+scalScomp = 0
+Doing tracer only
+NavierStokesBase::getForce()
+Force Domain:
+(0,0,8) - (63,7,15)
+Vel Domain:
+(0,0,8) - (63,7,15)
+Scal Domain:
+(0,0,8) - (63,7,15)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max -0.04404655714 / 1.085333863
+Vel  1 min/max -0.1164533322 / 0.1165972765
+Vel  2 min/max -0.1713047157 / 0.1712983485
+Scal 0 min/max 1 / 1.000000001
+Scal 1 min/max 0 / 0
+Scal 2 min/max 349.7124939 / 371.5874939
+Force 4 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+----------------------------------------
+E - scalar advection update (half time):
+----------------------------------------
+ mac velmin (           1 ) =   -4.4046557141775737E-002
+ mac velmax (           1 ) =    1.0853338627769369     
+ mac velmin (           2 ) =  -0.11645333221345401     
+ mac velmax (           2 ) =   0.11659727646479726     
+ mac velmin (           3 ) =  -0.17130471569926858     
+ mac velmax (           3 ) =   0.17129834846121947     
+NavierStokesBase::getForce(): Entered...
+time      = 0.001344806284
+scomp     = 5
+ncomp     = 1
+ngrow     = 0
+scalScomp = 0
+Doing individual scalar: 5 
+NavierStokesBase::getForce()
+Force Domain:
+(0,0,8) - (63,7,15)
+Vel Domain:
+(0,0,8) - (63,7,15)
+Scal Domain:
+(0,0,8) - (63,7,15)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max -0.04404655714 / 1.085333863
+Vel  1 min/max -0.1164533322 / 0.1165972765
+Vel  2 min/max -0.1713047157 / 0.1712983485
+Scal 0 min/max 1 / 1.000000001
+Scal 1 min/max 0 / 0
+Scal 2 min/max 349.7124939 / 371.5874939
+Force 5 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+----------------------------------------
+E - scalar advection update (half time):
+----------------------------------------
+ mac velmin (           1 ) =   0.96783995704065218     
+ mac velmax (           1 ) =    1.1619531591167207     
+ mac velmin (           2 ) =  -0.30253191254984113     
+ mac velmax (           2 ) =   0.30245608402562646     
+ mac velmin (           3 ) =  -0.17774047576949692     
+ mac velmax (           3 ) =   0.17771575569590051     
+NavierStokesBase::getForce(): Entered...
+time      = 0.001344806284
+scomp     = 4
+ncomp     = 1
+ngrow     = 0
+scalScomp = 0
+Doing tracer only
+NavierStokesBase::getForce()
+Force Domain:
+(0,8,8) - (63,15,15)
+Vel Domain:
+(0,8,8) - (63,15,15)
+Scal Domain:
+(0,8,8) - (63,15,15)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max 0.967839957 / 1.161953159
+Vel  1 min/max -0.3025319125 / 0.302456084
+Vel  2 min/max -0.1777404758 / 0.1777157557
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 324.7124939 / 346.5874939
+Force 4 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+----------------------------------------
+E - scalar advection update (half time):
+----------------------------------------
+ mac velmin (           1 ) =   0.96783995704065218     
+ mac velmax (           1 ) =    1.1619531591167207     
+ mac velmin (           2 ) =  -0.30253191254984113     
+ mac velmax (           2 ) =   0.30245608402562646     
+ mac velmin (           3 ) =  -0.17774047576949692     
+ mac velmax (           3 ) =   0.17771575569590051     
+NavierStokesBase::getForce(): Entered...
+time      = 0.001344806284
+scomp     = 5
+ncomp     = 1
+ngrow     = 0
+scalScomp = 0
+Doing individual scalar: 5 
+NavierStokesBase::getForce()
+Force Domain:
+(0,8,8) - (63,15,15)
+Vel Domain:
+(0,8,8) - (63,15,15)
+Scal Domain:
+(0,8,8) - (63,15,15)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max 0.967839957 / 1.161953159
+Vel  1 min/max -0.3025319125 / 0.302456084
+Vel  2 min/max -0.1777404758 / 0.1777157557
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 324.7124939 / 346.5874939
+Force 5 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+----------------------------------------
+E - scalar advection update (half time):
+----------------------------------------
+ mac velmin (           1 ) =   0.96783996907969883     
+ mac velmax (           1 ) =    1.1619531642061736     
+ mac velmin (           2 ) =  -0.30245614965768608     
+ mac velmax (           2 ) =   0.30253184665851385     
+ mac velmin (           3 ) =  -0.17774047853520120     
+ mac velmax (           3 ) =   0.17771575862131694     
+NavierStokesBase::getForce(): Entered...
+time      = 0.001344806284
+scomp     = 4
+ncomp     = 1
+ngrow     = 0
+scalScomp = 0
+Doing tracer only
+NavierStokesBase::getForce()
+Force Domain:
+(0,16,8) - (63,23,15)
+Vel Domain:
+(0,16,8) - (63,23,15)
+Scal Domain:
+(0,16,8) - (63,23,15)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max 0.9678399691 / 1.161953164
+Vel  1 min/max -0.3024561497 / 0.3025318467
+Vel  2 min/max -0.1777404785 / 0.1777157586
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 299.7124939 / 321.5874939
+Force 4 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+----------------------------------------
+E - scalar advection update (half time):
+----------------------------------------
+ mac velmin (           1 ) =   0.96783996907969883     
+ mac velmax (           1 ) =    1.1619531642061736     
+ mac velmin (           2 ) =  -0.30245614965768608     
+ mac velmax (           2 ) =   0.30253184665851385     
+ mac velmin (           3 ) =  -0.17774047853520120     
+ mac velmax (           3 ) =   0.17771575862131694     
+NavierStokesBase::getForce(): Entered...
+time      = 0.001344806284
+scomp     = 5
+ncomp     = 1
+ngrow     = 0
+scalScomp = 0
+Doing individual scalar: 5 
+NavierStokesBase::getForce()
+Force Domain:
+(0,16,8) - (63,23,15)
+Vel Domain:
+(0,16,8) - (63,23,15)
+Scal Domain:
+(0,16,8) - (63,23,15)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max 0.9678399691 / 1.161953164
+Vel  1 min/max -0.3024561497 / 0.3025318467
+Vel  2 min/max -0.1777404785 / 0.1777157586
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 299.7124939 / 321.5874939
+Force 5 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+----------------------------------------
+E - scalar advection update (half time):
+----------------------------------------
+ mac velmin (           1 ) =   -4.4046091874527224E-002
+ mac velmax (           1 ) =    1.0853338833691892     
+ mac velmin (           2 ) =  -0.11659734781442671     
+ mac velmax (           2 ) =   0.11645341387089364     
+ mac velmin (           3 ) =  -0.17130471921492574     
+ mac velmax (           3 ) =   0.17129835285198391     
+NavierStokesBase::getForce(): Entered...
+time      = 0.001344806284
+scomp     = 4
+ncomp     = 1
+ngrow     = 0
+scalScomp = 0
+Doing tracer only
+NavierStokesBase::getForce()
+Force Domain:
+(0,24,8) - (63,31,15)
+Vel Domain:
+(0,24,8) - (63,31,15)
+Scal Domain:
+(0,24,8) - (63,31,15)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max -0.04404609187 / 1.085333883
+Vel  1 min/max -0.1165973478 / 0.1164534139
+Vel  2 min/max -0.1713047192 / 0.1712983529
+Scal 0 min/max 0.9999999992 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 274.7124939 / 296.5874939
+Force 4 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+----------------------------------------
+E - scalar advection update (half time):
+----------------------------------------
+ mac velmin (           1 ) =   -4.4046091874527224E-002
+ mac velmax (           1 ) =    1.0853338833691892     
+ mac velmin (           2 ) =  -0.11659734781442671     
+ mac velmax (           2 ) =   0.11645341387089364     
+ mac velmin (           3 ) =  -0.17130471921492574     
+ mac velmax (           3 ) =   0.17129835285198391     
+NavierStokesBase::getForce(): Entered...
+time      = 0.001344806284
+scomp     = 5
+ncomp     = 1
+ngrow     = 0
+scalScomp = 0
+Doing individual scalar: 5 
+NavierStokesBase::getForce()
+Force Domain:
+(0,24,8) - (63,31,15)
+Vel Domain:
+(0,24,8) - (63,31,15)
+Scal Domain:
+(0,24,8) - (63,31,15)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max -0.04404609187 / 1.085333883
+Vel  1 min/max -0.1165973478 / 0.1164534139
+Vel  2 min/max -0.1713047192 / 0.1712983529
+Scal 0 min/max 0.9999999992 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 274.7124939 / 296.5874939
+Force 5 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+----------------------------------------
+E - scalar advection update (half time):
+----------------------------------------
+ mac velmin (           1 ) =   -4.4046560106150004E-002
+ mac velmax (           1 ) =    1.0853338685956633     
+ mac velmin (           2 ) =  -0.11645333032631355     
+ mac velmax (           2 ) =   0.11659727461008455     
+ mac velmin (           3 ) =  -0.17129834579326103     
+ mac velmax (           3 ) =   0.17130471269768066     
+NavierStokesBase::getForce(): Entered...
+time      = 0.001344806284
+scomp     = 4
+ncomp     = 1
+ngrow     = 0
+scalScomp = 0
+Doing tracer only
+NavierStokesBase::getForce()
+Force Domain:
+(0,0,16) - (63,7,23)
+Vel Domain:
+(0,0,16) - (63,7,23)
+Scal Domain:
+(0,0,16) - (63,7,23)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max -0.04404656011 / 1.085333869
+Vel  1 min/max -0.1164533303 / 0.1165972746
+Vel  2 min/max -0.1712983458 / 0.1713047127
+Scal 0 min/max 1 / 1.000000001
+Scal 1 min/max 0 / 0
+Scal 2 min/max 349.7124939 / 371.5874939
+Force 4 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+----------------------------------------
+E - scalar advection update (half time):
+----------------------------------------
+ mac velmin (           1 ) =   -4.4046560106150004E-002
+ mac velmax (           1 ) =    1.0853338685956633     
+ mac velmin (           2 ) =  -0.11645333032631355     
+ mac velmax (           2 ) =   0.11659727461008455     
+ mac velmin (           3 ) =  -0.17129834579326103     
+ mac velmax (           3 ) =   0.17130471269768066     
+NavierStokesBase::getForce(): Entered...
+time      = 0.001344806284
+scomp     = 5
+ncomp     = 1
+ngrow     = 0
+scalScomp = 0
+Doing individual scalar: 5 
+NavierStokesBase::getForce()
+Force Domain:
+(0,0,16) - (63,7,23)
+Vel Domain:
+(0,0,16) - (63,7,23)
+Scal Domain:
+(0,0,16) - (63,7,23)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max -0.04404656011 / 1.085333869
+Vel  1 min/max -0.1164533303 / 0.1165972746
+Vel  2 min/max -0.1712983458 / 0.1713047127
+Scal 0 min/max 1 / 1.000000001
+Scal 1 min/max 0 / 0
+Scal 2 min/max 349.7124939 / 371.5874939
+Force 5 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+----------------------------------------
+E - scalar advection update (half time):
+----------------------------------------
+ mac velmin (           1 ) =   0.96783995462165917     
+ mac velmax (           1 ) =    1.1619531632012405     
+ mac velmin (           2 ) =  -0.30253191188410700     
+ mac velmax (           2 ) =   0.30245608947895031     
+ mac velmin (           3 ) =  -0.17771575263447956     
+ mac velmax (           3 ) =   0.17774047295489154     
+NavierStokesBase::getForce(): Entered...
+time      = 0.001344806284
+scomp     = 4
+ncomp     = 1
+ngrow     = 0
+scalScomp = 0
+Doing tracer only
+NavierStokesBase::getForce()
+Force Domain:
+(0,8,16) - (63,15,23)
+Vel Domain:
+(0,8,16) - (63,15,23)
+Scal Domain:
+(0,8,16) - (63,15,23)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max 0.9678399546 / 1.161953163
+Vel  1 min/max -0.3025319119 / 0.3024560895
+Vel  2 min/max -0.1777157526 / 0.177740473
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 324.7124939 / 346.5874939
+Force 4 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+----------------------------------------
+E - scalar advection update (half time):
+----------------------------------------
+ mac velmin (           1 ) =   0.96783995462165917     
+ mac velmax (           1 ) =    1.1619531632012405     
+ mac velmin (           2 ) =  -0.30253191188410700     
+ mac velmax (           2 ) =   0.30245608947895031     
+ mac velmin (           3 ) =  -0.17771575263447956     
+ mac velmax (           3 ) =   0.17774047295489154     
+NavierStokesBase::getForce(): Entered...
+time      = 0.001344806284
+scomp     = 5
+ncomp     = 1
+ngrow     = 0
+scalScomp = 0
+Doing individual scalar: 5 
+NavierStokesBase::getForce()
+Force Domain:
+(0,8,16) - (63,15,23)
+Vel Domain:
+(0,8,16) - (63,15,23)
+Scal Domain:
+(0,8,16) - (63,15,23)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max 0.9678399546 / 1.161953163
+Vel  1 min/max -0.3025319119 / 0.3024560895
+Vel  2 min/max -0.1777157526 / 0.177740473
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 324.7124939 / 346.5874939
+Force 5 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+----------------------------------------
+E - scalar advection update (half time):
+----------------------------------------
+ mac velmin (           1 ) =   0.96783996354548973     
+ mac velmax (           1 ) =    1.1619531667911405     
+ mac velmin (           2 ) =  -0.30245614898927886     
+ mac velmax (           2 ) =   0.30253185211331823     
+ mac velmin (           3 ) =  -0.17771575582528293     
+ mac velmax (           3 ) =   0.17774047545565816     
+NavierStokesBase::getForce(): Entered...
+time      = 0.001344806284
+scomp     = 4
+ncomp     = 1
+ngrow     = 0
+scalScomp = 0
+Doing tracer only
+NavierStokesBase::getForce()
+Force Domain:
+(0,16,16) - (63,23,23)
+Vel Domain:
+(0,16,16) - (63,23,23)
+Scal Domain:
+(0,16,16) - (63,23,23)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max 0.9678399635 / 1.161953167
+Vel  1 min/max -0.302456149 / 0.3025318521
+Vel  2 min/max -0.1777157558 / 0.1777404755
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 299.7124939 / 321.5874939
+Force 4 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+----------------------------------------
+E - scalar advection update (half time):
+----------------------------------------
+ mac velmin (           1 ) =   0.96783996354548973     
+ mac velmax (           1 ) =    1.1619531667911405     
+ mac velmin (           2 ) =  -0.30245614898927886     
+ mac velmax (           2 ) =   0.30253185211331823     
+ mac velmin (           3 ) =  -0.17771575582528293     
+ mac velmax (           3 ) =   0.17774047545565816     
+NavierStokesBase::getForce(): Entered...
+time      = 0.001344806284
+scomp     = 5
+ncomp     = 1
+ngrow     = 0
+scalScomp = 0
+Doing individual scalar: 5 
+NavierStokesBase::getForce()
+Force Domain:
+(0,16,16) - (63,23,23)
+Vel Domain:
+(0,16,16) - (63,23,23)
+Scal Domain:
+(0,16,16) - (63,23,23)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max 0.9678399635 / 1.161953167
+Vel  1 min/max -0.302456149 / 0.3025318521
+Vel  2 min/max -0.1777157558 / 0.1777404755
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 299.7124939 / 321.5874939
+Force 5 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+----------------------------------------
+E - scalar advection update (half time):
+----------------------------------------
+ mac velmin (           1 ) =   -4.4046098811956688E-002
+ mac velmax (           1 ) =    1.0853338850851526     
+ mac velmin (           2 ) =  -0.11659734592483899     
+ mac velmax (           2 ) =   0.11645341200829024     
+ mac velmin (           3 ) =  -0.17129834990009496     
+ mac velmax (           3 ) =   0.17130471649528789     
+NavierStokesBase::getForce(): Entered...
+time      = 0.001344806284
+scomp     = 4
+ncomp     = 1
+ngrow     = 0
+scalScomp = 0
+Doing tracer only
+NavierStokesBase::getForce()
+Force Domain:
+(0,24,16) - (63,31,23)
+Vel Domain:
+(0,24,16) - (63,31,23)
+Scal Domain:
+(0,24,16) - (63,31,23)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max -0.04404609881 / 1.085333885
+Vel  1 min/max -0.1165973459 / 0.116453412
+Vel  2 min/max -0.1712983499 / 0.1713047165
+Scal 0 min/max 0.9999999992 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 274.7124939 / 296.5874939
+Force 4 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+----------------------------------------
+E - scalar advection update (half time):
+----------------------------------------
+ mac velmin (           1 ) =   -4.4046098811956688E-002
+ mac velmax (           1 ) =    1.0853338850851526     
+ mac velmin (           2 ) =  -0.11659734592483899     
+ mac velmax (           2 ) =   0.11645341200829024     
+ mac velmin (           3 ) =  -0.17129834990009496     
+ mac velmax (           3 ) =   0.17130471649528789     
+NavierStokesBase::getForce(): Entered...
+time      = 0.001344806284
+scomp     = 5
+ncomp     = 1
+ngrow     = 0
+scalScomp = 0
+Doing individual scalar: 5 
+NavierStokesBase::getForce()
+Force Domain:
+(0,24,16) - (63,31,23)
+Vel Domain:
+(0,24,16) - (63,31,23)
+Scal Domain:
+(0,24,16) - (63,31,23)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max -0.04404609881 / 1.085333885
+Vel  1 min/max -0.1165973459 / 0.116453412
+Vel  2 min/max -0.1712983499 / 0.1713047165
+Scal 0 min/max 0.9999999992 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 274.7124939 / 296.5874939
+Force 5 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+----------------------------------------
+E - scalar advection update (half time):
+----------------------------------------
+ mac velmin (           1 ) =   -4.4046553389470638E-002
+ mac velmax (           1 ) =    1.0853338626573525     
+ mac velmin (           2 ) =  -0.11645333278692832     
+ mac velmax (           2 ) =   0.11659727706850334     
+ mac velmin (           3 ) =  -0.17130471746017734     
+ mac velmax (           3 ) =   0.17129835054778247     
+NavierStokesBase::getForce(): Entered...
+time      = 0.001344806284
+scomp     = 4
+ncomp     = 1
+ngrow     = 0
+scalScomp = 0
+Doing tracer only
+NavierStokesBase::getForce()
+Force Domain:
+(0,0,24) - (63,7,31)
+Vel Domain:
+(0,0,24) - (63,7,31)
+Scal Domain:
+(0,0,24) - (63,7,31)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max -0.04404655339 / 1.085333863
+Vel  1 min/max -0.1164533328 / 0.1165972771
+Vel  2 min/max -0.1713047175 / 0.1712983505
+Scal 0 min/max 1 / 1.000000001
+Scal 1 min/max 0 / 0
+Scal 2 min/max 349.7124939 / 371.5874939
+Force 4 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+----------------------------------------
+E - scalar advection update (half time):
+----------------------------------------
+ mac velmin (           1 ) =   -4.4046553389470638E-002
+ mac velmax (           1 ) =    1.0853338626573525     
+ mac velmin (           2 ) =  -0.11645333278692832     
+ mac velmax (           2 ) =   0.11659727706850334     
+ mac velmin (           3 ) =  -0.17130471746017734     
+ mac velmax (           3 ) =   0.17129835054778247     
+NavierStokesBase::getForce(): Entered...
+time      = 0.001344806284
+scomp     = 5
+ncomp     = 1
+ngrow     = 0
+scalScomp = 0
+Doing individual scalar: 5 
+NavierStokesBase::getForce()
+Force Domain:
+(0,0,24) - (63,7,31)
+Vel Domain:
+(0,0,24) - (63,7,31)
+Scal Domain:
+(0,0,24) - (63,7,31)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max -0.04404655339 / 1.085333863
+Vel  1 min/max -0.1164533328 / 0.1165972771
+Vel  2 min/max -0.1713047175 / 0.1712983505
+Scal 0 min/max 1 / 1.000000001
+Scal 1 min/max 0 / 0
+Scal 2 min/max 349.7124939 / 371.5874939
+Force 5 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+----------------------------------------
+E - scalar advection update (half time):
+----------------------------------------
+ mac velmin (           1 ) =   0.96783996081538071     
+ mac velmax (           1 ) =    1.1619531580973530     
+ mac velmin (           2 ) =  -0.30253190838648575     
+ mac velmax (           2 ) =   0.30245608598375362     
+ mac velmin (           3 ) =  -0.17774047753700717     
+ mac velmax (           3 ) =   0.17771575724462424     
+NavierStokesBase::getForce(): Entered...
+time      = 0.001344806284
+scomp     = 4
+ncomp     = 1
+ngrow     = 0
+scalScomp = 0
+Doing tracer only
+NavierStokesBase::getForce()
+Force Domain:
+(0,8,24) - (63,15,31)
+Vel Domain:
+(0,8,24) - (63,15,31)
+Scal Domain:
+(0,8,24) - (63,15,31)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max 0.9678399608 / 1.161953158
+Vel  1 min/max -0.3025319084 / 0.302456086
+Vel  2 min/max -0.1777404775 / 0.1777157572
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 324.7124939 / 346.5874939
+Force 4 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+----------------------------------------
+E - scalar advection update (half time):
+----------------------------------------
+ mac velmin (           1 ) =   0.96783996081538071     
+ mac velmax (           1 ) =    1.1619531580973530     
+ mac velmin (           2 ) =  -0.30253190838648575     
+ mac velmax (           2 ) =   0.30245608598375362     
+ mac velmin (           3 ) =  -0.17774047753700717     
+ mac velmax (           3 ) =   0.17771575724462424     
+NavierStokesBase::getForce(): Entered...
+time      = 0.001344806284
+scomp     = 5
+ncomp     = 1
+ngrow     = 0
+scalScomp = 0
+Doing individual scalar: 5 
+NavierStokesBase::getForce()
+Force Domain:
+(0,8,24) - (63,15,31)
+Vel Domain:
+(0,8,24) - (63,15,31)
+Scal Domain:
+(0,8,24) - (63,15,31)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max 0.9678399608 / 1.161953158
+Vel  1 min/max -0.3025319084 / 0.302456086
+Vel  2 min/max -0.1777404775 / 0.1777157572
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 324.7124939 / 346.5874939
+Force 5 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+----------------------------------------
+E - scalar advection update (half time):
+----------------------------------------
+ mac velmin (           1 ) =   0.96783996973920838     
+ mac velmax (           1 ) =    1.1619531616872503     
+ mac velmin (           2 ) =  -0.30245614549408206     
+ mac velmax (           2 ) =   0.30253184861569693     
+ mac velmin (           3 ) =  -0.17774048003777571     
+ mac velmax (           3 ) =   0.17771576043542897     
+NavierStokesBase::getForce(): Entered...
+time      = 0.001344806284
+scomp     = 4
+ncomp     = 1
+ngrow     = 0
+scalScomp = 0
+Doing tracer only
+NavierStokesBase::getForce()
+Force Domain:
+(0,16,24) - (63,23,31)
+Vel Domain:
+(0,16,24) - (63,23,31)
+Scal Domain:
+(0,16,24) - (63,23,31)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max 0.9678399697 / 1.161953162
+Vel  1 min/max -0.3024561455 / 0.3025318486
+Vel  2 min/max -0.17774048 / 0.1777157604
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 299.7124939 / 321.5874939
+Force 4 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+----------------------------------------
+E - scalar advection update (half time):
+----------------------------------------
+ mac velmin (           1 ) =   0.96783996973920838     
+ mac velmax (           1 ) =    1.1619531616872503     
+ mac velmin (           2 ) =  -0.30245614549408206     
+ mac velmax (           2 ) =   0.30253184861569693     
+ mac velmin (           3 ) =  -0.17774048003777571     
+ mac velmax (           3 ) =   0.17771576043542897     
+NavierStokesBase::getForce(): Entered...
+time      = 0.001344806284
+scomp     = 5
+ncomp     = 1
+ngrow     = 0
+scalScomp = 0
+Doing individual scalar: 5 
+NavierStokesBase::getForce()
+Force Domain:
+(0,16,24) - (63,23,31)
+Vel Domain:
+(0,16,24) - (63,23,31)
+Scal Domain:
+(0,16,24) - (63,23,31)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max 0.9678399697 / 1.161953162
+Vel  1 min/max -0.3024561455 / 0.3025318486
+Vel  2 min/max -0.17774048 / 0.1777157604
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 299.7124939 / 321.5874939
+Force 5 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+----------------------------------------
+E - scalar advection update (half time):
+----------------------------------------
+ mac velmin (           1 ) =   -4.4046092095290770E-002
+ mac velmax (           1 ) =    1.0853338791468388     
+ mac velmin (           2 ) =  -0.11659734838325836     
+ mac velmax (           2 ) =   0.11645341446890020     
+ mac velmin (           3 ) =  -0.17130472125778767     
+ mac velmax (           3 ) =   0.17129835465461857     
+NavierStokesBase::getForce(): Entered...
+time      = 0.001344806284
+scomp     = 4
+ncomp     = 1
+ngrow     = 0
+scalScomp = 0
+Doing tracer only
+NavierStokesBase::getForce()
+Force Domain:
+(0,24,24) - (63,31,31)
+Vel Domain:
+(0,24,24) - (63,31,31)
+Scal Domain:
+(0,24,24) - (63,31,31)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max -0.0440460921 / 1.085333879
+Vel  1 min/max -0.1165973484 / 0.1164534145
+Vel  2 min/max -0.1713047213 / 0.1712983547
+Scal 0 min/max 0.9999999992 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 274.7124939 / 296.5874939
+Force 4 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+----------------------------------------
+E - scalar advection update (half time):
+----------------------------------------
+ mac velmin (           1 ) =   -4.4046092095290770E-002
+ mac velmax (           1 ) =    1.0853338791468388     
+ mac velmin (           2 ) =  -0.11659734838325836     
+ mac velmax (           2 ) =   0.11645341446890020     
+ mac velmin (           3 ) =  -0.17130472125778767     
+ mac velmax (           3 ) =   0.17129835465461857     
+NavierStokesBase::getForce(): Entered...
+time      = 0.001344806284
+scomp     = 5
+ncomp     = 1
+ngrow     = 0
+scalScomp = 0
+Doing individual scalar: 5 
+NavierStokesBase::getForce()
+Force Domain:
+(0,24,24) - (63,31,31)
+Vel Domain:
+(0,24,24) - (63,31,31)
+Scal Domain:
+(0,24,24) - (63,31,31)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max -0.0440460921 / 1.085333879
+Vel  1 min/max -0.1165973484 / 0.1164534145
+Vel  2 min/max -0.1713047213 / 0.1712983547
+Scal 0 min/max 0.9999999992 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 274.7124939 / 296.5874939
+Force 5 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+scalar_diffusion_update 4 of 5
+scalar_diffusion_update 5 of 5
+ ffffff1 proc. = 1, tag = 2877 file = ../../Source/NavierStokesBase.cpp function = velocity_advection_update line = 4413
+ ffffff2 proc. = 1, tag = 2878 file = ../../Source/NavierStokesBase.cpp function = velocity_advection_update line = 4524
+... update velocities 
+Calling getForce...
+Calling getForce...
+Calling getForce...
+Calling getForce...
+Calling getForce...
+Calling getForce...
+Calling getForce...
+Calling getForce...
+Calling getForce...
+Calling getForce...
+Calling getForce...
+Calling getForce...
+Calling getForce...
+Calling getForce...
+Calling getForce...
+Calling getForce...
+ ffffff1 proc. = 0, tag = 2877 file = ../../Source/NavierStokesBase.cpp function = velocity_advection_update line = 4413
+------------------------------------------
+F - velocity advection update (half time):
+------------------------------------------
+Calling getForce...
+NavierStokesBase::getForce(): Entered...
+time      = 0.001344806284
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 0
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(0,0,0) - (63,7,7)
+Vel Domain:
+(0,0,0) - (63,7,7)
+Scal Domain:
+(0,0,0) - (63,7,7)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max -0.04404656033 / 1.085333864
+Vel  1 min/max -0.1164533309 / 0.1165972752
+Vel  2 min/max -0.1712983476 / 0.1713047147
+Scal 0 min/max 1 / 1.000000001
+Scal 1 min/max 0 / 0
+Scal 2 min/max 349.7119536 / 371.5872794
+Force 0 min/max 0.04167 / 0.04167000002
+Force 1 min/max 0.009031066417 / 0.01646867729
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+------------------------------------------
+F - velocity advection update (half time):
+------------------------------------------
+Calling getForce...
+NavierStokesBase::getForce(): Entered...
+time      = 0.001344806284
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 0
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(0,8,0) - (63,15,7)
+Vel Domain:
+(0,8,0) - (63,15,7)
+Scal Domain:
+(0,8,0) - (63,15,7)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max 0.9678399553 / 1.161953161
+Vel  1 min/max -0.3025319138 / 0.3024560853
+Vel  2 min/max -0.1777157544 / 0.1777404745
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 324.6921495 / 346.5913433
+Force 0 min/max 0.04167 / 0.04167
+Force 1 min/max 0.0005243329127 / 0.00797005892
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+------------------------------------------
+F - velocity advection update (half time):
+------------------------------------------
+Calling getForce...
+NavierStokesBase::getForce(): Entered...
+time      = 0.001344806284
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 0
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(0,16,0) - (63,23,7)
+Vel Domain:
+(0,16,0) - (63,23,7)
+Scal Domain:
+(0,16,0) - (63,23,7)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max 0.9678399673 / 1.161953166
+Vel  1 min/max -0.3024561509 / 0.3025318479
+Vel  2 min/max -0.1777157574 / 0.1777404772
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 299.7086444 / 321.6078383
+Force 0 min/max 0.04167 / 0.04167
+Force 1 min/max -0.007970058921 / -0.0005243329142
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+------------------------------------------
+F - velocity advection update (half time):
+------------------------------------------
+Calling getForce...
+NavierStokesBase::getForce(): Entered...
+time      = 0.001344806284
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 0
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(0,24,0) - (63,31,7)
+Vel Domain:
+(0,24,0) - (63,31,7)
+Scal Domain:
+(0,24,0) - (63,31,7)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max -0.04404609506 / 1.085333885
+Vel  1 min/max -0.1165973465 / 0.1164534126
+Vel  2 min/max -0.171298352 / 0.1713047183
+Scal 0 min/max 0.9999999992 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 274.7127084 / 296.5880342
+Force 0 min/max 0.04166999997 / 0.04167
+Force 1 min/max -0.01646867727 / -0.009031066418
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+------------------------------------------
+F - velocity advection update (half time):
+------------------------------------------
+Calling getForce...
+NavierStokesBase::getForce(): Entered...
+time      = 0.001344806284
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 0
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(0,0,8) - (63,7,15)
+Vel Domain:
+(0,0,8) - (63,7,15)
+Scal Domain:
+(0,0,8) - (63,7,15)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max -0.04404655714 / 1.085333863
+Vel  1 min/max -0.1164533322 / 0.1165972765
+Vel  2 min/max -0.1713047157 / 0.1712983485
+Scal 0 min/max 1 / 1.000000001
+Scal 1 min/max 0 / 0
+Scal 2 min/max 349.7119536 / 371.5872794
+Force 0 min/max 0.04167 / 0.04167000002
+Force 1 min/max 0.009031066417 / 0.01646867729
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+------------------------------------------
+F - velocity advection update (half time):
+------------------------------------------
+Calling getForce...
+NavierStokesBase::getForce(): Entered...
+time      = 0.001344806284
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 0
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(0,8,8) - (63,15,15)
+Vel Domain:
+(0,8,8) - (63,15,15)
+Scal Domain:
+(0,8,8) - (63,15,15)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max 0.967839957 / 1.161953159
+Vel  1 min/max -0.3025319125 / 0.302456084
+Vel  2 min/max -0.1777404758 / 0.1777157557
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 324.6921495 / 346.5913433
+Force 0 min/max 0.04167 / 0.04167
+Force 1 min/max 0.0005243329128 / 0.00797005892
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+------------------------------------------
+F - velocity advection update (half time):
+------------------------------------------
+Calling getForce...
+NavierStokesBase::getForce(): Entered...
+time      = 0.001344806284
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 0
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(0,16,8) - (63,23,15)
+Vel Domain:
+(0,16,8) - (63,23,15)
+Scal Domain:
+(0,16,8) - (63,23,15)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max 0.9678399691 / 1.161953164
+Vel  1 min/max -0.3024561497 / 0.3025318467
+Vel  2 min/max -0.1777404785 / 0.1777157586
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 299.7086444 / 321.6078383
+Force 0 min/max 0.04167 / 0.04167
+Force 1 min/max -0.007970058921 / -0.0005243329143
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+------------------------------------------
+F - velocity advection update (half time):
+------------------------------------------
+Calling getForce...
+NavierStokesBase::getForce(): Entered...
+time      = 0.001344806284
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 0
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(0,24,8) - (63,31,15)
+Vel Domain:
+(0,24,8) - (63,31,15)
+Scal Domain:
+(0,24,8) - (63,31,15)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max -0.04404609187 / 1.085333883
+Vel  1 min/max -0.1165973478 / 0.1164534139
+Vel  2 min/max -0.1713047192 / 0.1712983529
+Scal 0 min/max 0.9999999992 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 274.7127084 / 296.5880342
+Force 0 min/max 0.04166999997 / 0.04167
+Force 1 min/max -0.01646867727 / -0.009031066418
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+------------------------------------------
+F - velocity advection update (half time):
+------------------------------------------
+Calling getForce...
+NavierStokesBase::getForce(): Entered...
+time      = 0.001344806284
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 0
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(0,0,16) - (63,7,23)
+Vel Domain:
+(0,0,16) - (63,7,23)
+Scal Domain:
+(0,0,16) - (63,7,23)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max -0.04404656011 / 1.085333869
+Vel  1 min/max -0.1164533303 / 0.1165972746
+Vel  2 min/max -0.1712983458 / 0.1713047127
+Scal 0 min/max 1 / 1.000000001
+Scal 1 min/max 0 / 0
+Scal 2 min/max 349.7119536 / 371.5872794
+Force 0 min/max 0.04167 / 0.04167000002
+Force 1 min/max 0.009031066417 / 0.01646867729
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+------------------------------------------
+F - velocity advection update (half time):
+------------------------------------------
+Calling getForce...
+NavierStokesBase::getForce(): Entered...
+time      = 0.001344806284
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 0
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(0,8,16) - (63,15,23)
+Vel Domain:
+(0,8,16) - (63,15,23)
+Scal Domain:
+(0,8,16) - (63,15,23)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max 0.9678399546 / 1.161953163
+Vel  1 min/max -0.3025319119 / 0.3024560895
+Vel  2 min/max -0.1777157526 / 0.177740473
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 324.6921495 / 346.5913433
+Force 0 min/max 0.04167 / 0.04167
+Force 1 min/max 0.0005243329128 / 0.00797005892
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+------------------------------------------
+F - velocity advection update (half time):
+------------------------------------------
+Calling getForce...
+NavierStokesBase::getForce(): Entered...
+time      = 0.001344806284
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 0
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(0,16,16) - (63,23,23)
+Vel Domain:
+(0,16,16) - (63,23,23)
+Scal Domain:
+(0,16,16) - (63,23,23)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max 0.9678399635 / 1.161953167
+Vel  1 min/max -0.302456149 / 0.3025318521
+Vel  2 min/max -0.1777157558 / 0.1777404755
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 299.7086444 / 321.6078383
+Force 0 min/max 0.04167 / 0.04167
+Force 1 min/max -0.007970058921 / -0.0005243329141
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+------------------------------------------
+F - velocity advection update (half time):
+------------------------------------------
+Calling getForce...
+NavierStokesBase::getForce(): Entered...
+time      = 0.001344806284
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 0
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(0,24,16) - (63,31,23)
+Vel Domain:
+(0,24,16) - (63,31,23)
+Scal Domain:
+(0,24,16) - (63,31,23)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max -0.04404609881 / 1.085333885
+Vel  1 min/max -0.1165973459 / 0.116453412
+Vel  2 min/max -0.1712983499 / 0.1713047165
+Scal 0 min/max 0.9999999992 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 274.7127084 / 296.5880342
+Force 0 min/max 0.04166999997 / 0.04167
+Force 1 min/max -0.01646867727 / -0.009031066418
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+------------------------------------------
+F - velocity advection update (half time):
+------------------------------------------
+Calling getForce...
+NavierStokesBase::getForce(): Entered...
+time      = 0.001344806284
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 0
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(0,0,24) - (63,7,31)
+Vel Domain:
+(0,0,24) - (63,7,31)
+Scal Domain:
+(0,0,24) - (63,7,31)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max -0.04404655339 / 1.085333863
+Vel  1 min/max -0.1164533328 / 0.1165972771
+Vel  2 min/max -0.1713047175 / 0.1712983505
+Scal 0 min/max 1 / 1.000000001
+Scal 1 min/max 0 / 0
+Scal 2 min/max 349.7119536 / 371.5872794
+Force 0 min/max 0.04167 / 0.04167000002
+Force 1 min/max 0.009031066417 / 0.01646867729
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+------------------------------------------
+F - velocity advection update (half time):
+------------------------------------------
+Calling getForce...
+NavierStokesBase::getForce(): Entered...
+time      = 0.001344806284
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 0
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(0,8,24) - (63,15,31)
+Vel Domain:
+(0,8,24) - (63,15,31)
+Scal Domain:
+(0,8,24) - (63,15,31)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max 0.9678399608 / 1.161953158
+Vel  1 min/max -0.3025319084 / 0.302456086
+Vel  2 min/max -0.1777404775 / 0.1777157572
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 324.6921495 / 346.5913433
+Force 0 min/max 0.04167 / 0.04167
+Force 1 min/max 0.0005243329128 / 0.00797005892
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+------------------------------------------
+F - velocity advection update (half time):
+------------------------------------------
+Calling getForce...
+NavierStokesBase::getForce(): Entered...
+time      = 0.001344806284
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 0
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(0,16,24) - (63,23,31)
+Vel Domain:
+(0,16,24) - (63,23,31)
+Scal Domain:
+(0,16,24) - (63,23,31)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max 0.9678399697 / 1.161953162
+Vel  1 min/max -0.3024561455 / 0.3025318486
+Vel  2 min/max -0.17774048 / 0.1777157604
+Scal 0 min/max 1 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 299.7086444 / 321.6078383
+Force 0 min/max 0.04167 / 0.04167
+Force 1 min/max -0.007970058921 / -0.0005243329142
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+------------------------------------------
+F - velocity advection update (half time):
+------------------------------------------
+Calling getForce...
+NavierStokesBase::getForce(): Entered...
+time      = 0.001344806284
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 0
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(0,24,24) - (63,31,31)
+Vel Domain:
+(0,24,24) - (63,31,31)
+Scal Domain:
+(0,24,24) - (63,31,31)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max -0.0440460921 / 1.085333879
+Vel  1 min/max -0.1165973484 / 0.1164534145
+Vel  2 min/max -0.1713047213 / 0.1712983547
+Scal 0 min/max 0.9999999992 / 1
+Scal 1 min/max 0 / 0
+Scal 2 min/max 274.7127084 / 296.5880342
+Force 0 min/max 0.04166999997 / 0.04167
+Force 1 min/max -0.01646867727 / -0.009031066418
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+ ffffff2 proc. = 0, tag = 2878 file = ../../Source/NavierStokesBase.cpp function = velocity_advection_update line = 4524
+ xxxxx proc. = 1, tag = 2881 file = ../../Source/NavierStokesBase.cpp function = initial_velocity_diffusion_update line = 4599
+ xxxxx proc. = 0, tag = 2881 file = ../../Source/NavierStokesBase.cpp function = initial_velocity_diffusion_update line = 4599
+--------------------------------------
+G - initial velocity diffusion update:
+--------------------------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 3
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(0,0,0) - (63,7,7)
+Vel Domain:
+(-1,-1,-1) - (64,32,32)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max -0.04435041073 / 1.161877379
+Scal 1 min/max -0.3025435872 / 0.3025435216
+Scal 2 min/max -0.1777562998 / 0.1777562998
+Force 0 min/max -0.001848081568 / 0.04521785291
+Force 1 min/max -0.1192262117 / 0.004872847419
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+--------------------------------------
+G - initial velocity diffusion update:
+--------------------------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 3
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(0,8,0) - (63,15,7)
+Vel Domain:
+(-1,-1,-1) - (64,32,32)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max -0.04435041073 / 1.161877379
+Scal 1 min/max -0.3025435872 / 0.3025435216
+Scal 2 min/max -0.1777562998 / 0.1777562998
+Force 0 min/max 0.04032398939 / 0.04841543032
+Force 1 min/max -0.1276571855 / -0.1063214152
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+--------------------------------------
+G - initial velocity diffusion update:
+--------------------------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 3
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(0,16,0) - (63,23,7)
+Vel Domain:
+(-1,-1,-1) - (64,32,32)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max -0.04435041073 / 1.161877379
+Scal 1 min/max -0.3025435872 / 0.3025435216
+Scal 2 min/max -0.1777562998 / 0.1777562998
+Force 0 min/max 0.04032398945 / 0.04841543035
+Force 1 min/max -0.1276571856 / -0.1063214154
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+--------------------------------------
+G - initial velocity diffusion update:
+--------------------------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 3
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(0,24,0) - (63,31,7)
+Vel Domain:
+(-1,-1,-1) - (64,32,32)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max -0.04435041073 / 1.161877379
+Scal 1 min/max -0.3025435872 / 0.3025435216
+Scal 2 min/max -0.1777562998 / 0.1777562998
+Force 0 min/max -0.001848081484 / 0.045217853
+Force 1 min/max -0.1192262119 / 0.004872847198
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+--------------------------------------
+G - initial velocity diffusion update:
+--------------------------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 3
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(0,0,8) - (63,7,15)
+Vel Domain:
+(-1,-1,-1) - (64,32,32)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max -0.04435041073 / 1.161877379
+Scal 1 min/max -0.3025435872 / 0.3025435216
+Scal 2 min/max -0.1777562998 / 0.1777562998
+Force 0 min/max -0.001848081489 / 0.04521785289
+Force 1 min/max -0.1192262113 / 0.004872847875
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+--------------------------------------
+G - initial velocity diffusion update:
+--------------------------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 3
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(0,8,8) - (63,15,15)
+Vel Domain:
+(-1,-1,-1) - (64,32,32)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max -0.04435041073 / 1.161877379
+Scal 1 min/max -0.3025435872 / 0.3025435216
+Scal 2 min/max -0.1777562998 / 0.1777562998
+Force 0 min/max 0.04032398941 / 0.04841543029
+Force 1 min/max -0.1276571852 / -0.1063214156
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+--------------------------------------
+G - initial velocity diffusion update:
+--------------------------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 3
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(0,16,8) - (63,23,15)
+Vel Domain:
+(-1,-1,-1) - (64,32,32)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max -0.04435041073 / 1.161877379
+Scal 1 min/max -0.3025435872 / 0.3025435216
+Scal 2 min/max -0.1777562998 / 0.1777562998
+Force 0 min/max 0.04032398948 / 0.04841543033
+Force 1 min/max -0.1276571853 / -0.1063214158
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+--------------------------------------
+G - initial velocity diffusion update:
+--------------------------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 3
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(0,24,8) - (63,31,15)
+Vel Domain:
+(-1,-1,-1) - (64,32,32)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max -0.04435041073 / 1.161877379
+Scal 1 min/max -0.3025435872 / 0.3025435216
+Scal 2 min/max -0.1777562998 / 0.1777562998
+Force 0 min/max -0.001848081405 / 0.04521785298
+Force 1 min/max -0.1192262116 / 0.004872847653
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+--------------------------------------
+G - initial velocity diffusion update:
+--------------------------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 3
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(0,0,16) - (63,7,23)
+Vel Domain:
+(-1,-1,-1) - (64,32,32)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max -0.04435041073 / 1.161877379
+Scal 1 min/max -0.3025435872 / 0.3025435216
+Scal 2 min/max -0.1777562998 / 0.1777562998
+Force 0 min/max -0.001848081531 / 0.04521785303
+Force 1 min/max -0.119226212 / 0.004872847321
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+--------------------------------------
+G - initial velocity diffusion update:
+--------------------------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 3
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(0,8,16) - (63,15,23)
+Vel Domain:
+(-1,-1,-1) - (64,32,32)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max -0.04435041073 / 1.161877379
+Scal 1 min/max -0.3025435872 / 0.3025435216
+Scal 2 min/max -0.1777562998 / 0.1777562998
+Force 0 min/max 0.04032398942 / 0.04841543038
+Force 1 min/max -0.1276571856 / -0.1063214153
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+--------------------------------------
+G - initial velocity diffusion update:
+--------------------------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 3
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(0,16,16) - (63,23,23)
+Vel Domain:
+(-1,-1,-1) - (64,32,32)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max -0.04435041073 / 1.161877379
+Scal 1 min/max -0.3025435872 / 0.3025435216
+Scal 2 min/max -0.1777562998 / 0.1777562998
+Force 0 min/max 0.04032398936 / 0.04841543034
+Force 1 min/max -0.1276571856 / -0.1063214151
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+--------------------------------------
+G - initial velocity diffusion update:
+--------------------------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 3
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(0,24,16) - (63,31,23)
+Vel Domain:
+(-1,-1,-1) - (64,32,32)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max -0.04435041073 / 1.161877379
+Scal 1 min/max -0.3025435872 / 0.3025435216
+Scal 2 min/max -0.1777562998 / 0.1777562998
+Force 0 min/max -0.001848081615 / 0.04521785295
+Force 1 min/max -0.1192262117 / 0.004872847543
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+--------------------------------------
+G - initial velocity diffusion update:
+--------------------------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 3
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(0,0,24) - (63,7,31)
+Vel Domain:
+(-1,-1,-1) - (64,32,32)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max -0.04435041073 / 1.161877379
+Scal 1 min/max -0.3025435872 / 0.3025435216
+Scal 2 min/max -0.1777562998 / 0.1777562998
+Force 0 min/max -0.001848081358 / 0.04521785295
+Force 1 min/max -0.1192262115 / 0.00487284753
+Force 2 min/max -0 / -0
+NavierStokesBase::getForce(): Leaving...
+---
+
+--------------------------------------
+G - initial velocity diffusion update:
+--------------------------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 3
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(0,8,24) - (63,15,31)
+Vel Domain:
+(-1,-1,-1) - (64,32,32)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max -0.04435041073 / 1.161877379
+Scal 1 min/max -0.3025435872 / 0.3025435216
+Scal 2 min/max -0.1777562998 / 0.1777562998
+Force 0 min/max 0.04032398951 / 0.0484154303
+Force 1 min/max -0.1276571852 / -0.1063214158
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+--------------------------------------
+G - initial velocity diffusion update:
+--------------------------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 3
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(0,16,24) - (63,23,31)
+Vel Domain:
+(-1,-1,-1) - (64,32,32)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max -0.04435041073 / 1.161877379
+Scal 1 min/max -0.3025435872 / 0.3025435216
+Scal 2 min/max -0.1777562998 / 0.1777562998
+Force 0 min/max 0.04032398945 / 0.04841543027
+Force 1 min/max -0.1276571851 / -0.1063214157
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+
+--------------------------------------
+G - initial velocity diffusion update:
+--------------------------------------
+NavierStokesBase::getForce(): Entered...
+time      = 0
+scomp     = 0
+ncomp     = 3
+ngrow     = 0
+scalScomp = 3
+Doing all velocity components
+NavierStokesBase::getForce()
+Force Domain:
+(0,24,24) - (63,31,31)
+Vel Domain:
+(-1,-1,-1) - (64,32,32)
+Scal Domain:
+(-1,-1,-1) - (64,32,32)
+rhs Domain:
+(-1,-1,-1) - (64,32,32)
+Vel  0 min/max -0.04435041073 / 1.161877379
+Vel  1 min/max -0.3025435872 / 0.3025435216
+Vel  2 min/max -0.1777562998 / 0.1777562998
+Scal 0 min/max -0.04435041073 / 1.161877379
+Scal 1 min/max -0.3025435872 / 0.3025435216
+Scal 2 min/max -0.1777562998 / 0.1777562998
+Force 0 min/max -0.001848081442 / 0.04521785286
+Force 1 min/max -0.1192262112 / 0.004872847752
+Force 2 min/max 0 / 0
+NavierStokesBase::getForce(): Leaving...
+---
+

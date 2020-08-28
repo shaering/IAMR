@@ -68,8 +68,12 @@ void
 initialize_EB2 (const Geometry& geom, const int required_coarsening_level,
 		const int max_coarsening_level)
 {
+
+  //    std::cout << " <NS_init_eb2> Initializing EB2...\n";
+  
     // read in EB parameters
     ParmParse ppeb2("eb2");
+    //ParmParse ppeb2("eb3");  
     std::string geom_type;
     ppeb2.get("geom_type", geom_type);
 
@@ -122,6 +126,8 @@ initialize_EB2 (const Geometry& geom, const int required_coarsening_level,
     auto gshop = EB2::makeShop(pr);
     EB2::Build(gshop, geom, required_coarsening_level, max_coarsening_level);
   }
+
+
   else if (geom_type == "Piston-Cylinder")
   {
     EB2::SplineIF Piston;
@@ -158,6 +164,8 @@ initialize_EB2 (const Geometry& geom, const int required_coarsening_level,
     auto gshop = EB2::makeShop(PistonCylinder);
     EB2::Build(gshop, geom, required_coarsening_level, max_coarsening_level);
   }
+
+  
   else if (geom_type == "Line-Piston-Cylinder")
   {
     EB2::SplineIF Piston;
@@ -208,6 +216,8 @@ initialize_EB2 (const Geometry& geom, const int required_coarsening_level,
     auto gshop = EB2::makeShop(PistonCylinder);
     EB2::Build(gshop, geom, required_coarsening_level, max_coarsening_level);
   }
+
+  
   else if (geom_type == "Inflow-Pipe")
   {
     
@@ -237,8 +247,9 @@ initialize_EB2 (const Geometry& geom, const int required_coarsening_level,
 
     // Compute distance between cylinder centres
     Real offset = 0.0;
-    for(int i = 0; i < 3; i++)
+    for(int i = 0; i < 3; i++) {
         offset += pow(center1[i] - center2[i], 2);
+    }
     offset = sqrt(offset);
 
     // Print info about cylinders
@@ -256,7 +267,7 @@ initialize_EB2 (const Geometry& geom, const int required_coarsening_level,
 
     amrex::Print() << "\n Offset:          " << offset << std::endl;
 
-        // Build the implicit function as a union of two cylinders
+    // Build the implicit function as a union of two cylinders
     EB2::CylinderIF cyl1(radius1, height1, direction1, center1, false);
     EB2::CylinderIF cyl2(radius2, height2, direction2, center2, false);
 //    auto twocylinders = EB2::makeUnion(cyl1, cyl2);
@@ -272,6 +283,81 @@ initialize_EB2 (const Geometry& geom, const int required_coarsening_level,
     EB2::Build(gshop, geom, required_coarsening_level, max_coarsening_level);
 
   }
+    
+  else if (geom_type == "Impingement-Effusion")
+  {
+    
+    // Initialise parameters
+    //    int some_int = 1;
+    Real r_top = 0.5;
+    Real r_bot = 0.5;
+    Real l_chan = 1.0;
+    Real l_top = 0.5;
+    Real l_bot = 0.5;        
+    Real theta_bot = 0.0;
+    Vector<Real> center_top(3);
+    Vector<Real> center_bot(3);
+    //    Vector<Real> plt1pt(3);
+    //    Vector<Real> plt2pt(3);
+    //    Vector<Real> plnm(3);
+
+    std::cout << " >>> EB: Impingment-Effusion selected <<<\n";
+
+    center_top[0] = 1.0;
+    center_top[1] = 2.0;
+    center_top[2] = 1.0;
+
+    center_bot[0] = 1.25;
+    center_bot[1] = -0.5;
+    center_bot[2] = 1.25;        
+
+    // Get information from inputs file.
+    ParmParse pp("IE");
+    //    pp.query("some_int",       some_int);
+    pp.query("radius_top",     r_top);
+    pp.query("radius_bottom",  r_bot);
+    pp.query("channel_height", l_chan);
+    pp.query("impTube_length", l_top);
+    pp.query("effTube_length", l_bot);    
+    pp.getarr("center_top",    center_top, 0, 3);
+    pp.getarr("center_bottom", center_bot, 0, 3);
+    
+    Array<Real, 3> center1 = {center_top[0], center_top[1], center_top[2]};
+    Array<Real, 3> center2 = {center_bot[0], center_bot[1], center_bot[2]};
+
+    // Build the implicit function as a union of two cylinders and
+    // a center channel with one cylinder at an angle
+    // EB2::CylinderIF cf(radius, height, direction, center, has_fluid_inside);
+    EB2::CylinderIF cyl1(r_top, l_top, 2, center1, true);
+    EB2::CylinderIF cyl2(r_bot, l_bot, 2, center2, true);
+    // std::rotate(cyl2, theta_bot, 0); //degrees or radians?
+
+    //    auto pr = EB2::translate(EB2::lathe(polys), {lenx*0.5, leny*0.5, 0.});    // move cyls if necessary
+
+    //    Vector<Real> pl1pt, pl2pt, pl2nm, pl3pt;
+    //    pp.getarr("top_plane1_point", pl1pt);
+    //    pp.getarr("top_plane2_point", pl2pt);
+    //    pp.getarr("top_plane3_point", pl3pt);    
+    //    pp.getarr("top_plane_normal", plnm);
+
+    // (lo pt, hi pt, fill?)
+    EB2::BoxIF chan({0.0, 0.0, 0.0}, {4.0, 2.0, 1.0}, true);
+    
+
+    //    EB2::PlaneIF surf_top({0., l_chan, 0.}, {0., -1., 0.});
+    //    EB2::PlaneIF surf_bot({0., 0., 0.}, {0., 1., 0.});    
+
+    // arbitrary surface patch constructed by point and normal
+    //    auto top = EB2::makeIntersection(surf_top, cyl1);
+    //    auto bot = EB2::makeIntersection(surf_bot, cyl2);
+
+    // put it all together
+    auto domain = EB2::makeUnion(cyl1, chan, cyl2);
+    auto gshop = EB2::makeShop(domain);
+    EB2::Build(gshop, geom, required_coarsening_level, max_coarsening_level);        
+    
+  }
+  
   else
 #endif
   {
@@ -372,6 +458,7 @@ NavierStokesBase::initialize_eb2_structs() {
     }   
   }
 }
+
 
 void
 NavierStokesBase::define_body_state()
