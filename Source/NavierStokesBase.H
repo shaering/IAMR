@@ -27,7 +27,9 @@
 #include <AMReX_EBFluxRegister.H>
 #endif
 
+#ifdef AMREX_PARTICLES
 #include <activeParticles.H>
+#endif
 //#include <AmrActiveParticles.H>
 
 //

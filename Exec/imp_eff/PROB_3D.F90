@@ -26,10 +26,10 @@ module prob_3D_module
 
    ! Define some parameters
    ! These could be loaded via a probin file instead of being hardcoded
-   REAL_T, parameter :: U0       = 1.0
-   REAL_T, parameter :: density  = 1.0
-   REAL_T, parameter :: temp_bot  = 373.15
-   REAL_T, parameter :: temp_top  = 273.15
+   REAL_T, parameter :: U0       = 1.0d0
+   REAL_T, parameter :: density  = 1.0d0
+   REAL_T, parameter :: temp_bot  = 293.0d0 !373.15
+   REAL_T, parameter :: temp_top  = 293.0d0
 
    ! Set problo and probhi as module variables so that they can be
    ! used everywehere in this module
@@ -174,6 +174,7 @@ subroutine amrex_probinit (init,name,namlen,problo,probhi) bind(c)
       integer i, j, k
       REAL_T  x, y, z, yn, hx, hy, hz
 
+      
       hx = dx(1)
       hy = dx(2)
       hz = dx(3)
@@ -643,6 +644,8 @@ subroutine amrex_probinit (init,name,namlen,problo,probhi) bind(c)
       ! Since we are not advecting any scalar besides density
       ! we do not need this subroutine to do anything
 
+      adv = 0.0d0
+
    end subroutine FORT_ADVFILL
 
    subroutine FORT_ADV2FILL (adv,DIMS(adv),domlo,domhi,dx, &
@@ -660,6 +663,8 @@ subroutine amrex_probinit (init,name,namlen,problo,probhi) bind(c)
 
       ! Since we are not advecting any scalar besides density
       ! we do not need this subroutine to do anything
+
+      adv = 0.0d0
 
    end subroutine FORT_ADV2FILL
 
@@ -734,6 +739,7 @@ subroutine amrex_probinit (init,name,namlen,problo,probhi) bind(c)
       end if
 
       if (bc(2,1).eq.EXT_DIR.and.ARG_L2(temp).lt.domlo(2)) then
+!      if (bc(2,1).eq.FOEXTRAP.and.ARG_L2(temp).lt.domlo(2)) then            
          do j = ARG_L2(temp), domlo(2)-1
             do k = ARG_L3(temp), ARG_H3(temp)
                do i = ARG_L1(temp), ARG_H1(temp)
@@ -819,6 +825,9 @@ subroutine amrex_probinit (init,name,namlen,problo,probhi) bind(c)
       REAL_T factor, twidth, toffset, ui, u_face
       REAL_T x_top, z_top, r_top, x_bot, z_bot, r_bot, zc
 
+      REAL_T pert, unsteady, pi, Lf
+      REAL_T x,r,u1,u2,u3,u_inf,eta      
+
 
 #include <probdata.H>
 
@@ -829,8 +838,6 @@ subroutine amrex_probinit (init,name,namlen,problo,probhi) bind(c)
 !      REAL_T, allocatable :: uflct(:,:,:)
 !#include <INFL_FORCE_F.H>
 !#endif
-
-      REAL_T x,r,u1,u2,u3,u_inf,eta
 
 !      parameter (constn=.22089323)
 
@@ -867,18 +874,26 @@ subroutine amrex_probinit (init,name,namlen,problo,probhi) bind(c)
 !      yc = 0.5*(domnhi(2) - domnlo(2))
 !      zc = 0.5*(domnhi(3) - domnlo(3))      
 
-      ! geom descriptions, should make this connected to EB2 file
-      x_top = 1.0d0 ! center of top cylinder
-      z_top = 1.0d0
-      r_top = sqrt( x_top*x_top + z_top*z_top )      
-      x_bot = 1.25d0 ! center of bottom cylinder
-      z_bot = 1.25d0
-      r_bot = sqrt( x_bot*x_bot + z_bot*z_bot )            
 
+      ! geom descriptions, should make this connected to EB2 file
+      x_top = 2.5d0 ! center of top cylinder
+      z_top = 1.0d0
+      r_top = 0.5d0
+      
+      x_bot = 1.5d0 ! center of bottom cylinder
+      z_bot = 1.0d0
+      r_bot = 0.5d0      
+
+      pi = 3.14159265359D0
+      Lf = pi/r_top
       twidth = 1.0d0
       toffset = 2.5d0
-      factor = 0.5d0 * (tanh(time/twidth-toffset)-1.0d0)      
-      ui = zero ! holder for fluctuations
+      factor = 0.5d0 * (tanh(time/twidth-toffset)-1.0d0)
+
+      unsteady = (sin((time/twidth)*pi) + 10.0d0)/10.0d0
+      factor = factor * unsteady
+
+      ui = 1.0d0 ! holder for fluctuations
       ui = factor * ui
 
       call filcc(u,DIMS(u),domlo,domhi,dx,xlo,bc)
@@ -907,7 +922,8 @@ subroutine amrex_probinit (init,name,namlen,problo,probhi) bind(c)
       endif
 
       ! y-face low OUTFLOW
-      if (bc(2,1).eq.EXT_DIR.and.ARG_L2(u).lt.domlo(2)) then
+      if (bc(2,1).eq.EXT_DIR.and.ARG_L2(u).lt.domlo(2)) then 
+!      if (bc(2,1).eq.FOEXTRAP.and.ARG_L2(u).lt.domlo(2)) then
          do j = ARG_L2(u), domlo(2)-1
             do k = ARG_L3(u), ARG_H3(u)
                z = domnlo(3) + (k+0.5)*dx(3)
@@ -917,10 +933,10 @@ subroutine amrex_probinit (init,name,namlen,problo,probhi) bind(c)
                   xc = x - x_bot
                   r = sqrt( xc*xc + zc*zc )
                   u(i,j,k) = 0.0d0
-                  if (r.lt.r_top) then
+!                  if (r.lt.r_top) then
                      u_face = u(i,domlo(2),k)
                      u(i,j,k) = u_face ! careful, this may not work => just simple zero gradient
-                  endif
+!                  endif
                end do
 	    end do
 	 end do
@@ -930,18 +946,27 @@ subroutine amrex_probinit (init,name,namlen,problo,probhi) bind(c)
       if (bc(2,2).eq.EXT_DIR.and.ARG_H2(u).gt.domhi(2)) then
          do j = domhi(2)+1, ARG_H2(u)
             do k = ARG_L3(u), ARG_H3(u)
-               z = domnlo(3) + (k+0.5)*dx(3)
+               z = domnlo(3) + (dble(k)+0.5)*dx(3)
                zc = z - z_top                              
                do i = ARG_L1(u), ARG_H1(u)
-                  x = domnlo(1) + (i+0.5)*dx(1)
+                  x = domnlo(1) + (dble(i)+0.5)*dx(1)
                   xc = x - x_top                  
                   r = sqrt( xc*xc + zc*zc )
                   u(i,j,k) = 0.0d0
-                  if (r.lt.r_top) u(i,j,k) = ui * (1.0d0-r/r_top)**4.0 ! for now no fluc                  
+                  if (r.lt.r_top) then
+
+                    pert = -1.0d0 * cos(Lf*xc) * sin(Lf*time) * sin(Lf*zc)
+                    pert = 0.06d0 * pert * factor
+                    u(i,j,k) = pert * (1.0d0-(r/r_top)**2)
+                    
+                  endif
+                  
                end do
 	    end do
 	 end do
       end if
+
+
 
       ! z-face low        
       if (bc(3,1).eq.EXT_DIR.and.ARG_L3(u).lt.domlo(3)) then
@@ -1014,6 +1039,9 @@ subroutine amrex_probinit (init,name,namlen,problo,probhi) bind(c)
 
       REAL_T factor, twidth, toffset, vi, v_face
       REAL_T x_top, z_top, r_top, x_bot, z_bot, r_bot, zc
+      REAL_T uA, gvar, pi, pert, unsteady, Lf
+
+      REAL_T x,y,z,r,u1,u2,u3,u_inf,eta      
       
 #include <probdata.H>
 
@@ -1025,7 +1053,6 @@ subroutine amrex_probinit (init,name,namlen,problo,probhi) bind(c)
 !#include <INFL_FORCE_F.H>
 !#endif
       
-      REAL_T x,y,z,r,u1,u2,u3,u_inf,eta
 
       lo(1) = ARG_L1(v)
       lo(2) = ARG_L2(v)
@@ -1056,19 +1083,30 @@ subroutine amrex_probinit (init,name,namlen,problo,probhi) bind(c)
 !      zc = 0.5*(domnhi(3) - domnlo(3))      
 
       ! geom descriptions, should make this connected to EB2 file
-      x_top = 1.0d0 ! center of top cylinder
+      x_top = 2.5d0 ! center of top cylinder
       z_top = 1.0d0
-      r_top = sqrt( x_top*x_top + z_top*z_top )      
-      x_bot = 1.25d0 ! center of bottom cylinder
-      z_bot = 1.25d0
-      r_bot = sqrt( x_bot*x_bot + z_bot*z_bot )            
+      r_top = 0.5d0
+      
+      x_bot = 1.5d0 ! center of bottom cylinder
+      z_bot = 1.0d0
+      r_bot = 0.5d0
 
+      gvar = r_top/10.0d0
+
+      pi = 3.14159265359D0
+      Lf = pi/r_top      
       twidth = 1.0d0
       toffset = 2.5d0
-      factor = 0.5d0 * (tanh(time/twidth-toffset)+1.0d0)      
-      vi = -1.0d0 ! holder for fluctuations
+      factor = 0.5d0 * (tanh(time/twidth-toffset)+1.0d0)
+
+      unsteady = (sin((time/twidth)*pi) + 10.0d0)/10.0d0
+      factor = factor * unsteady
+
+      vi = -1.0d0
       vi = factor * vi
 
+
+      
       call filcc(v,DIMS(v),domlo,domhi,dx,xlo,bc)
 
 
@@ -1094,21 +1132,27 @@ subroutine amrex_probinit (init,name,namlen,problo,probhi) bind(c)
 	 end do
       endif
 
-      ! y-face low OUTFLOW
-      if (bc(2,1).eq.EXT_DIR.and.ARG_L2(v).lt.domlo(2)) then
+      ! y-face low OUTFLOW, apparently this doesnt matterd
+!      if (bc(2,1).eq.EXT_DIR.and.ARG_L2(v).lt.domlo(2)) then
+       if (bc(2,1).eq.FOEXTRAP .AND. ARG_L2(v).lt.domlo(2)) then
+         !         print*, ">>> Setting outflow ghost"
          do j = ARG_L2(v), domlo(2)-1
             do k = ARG_L3(v), ARG_H3(v)
-               z = domnlo(3) + (k+0.5)*dx(3)
+               z = domnlo(3) + (dble(k)+0.5)*dx(3)
                zc = z - z_bot            
                do i = ARG_L1(v), ARG_H1(v)
-                  x = domnlo(1) + (i+0.5)*dx(1)
+                  x = domnlo(1) + (dble(i)+0.5)*dx(1)
                   xc = x - x_bot
                   r = sqrt( xc*xc + zc*zc )
-                  v(i,j,k) = 0.0d0
-                  if (r.lt.r_top) then
-                     v_face = v(i,domlo(2),k)
-                     v(i,j,k) = v_face ! careful, this may not work => just simple zero gradient
-                  endif
+!                  v(i,j,k) = 0.0d0
+                  v_face = v(i,domlo(2),k)
+!                  if (r.lt.r_bot) v_face = v(i,domlo(2),k)                  
+!                     print*, ">>> Setting outflow ghost", v_face                     
+!                     v_face = vi * (r_top/r_bot)**2 * (1.0d0-r/r_bot)**2
+!                     v(i,j,k) = v_face ! careful, this may not work => just simple zero gradient
+!                     !                     v(i,domlo(2),k) = 0.5d0 * ( v_face + v(i,domlo(2),k) )
+!                  endif
+                  v(i,j,k) = min(v_face,0.0d0)
                end do
 	    end do
 	 end do
@@ -1116,16 +1160,25 @@ subroutine amrex_probinit (init,name,namlen,problo,probhi) bind(c)
 
       ! y-face high INFLOW
       if (bc(2,2).eq.EXT_DIR.and.ARG_H2(v).gt.domhi(2)) then
+!         print*, ">>> Setting inflow ghost"         
          do j = domhi(2)+1, ARG_H2(v)
             do k = ARG_L3(v), ARG_H3(v)
-               z = domnlo(3) + (k+0.5)*dx(3)
+               z = domnlo(3) + (dble(k)+0.5)*dx(3)
                zc = z - z_top                              
                do i = ARG_L1(v), ARG_H1(v)
-                  x = domnlo(1) + (i+0.5)*dx(1)
+                  x = domnlo(1) + (dble(i)+0.5)*dx(1)
                   xc = x - x_top                  
                   r = sqrt( xc*xc + zc*zc )
                   v(i,j,k) = 0.0d0
-                  if (r.lt.r_top) v(i,j,k) = vi * (1.0d0-r/r_top)**4.0 ! for now no fluc                  
+                  if (r.lt.r_top) then
+
+                     v(i,j,k) = vi * (1.0d0-(r/r_top)**4) ! for now no fluc
+
+                     pert = 3.0d0 * sin(Lf*xc) * cos(Lf*time) * sin(Lf*zc)
+                     pert = 0.06d0 * pert * factor
+                     v(i,j,k) = v(i,j,k) + pert * (1.0d0-(r/r_top)**2)
+                     
+                  endif
                end do
 	    end do
 	 end do
@@ -1198,6 +1251,13 @@ subroutine amrex_probinit (init,name,namlen,problo,probhi) bind(c)
       REAL_T     z_vel
       REAL_T     jv, s, t,xc,yc
 
+      REAL_T x,y,z,r,u1,u2,u3,u_inf,eta
+      REAL_T Lx, Ly
+      REAL_T factor, twidth, toffset, w_face
+      REAL_T x_top, z_top, r_top, x_bot, z_bot, r_bot, zc
+      REAL_T pert, unsteady, pi, Lf
+      
+
 #include <probdata.H>
 
 !#ifdef BL_DO_FLCT
@@ -1207,10 +1267,6 @@ subroutine amrex_probinit (init,name,namlen,problo,probhi) bind(c)
 !      REAL_T, allocatable :: wflct(:,:,:)
 !#include <INFL_FORCE_F.H>
 !#endif
-      REAL_T x,y,z,r,u1,u2,u3,u_inf,eta
-      REAL_T Lx, Ly, pert
-      REAL_T factor, twidth, toffset, wi, w_face
-      REAL_T x_top, z_top, r_top, x_bot, z_bot, r_bot, zc
 
       lo(1) = ARG_L1(w)
       lo(2) = ARG_L2(w)
@@ -1240,21 +1296,31 @@ subroutine amrex_probinit (init,name,namlen,problo,probhi) bind(c)
 !      yc = 0.5*(domnhi(2) - domnlo(2))
 !      zc = 0.5*(domnhi(3) - domnlo(3))      
 
-      ! geom descriptions, should make this connected to EB2 file
-      x_top = 1.0d0 ! center of top cylinder
-      z_top = 1.0d0
-      r_top = sqrt( x_top*x_top + z_top*z_top )      
-      x_bot = 1.25d0 ! center of bottom cylinder
-      z_bot = 1.25d0
-      r_bot = sqrt( x_bot*x_bot + z_bot*z_bot )            
 
-      !factor = 1.d0
+      ! geom descriptions, should make this connected to EB2 file
+      x_top = 2.5d0 ! center of top cylinder
+      z_top = 1.0d0
+      r_top = 0.5d0
+      
+      x_bot = 1.5d0 ! center of bottom cylinder
+      z_bot = 1.0d0
+      r_bot = 0.5d0
+
+      pi = 3.14159265359D0
+      Lf = pi/r_top      
       twidth = 1.0d0
       toffset = 2.5d0
       factor = 0.5d0 * (tanh(time/twidth-toffset)+1.0d0)
-      wi = 0.0d0 ! holder for fluctuations
-      wi = factor * wi
 
+      unsteady = (sin((time/twidth)*pi) + 10.0d0)/10.0d0
+      factor = factor * unsteady
+
+      !wi = -1.0d0
+      !wi = factor * wi
+      
+
+
+      
       call filcc(w,DIMS(w),domlo,domhi,dx,xlo,bc)
 
 
@@ -1282,6 +1348,7 @@ subroutine amrex_probinit (init,name,namlen,problo,probhi) bind(c)
 
       ! y-face low OUTFLOW
       if (bc(2,1).eq.EXT_DIR.and.ARG_L2(w).lt.domlo(2)) then
+!      if (bc(2,1).eq.FOEXTRAP.and.ARG_L2(w).lt.domlo(2)) then            
          do j = ARG_L2(w), domlo(2)-1
             do k = ARG_L3(w), ARG_H3(w)
                z = domnlo(3) + (k+0.5)*dx(3)
@@ -1291,10 +1358,10 @@ subroutine amrex_probinit (init,name,namlen,problo,probhi) bind(c)
                   xc = x - x_bot
                   r = sqrt( xc*xc + zc*zc )
                   w(i,j,k) = 0.0d0
-                  if (r.lt.r_top) then
+!                  if (r.lt.r_top) then
                      w_face = w(i,domlo(2),k)
                      w(i,j,k) = w_face ! careful, this may not work => just simple zero gradient
-                  endif
+!                  endif
                end do
 	    end do
 	 end do
@@ -1311,7 +1378,13 @@ subroutine amrex_probinit (init,name,namlen,problo,probhi) bind(c)
                   xc = x - x_top                  
                   r = sqrt( xc*xc + zc*zc )
                   w(i,j,k) = 0.0d0
-                  if (r.lt.r_top) w(i,j,k) = wi * (1.0d0-r/r_top)**4.0 ! for now no fluc                  
+                  if (r.lt.r_top) then
+
+                    pert = -2.0d0 * sin(Lf*xc) * sin(Lf*time) * cos(Lf*xc)
+                    pert = 0.06d0 * pert * factor                     
+                    w(i,j,k) = w(i,j,k) + pert * (1.0d0-(r/r_top)**2)
+                    
+                  endif
                end do
 	    end do
 	 end do

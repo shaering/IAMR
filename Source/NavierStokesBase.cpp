@@ -343,11 +343,12 @@ NavierStokesBase::NavierStokesBase (Amr&            papa,
     mac_projector->install_level(level,this);
     //    std::cout << " Done install_level 2 \n";
 
-    
+    /*
     amrex::AllPrint() << " bbbbb proc. = " << ParallelDescriptor::MyProc() << ", tag = " <<
       ParallelDescriptor::SeqNum()
 		      << " file = " << __FILE__ << " function = " << __FUNCTION__
 		      << " line = " << __LINE__ << std::endl;
+    */
    
     
     
@@ -1147,7 +1148,7 @@ NavierStokesBase::computeNewDt (int                   finest_level,
         n_factor   *= n_cycle[i];
         dt_level[i] = dt_0/( (Real)n_factor );
     }
-    std::cout << "  checkpoint 5 \n";
+    //    std::cout << "  checkpoint 5 \n";
 
 }
 
@@ -1485,11 +1486,12 @@ NavierStokesBase::estTimeStep ()
     //
     MultiFab tforces(grids,dmap,AMREX_SPACEDIM,n_grow,MFInfo(),Factory());
 
-
+    /*
       amrex::AllPrint() << " xxxxx proc. = " << ParallelDescriptor::MyProc() << ", tag = " <<
       ParallelDescriptor::SeqNum()
 		      << " file = " << __FILE__ << " function = " << __FUNCTION__
 		      << " line = " << __LINE__ << std::endl;
+    */
 
     
 
@@ -1669,11 +1671,12 @@ NavierStokesBase::estTimeStep ()
     }
     //    std::cout<< " ...I AM HERE... \n ";
 
-
+    /*
       amrex::AllPrint() << " xxxxx proc. = " << ParallelDescriptor::MyProc() << ", tag = " <<
       ParallelDescriptor::SeqNum()
 		      << " file = " << __FILE__ << " function = " << __FUNCTION__
 		      << " line = " << __LINE__ << std::endl;
+    */
     
     return estdt;
 }
@@ -2784,10 +2787,12 @@ NavierStokesBase::post_regrid (int lbase,
                                int new_finest)
 {
 
+  /*
     amrex::AllPrint() << " rrrrr1 proc. = " << ParallelDescriptor::MyProc() << ", tag = " <<
       ParallelDescriptor::SeqNum()
 		      << " file = " << __FILE__ << " function = " << __FUNCTION__
 		      << " line = " << __LINE__ << std::endl;  
+  */
 
   
 #ifdef AMREX_PARTICLES
@@ -2797,11 +2802,12 @@ NavierStokesBase::post_regrid (int lbase,
     }
 #endif
 
-
+    /*
     amrex::AllPrint() << " rrrrr2 proc. = " << ParallelDescriptor::MyProc() << ", tag = " <<
       ParallelDescriptor::SeqNum()
 		      << " file = " << __FILE__ << " function = " << __FUNCTION__
 		      << " line = " << __LINE__ << std::endl;      
+    */
 
     
 }
@@ -3217,11 +3223,12 @@ NavierStokesBase::scalar_advection_update (Real dt,
 	 exit(0);
        }
 
-
+       /*
       amrex::AllPrint() << " xxxxx proc. = " << ParallelDescriptor::MyProc() << ", tag = " <<
       ParallelDescriptor::SeqNum()
 		      << " file = " << __FILE__ << " function = " << __FUNCTION__
 		      << " line = " << __LINE__ << std::endl;       
+       */
 	
 	
 
@@ -3894,10 +3901,12 @@ NavierStokesBase::velocity_advection (Real dt)
 	   rhs.setVal(0.0);
 
 
+	   /*
       amrex::AllPrint() << " xxxxx proc. = " << ParallelDescriptor::MyProc() << ", tag = " <<
       ParallelDescriptor::SeqNum()
 		      << " file = " << __FILE__ << " function = " << __FUNCTION__
-		      << " line = " << __LINE__ << std::endl;
+          	      << " line = " << __LINE__ << std::endl;
+	   */
       
 
 #ifdef AMREX_PARTICLES	   
@@ -4406,11 +4415,12 @@ NavierStokesBase::velocity_advection_update (Real dt)
     //    rhs.SumBoundary(0, ncomp, IntVect(1), Geom().periodicity());
     rhs.SumBoundary(Geom().periodicity());
 
-
+    /*
       amrex::AllPrint() << " ffffff1 proc. = " << ParallelDescriptor::MyProc() << ", tag = " <<
       ParallelDescriptor::SeqNum()
 		      << " file = " << __FILE__ << " function = " << __FUNCTION__
 		      << " line = " << __LINE__ << std::endl;    
+    */
     
 
 #ifdef _OPENMP
@@ -4518,10 +4528,12 @@ NavierStokesBase::velocity_advection_update (Real dt)
     }
 }
 
+/*
       amrex::AllPrint() << " ffffff2 proc. = " << ParallelDescriptor::MyProc() << ", tag = " <<
       ParallelDescriptor::SeqNum()
 		      << " file = " << __FILE__ << " function = " << __FUNCTION__
 		      << " line = " << __LINE__ << std::endl;    
+*/
  
 // std::cout << " OK HERE \n"; 
     for (int sigma = 0; sigma < AMREX_SPACEDIM; sigma++)
@@ -4591,11 +4603,12 @@ NavierStokesBase::initial_velocity_diffusion_update (Real dt)
         rhs.SumBoundary(Geom().periodicity());
 	//rhs.SumBoundary(0, ncomp, IntVect(1), Geom().periodicity());	
 
-
+	/*
       amrex::AllPrint() << " xxxxx proc. = " << ParallelDescriptor::MyProc() << ", tag = " <<
       ParallelDescriptor::SeqNum()
 		      << " file = " << __FILE__ << " function = " << __FUNCTION__
 		      << " line = " << __LINE__ << std::endl;	   
+	*/
 
 	
 	

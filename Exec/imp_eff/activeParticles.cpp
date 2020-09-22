@@ -12,7 +12,7 @@ namespace amrex {
 // Uses midpoint method to advance particles using umac.
 //
 void
-ActiveParticleContainer::myAdvectWithUmac (MultiFab* umac, int lev, Real dt, MultiFab& rho, MultiFab& temp, Real nu_m)
+ActiveParticleContainer::myAdvectWithUmac (MultiFab* umac, int lev, Real dt, MultiFab& rho, MultiFab& temp, Real nu_m, Real time)
 {
     BL_PROFILE("AmrActiveParticleContainer::myAdvectWithUmac()");
     //    std::cout << " *** myAdvectWithUmac: lev " << lev << "\n";
@@ -276,6 +276,45 @@ p.m_rdata_arr[SPACEDIM+6] = particle density
 */
 
 
+
+                // imp-eff specific
+		int hole_top_n0, hole_top_n1;
+		int hole_bot_n0, hole_bot_n1;		
+		const Real ground = 0.5;
+	        const Real ceiling = 2.5;
+	        const Real bottom = -1.49;		
+        	Real r_top, r_bot, rp_top, rp_bot;
+	        Real x_top, z_top, x_bot, z_bot;
+		Real xp, yp, zp, norm_x,norm_z;
+		Real ur_prime, ut_prime, theta_p;
+
+		x_top = 2.5;
+		z_top = 1.0;		
+		r_top = 0.5;
+
+		x_bot = 1.5;
+		z_bot = 1.0;		
+		r_bot = 0.5;
+
+                // index i is particle number, gradually release particles into jet inlet
+		int gradual_release_flag, p_cutoff, p_freq;
+		Real t_freq;
+                Real rnd_wgt;		
+
+		t_freq = 0.1;
+		gradual_release_flag = 1; // set this to zero except from gradual release in imp-eff
+		p_cutoff = std::round(time/t_freq);
+		//		std::cout << "*** particle: " << i << "\n";
+		//		std::cout << "*** time: " << time << "\n";
+		//		std::cout << "*** p_cutoff: " << p_cutoff << "\n";
+
+		//                int p_active = p.m_idata[0];
+
+		// is i local to the proc?  would explain freezing...
+		if ( i<p_cutoff || gradual_release_flag==0 ) {
+		  
+		  //		  std::cout << "*** particle: " << i << " lives! (" << time << ")\n";
+		
                 // particles advanced here <warp>
                 if (ipass == 0)
                 {
@@ -293,6 +332,21 @@ p.m_rdata_arr[SPACEDIM+6] = particle density
                 }
                 else
                 {
+
+
+		    // old position
+		    xp = p.m_rdata.arr[AMREX_SPACEDIM+0]; //p.m_rdata.pos[0];
+		    yp = p.m_rdata.arr[AMREX_SPACEDIM+1]; //p.m_rdata.pos[1];
+		    zp = p.m_rdata.arr[AMREX_SPACEDIM+2]; //p.m_rdata.pos[2];
+      	            rp_top = sqrt( (xp-x_top)*(xp-x_top) + (zp-z_top)*(zp-z_top) );
+	            rp_bot = sqrt( (xp-x_bot)*(xp-x_bot) + (zp-z_bot)*(zp-z_bot) );
+
+		    hole_top_n0 = 0;
+		    hole_bot_n0 = 0;		
+		    if ( rp_top<=r_top && yp>=ceiling ) hole_top_n0 = 1;
+		    if ( rp_bot<=r_bot && yp<=ground )  hole_bot_n0 = 1;
+		
+				  
                     for (int dim=0; dim < AMREX_SPACEDIM; dim++)
                     {
 
@@ -301,7 +355,7 @@ p.m_rdata_arr[SPACEDIM+6] = particle density
 		      // p.m_rdata.arr[AMREX_SPACEDIM+dim] = v[dim];                         // copy vel to arr, why?
 
                       p.m_rdata.arr[2*AMREX_SPACEDIM+dim] = (1.0-wt0)*p.m_rdata.arr[2*AMREX_SPACEDIM+dim] + wt0*v[dim]; // update vel_p
-		      p.m_rdata.pos[dim] = p.m_rdata.arr[AMREX_SPACEDIM+dim] + dt*p.m_rdata.arr[2*AMREX_SPACEDIM+dim]; // update pos to fill dt
+		      p.m_rdata.pos[dim] = p.m_rdata.arr[AMREX_SPACEDIM+dim] + dt*p.m_rdata.arr[2*AMREX_SPACEDIM+dim];  // update pos to full dt
 		      p.m_rdata.arr[AMREX_SPACEDIM+dim] = p.m_rdata.arr[2*AMREX_SPACEDIM+dim];                          // copy vel to arr, why?
 
                       // update force to reuse
@@ -315,31 +369,109 @@ p.m_rdata_arr[SPACEDIM+6] = particle density
     		    p.m_rdata.arr[2*AMREX_SPACEDIM+3+6] = 0.01 * (temp_f[0]-p.m_rdata.arr[9]);
 		    /**/
 
-		    // hack for reflection or sticking
-                    Real rnd_wgt;
-                    if (p.m_rdata.pos[1] < 0.0) {
-		       srand( (unsigned)time( NULL ) );
-		       rnd_wgt = round(rand()/RAND_MAX);
-		       //		       std::cout << " ***RND TRAP: " << rnd_wgt << "\n";
- 		       //rnd_wgt = 1.0;
-                       p.m_rdata.pos[1] = -1.0 * rnd_wgt * p.m_rdata.pos[1];
+		    // hack for reflection or sticking ==> this should be changed to some global wall distance, manual changes now 
+		    //srand( (unsigned)time( NULL ) );
+		    //rnd_wgt = round(rand()/RAND_MAX);
+ 	            rnd_wgt = 1.0;		    
+
+		    // updated position
+                    xp = p.m_rdata.pos[0];
+                    yp = p.m_rdata.pos[1];
+                    zp = p.m_rdata.pos[2];
+  		    rp_top = sqrt( (xp-x_top)*(xp-x_top) + (zp-z_top)*(zp-z_top) );
+		    rp_bot = sqrt( (xp-x_bot)*(xp-x_bot) + (zp-z_bot)*(zp-z_bot) );
+
+		    hole_top_n1 = 0;
+ 		    hole_bot_n1 = 0;		
+		    if ( rp_top<=r_top && yp>=ceiling ) hole_top_n1 = 1;
+		    if ( rp_bot<=r_bot && yp<=ground )  hole_bot_n1 = 1;		    
+
+		    // floor bounce
+                    if (yp < ground && hole_bot_n1==0 && hole_bot_n0==0 ) {
+		       p.m_rdata.pos[1] = ground;
                        p.m_rdata.arr[2*AMREX_SPACEDIM+0] =  1.0 * rnd_wgt * p.m_rdata.arr[2*AMREX_SPACEDIM+0];
                        p.m_rdata.arr[2*AMREX_SPACEDIM+1] = -1.0 * rnd_wgt * p.m_rdata.arr[2*AMREX_SPACEDIM+1];
                        p.m_rdata.arr[2*AMREX_SPACEDIM+2] =  1.0 * rnd_wgt * p.m_rdata.arr[2*AMREX_SPACEDIM+2];
 	            }
 
-                    if (p.m_rdata.pos[1] > 2.0) {
-		       srand( (unsigned)time( NULL ) );
-		       rnd_wgt = round(rand()/RAND_MAX);
-		       //		       std::cout << " ***RND TRAP: " << rnd_wgt << "\n";
- 		       //rnd_wgt = 1.0;
-		       p.m_rdata.pos[1] = 2.0 - 1.0 * rnd_wgt * (p.m_rdata.pos[1]-2.0);
+		    // ceiling bounce
+                    if (yp > ceiling && hole_top_n1==0 && hole_top_n0==0) {
+		       p.m_rdata.pos[1] = ceiling;
                        p.m_rdata.arr[2*AMREX_SPACEDIM+0] =  1.0 * rnd_wgt * p.m_rdata.arr[2*AMREX_SPACEDIM+0];
                        p.m_rdata.arr[2*AMREX_SPACEDIM+1] = -1.0 * rnd_wgt * p.m_rdata.arr[2*AMREX_SPACEDIM+1];
                        p.m_rdata.arr[2*AMREX_SPACEDIM+2] =  1.0 * rnd_wgt * p.m_rdata.arr[2*AMREX_SPACEDIM+2];
 		    }
 
+		    
+		    // upper hole
+                    if (yp > ceiling && hole_top_n1==0 && hole_top_n0==1) {
+
+		       // rotate vel
+		       norm_x = (xp - x_top) / rp_top;
+		       norm_z = (zp - z_top) / rp_top;
+		       theta_p = atan(norm_z/norm_x);
+
+		       ur_prime = p.m_rdata.arr[2*AMREX_SPACEDIM+0] * cos(theta_p) + p.m_rdata.arr[2*AMREX_SPACEDIM+2] * sin(theta_p);
+		       ut_prime = -1.0 * p.m_rdata.arr[2*AMREX_SPACEDIM+0] * sin(theta_p) + p.m_rdata.arr[2*AMREX_SPACEDIM+2] * cos(theta_p);
+
+		       // flip wall vel
+		       ur_prime = -ur_prime; 
+
+		       // rotate back
+		       p.m_rdata.arr[2*AMREX_SPACEDIM+0] = ur_prime * cos(theta_p) - ut_prime * sin(theta_p);
+                       p.m_rdata.arr[2*AMREX_SPACEDIM+2] = ur_prime * sin(theta_p) - ut_prime * cos(theta_p);
+
+		       // back particle out to hole surface		       
+                       p.m_rdata.pos[0] = r_top * norm_x;
+                       p.m_rdata.pos[2] = r_top * norm_z;		       
+
+	            }
+
+		    // lower hole
+                    if (yp < ground && hole_bot_n1==0 && hole_bot_n0==1) {
+
+		       // rotate vel
+		       norm_x = (xp - x_bot) / rp_bot;
+		       norm_z = (zp - z_bot) / rp_bot;
+		       theta_p = atan(norm_z/norm_x);
+
+		       ur_prime = p.m_rdata.arr[2*AMREX_SPACEDIM+0] * cos(theta_p) + p.m_rdata.arr[2*AMREX_SPACEDIM+2] * sin(theta_p);
+		       ut_prime = -1.0 * p.m_rdata.arr[2*AMREX_SPACEDIM+0] * sin(theta_p) + p.m_rdata.arr[2*AMREX_SPACEDIM+2] * cos(theta_p);
+
+		       // flip wall vel
+		       ur_prime = -ur_prime; 
+
+		       // rotate back
+		       p.m_rdata.arr[2*AMREX_SPACEDIM+0] = ur_prime * cos(theta_p) - ut_prime * sin(theta_p);
+                       p.m_rdata.arr[2*AMREX_SPACEDIM+2] = ur_prime * sin(theta_p) - ut_prime * cos(theta_p);
+
+		       // back particle out to hole surface
+                       p.m_rdata.pos[0] = r_bot * norm_x;
+                       p.m_rdata.pos[2] = r_bot * norm_z;		       
+
+	            }
+
+		    // recycle
+                    if (yp < bottom) {
+
+		       std::cout << " *** Particle Recycled: " << i << "\n";
+		       p.m_rdata.pos[0] = p.m_rdata.pos[0] + 1.0; // fix these hard-codes
+                       p.m_rdata.pos[1] = p.m_rdata.pos[1] + 4.48;
+                       p.m_rdata.pos[2] = p.m_rdata.pos[2];
+
+	            }		    		    
+
+		    
                 }
+
+		}
+		else { // just set forces to zero and dont update position, vel, or temp
+
+    		      p.m_rdata.arr[2*AMREX_SPACEDIM+0+6] = 0.0;
+    		      p.m_rdata.arr[2*AMREX_SPACEDIM+1+6] = 0.0;
+    		      p.m_rdata.arr[2*AMREX_SPACEDIM+2+6] = 0.0;		      
+		  
+		}; // gradual release if
 
 		/*
 		std::cout << " p.m_Xdata.arr dump (AFTER) \n";

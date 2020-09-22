@@ -53,13 +53,15 @@ contains
       integer :: r_lo(3), r_hi(3)
       integer :: scomp, ncomp
       integer :: nscal, getForceVerbose
-      REAL_T  :: time, dx(3)
+      REAL_T  :: time, dx(3), dvol
       REAL_T  :: xlo(3), xhi(3)
       REAL_T  :: gravity, Fx, Fy, Fz, rho, Tref, alpha, temp
       REAL_T, dimension(f_lo(1):f_hi(1),f_lo(2):f_hi(2),f_lo(3):f_hi(3),scomp:scomp+ncomp-1) :: force
       REAL_T, dimension(v_lo(1):v_hi(1),v_lo(2):v_hi(2),v_lo(3):v_hi(3),0:SDIM-1)            :: vel
       REAL_T, dimension(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),0:nscal-1)           :: scal
       REAL_T, dimension(r_lo(1):r_hi(1),r_lo(2):r_hi(2),r_lo(3):r_hi(3),0:nscal-1)           :: rhs
+      REAL_T  :: xp(3), up(3), Fbody(3), ceiling, Af, Lf, pi
+      REAL_T  :: rp, x_top, y_top, z_top, r_top
 
       integer :: isioproc, n, i, j, k
       integer :: ixlo, ixhi, iylo, iyhi, izlo, izhi
@@ -97,6 +99,7 @@ contains
 
       Tref = 323.15  ! MAKE READABLE!
       alpha = 0.0034 ! calc real values later
+      dvol = dx(1)*dx(2)*dx(3)
 
 !      if (getForceVerbose > 0) then
 !         call bl_pd_is_ioproc(isioproc)
@@ -129,12 +132,41 @@ contains
 !      do i = force_l1, force_h1
 
 
+      
+      ! center of top cylinder
+      x_top = 2.5d0
+      y_top = 2.0d0
+      z_top = 1.0d0
+      r_top = 0.5d0
+      ceiling = 2.0d0
+
+      pi = 3.14159265359D0
+      Af = 0.0001d0 * dvol
+      Lf = pi/r_top
+
 
       do k = izlo, izhi
          do j = iylo, iyhi
             do i = ixlo, ixhi
+
+
+               xp(1) = xlo(1) + dble(i)*dx(1)
+               xp(2) = xlo(2) + dble(j)*dx(2)
+               xp(3) = xlo(3) + dble(k)*dx(3)
+               rp = sqrt( (xp(1)-x_top)*(xp(1)-x_top) + (xp(3)-z_top)*(xp(3)-z_top) )
+               Af = Af * (1.0d0 - (rp/r_top)**2)
+
+               up(1) = vel(i,j,k,0)
+               up(2) = vel(i,j,k,1)
+               up(3) = vel(i,j,k,2)
+
+               ! assume vel is v=-1
+               Fbody(1) = -1.0d0 * cos(Lf*(xp(1)-x_top)) * sin(Lf*((xp(2)-y_top)-1.0d0*time)) * sin(Lf*(xp(3)-z_top))
+               Fbody(2) = -3.0d0 * sin(Lf*(xp(1)-x_top)) * cos(Lf*((xp(2)-y_top)-1.0d0*time)) * sin(Lf*(xp(3)-z_top))
+               Fbody(3) = -2.0d0 * sin(Lf*(xp(1)-x_top)) * sin(Lf*((xp(2)-y_top)-1.0d0*time)) * cos(Lf*(xp(3)-z_top))
+               Fbody(1:3) = Af * Fbody(1:3)
                
-!         print*, " HERE I AM (2)!"               
+               !         print*, " HERE I AM (2)!"               
                ! static rho for now
                rho = scal(i,j,k,0)
                temp = scal(i,j,k,2) ! need to make these slots general
@@ -158,11 +190,11 @@ contains
                if(isnan(rhs(i,j,k,1))) print*, " 1. RHS2 NAN at:", i,j,k
                if(isnan(rhs(i,j,k,2))) print*, " 1. RHS3 NAN at:", i,j,k                  
 
-!         print*, " HERE I AM (4)!", i, j, k, nscal
-                 ! basic forcing term 
-                 force(i,j,k,0) = rho * Fx !0.d0 ! pass a read-in generic Fi
-                 force(i,j,k,1) = rho * Fy !0.d0
-                 force(i,j,k,2) = rho * Fz !0.d0
+               !         print*, " HERE I AM (4)!", i, j, k, nscal
+               ! basic forcing term 
+               force(i,j,k,0) = rho * Fx !0.d0 ! pass a read-in generic Fi
+               force(i,j,k,1) = rho * Fy !0.d0
+               force(i,j,k,2) = rho * Fz !0.d0
 
                if(isnan(force(i,j,k,0))) print*, " 2. F1 NAN at:", i,j,k
                if(isnan(force(i,j,k,1))) print*, " 2. F2 NAN at:", i,j,k
@@ -173,7 +205,7 @@ contains
 
 !         print*, " HERE I AM (4a)!"                 
 
-                 ! Boussinesq term, hardcode to y-dir (1) fix for grav vector later
+               ! Boussinesq term, hardcode to y-dir (1) fix for grav vector later
                force(i,j,k,1) = force(i,j,k,1) + rho * gravity * alpha * (temp-Tref)
 
                if(isnan(force(i,j,k,0))) print*, " 3. F1 NAN at:", i,j,k
@@ -217,6 +249,15 @@ contains
                if(isnan(rhs(i,j,k,1))) print*, " 4. RHS2 NAN at:", i,j,k
                if(isnan(rhs(i,j,k,2))) print*, " 4. RHS3 NAN at:", i,j,k                                   
 
+
+               ! add forcing in hole
+!               if(rp.lt.r_top .AND. xp(2).gt.ceiling) then
+!                  force(i,j,k,0) = force(i,j,k,0) + rho * Fbody(1)
+!                  force(i,j,k,1) = force(i,j,k,1) + rho * Fbody(2)
+!                  force(i,j,k,2) = force(i,j,k,2) + rho * Fbody(3)
+!               endif
+               
+               
           elseif (scomp .EQ. 3 .AND. ncomp .EQ. 1) then ! rho only
 
 !             print*, " HERE I AM (5)!"

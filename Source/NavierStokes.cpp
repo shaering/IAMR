@@ -290,11 +290,12 @@ NavierStokes::advance (Real time,
 {
     BL_PROFILE("NavierStokes::advance()");
 
-
+    /*
       amrex::AllPrint() << " aaaaa proc. = " << ParallelDescriptor::MyProc() << ", tag = " <<
       ParallelDescriptor::SeqNum()
 		      << " file = " << __FILE__ << " function = " << __FUNCTION__
 		      << " line = " << __LINE__ << std::endl;
+    */
     
     if (verbose)
     {
@@ -328,10 +329,12 @@ NavierStokes::advance (Real time,
         printMaxValues(false);
     }
 
+    /*
       amrex::AllPrint() << " aaaaa proc. = " << ParallelDescriptor::MyProc() << ", tag = " <<
       ParallelDescriptor::SeqNum()
 		      << " file = " << __FILE__ << " function = " << __FUNCTION__
 		      << " line = " << __LINE__ << std::endl;    
+    */
 
     // Compute traced states for normal comp of velocity at half time level.
     Real dt_test = predict_velocity(dt);
@@ -438,7 +441,7 @@ NavierStokes::advance (Real time,
     //    if (theNSPC() != 0 and NavierStokes::initial_iter != true)
     {
 
-      std::cout << " >>> CALLING myAdvectWithYUmac <<<\n"; 
+      //      std::cout << " >>> CALLING myAdvectWithYUmac <<<\n"; 
       //      theNSPC()->basicAdvectWithUmac(u_mac, level, dt);
       
       MultiFab& Sstate = get_new_data(State_Type);
@@ -453,7 +456,7 @@ NavierStokes::advance (Real time,
       //MultiFab& phi=S_fpi.get_mf();
       
       //      theNSPC()->myAdvectWithUmac(u_mac, level, dt, rho, temp, visc_coef[0]); // PARTICLES (particles) ADVANCED HERE
-      theNSPC()->myAdvectWithUmac(u_mac, level, dt, rho, temp, visc_coef[0]); 
+      theNSPC()->myAdvectWithUmac(u_mac, level, dt, rho, temp, visc_coef[0], time); 
       //      std::cout << "myAdvectWithUmac okay... \n";
       
     }
@@ -484,10 +487,12 @@ NavierStokes::predict_velocity (Real  dt)
 {
     BL_PROFILE("NavierStokes::predict_velocity()");
 
+    /*
       amrex::AllPrint() << " xxxxx1 proc. = " << ParallelDescriptor::MyProc() << ", tag = " <<
       ParallelDescriptor::SeqNum()
 		      << " file = " << __FILE__ << " function = " << __FUNCTION__
 		      << " line = " << __LINE__ << std::endl;
+    */
 	
 
     
@@ -640,10 +645,12 @@ NavierStokes::predict_velocity (Real  dt)
         FArrayBox tforces;
         Vector<int> bndry[BL_SPACEDIM];
 
+	/*
       amrex::AllPrint() << " xxxxx2 proc. = " << ParallelDescriptor::MyProc() << ", tag = " <<
       ParallelDescriptor::SeqNum()
 		      << " file = " << __FILE__ << " function = " << __FUNCTION__
 		      << " line = " << __LINE__ << std::endl;
+	*/
 	
 
 	//AMReX provides an iterator, MFIter for looping over the FArrayBoxes in MultiFabs
@@ -810,11 +817,12 @@ NavierStokes::scalar_advection (Real dt,
     rhs.SumBoundary(Geom().periodicity()); 	   
     //    std::cout << "okay G\n";         
 
-
+    /*
       amrex::AllPrint() << " xxxxx2 proc. = " << ParallelDescriptor::MyProc() << ", tag = " <<
       ParallelDescriptor::SeqNum()
 		      << " file = " << __FILE__ << " function = " << __FUNCTION__
 		      << " line = " << __LINE__ << std::endl;
+    */
 
     
 
