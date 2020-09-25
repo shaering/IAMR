@@ -445,7 +445,7 @@ NavierStokes::advance (Real time,
       //      theNSPC()->basicAdvectWithUmac(u_mac, level, dt);
       
       MultiFab& Sstate = get_new_data(State_Type);
-      const int nGrow = 2;// is this it?
+      const int nGrow = 2;// is this it?  I HAD THIS AT 2, NOT SURE WHY
       FillPatchIterator fpi(*this,Sstate,nGrow,prev_time,State_Type,Density,1);
       MultiFab& rho=fpi.get_mf();
 

@@ -322,13 +322,10 @@ initialize_EB2 (const Geometry& geom, const int required_coarsening_level,
     //    center_bot[2] = 3.0;
 
 
-    
     center_bot[0] = 2.7;
     center_bot[1] = -0.5;    
     center_bot[2] = 3.0;
-    
-
-    
+     
 
     /*
     center_bot[0] = 2.65;
@@ -369,7 +366,7 @@ initialize_EB2 (const Geometry& geom, const int required_coarsening_level,
 
 
     // chamfer shape
-    Real offset = r_bot*tan(-a_rot) + 0.1;
+    Real offset = r_bot*tan(-a_rot) + 0.05;
     Real clip_h = 0.2;
     clip_offset[0] = center_bot[0] + 1.0*tan(-a_rot) - offset;
     clip_offset[1] = 0.5;
@@ -388,10 +385,10 @@ initialize_EB2 (const Geometry& geom, const int required_coarsening_level,
 
 
     // ouflow chamfer 
-    offset = r_bot*tan(-a_rot) + 0.1;
+    offset = r_bot*tan(-a_rot) + 0.05;
     clip_h = 0.2;
-    clip_offset[0] = center_bot[0] - 0.5*tan(-a_rot) + offset;
-    clip_offset[1] = -1.0;
+    clip_offset[0] = center_bot[0] - 1.5*tan(-a_rot) + offset;
+    clip_offset[1] = -2.0;
     clip_offset[2] = center_bot[2];
     EB2::CylinderIF cyl5t(1.0*r_bot, 2.0*clip_h, 1, {0.0,0.0,0.0}, false); // clip edge    
     auto cyl5 = EB2::translate(cyl5t, {clip_offset[0],clip_offset[1],clip_offset[2]});
@@ -409,7 +406,7 @@ initialize_EB2 (const Geometry& geom, const int required_coarsening_level,
 
     auto domain_temp3 = EB2::makeDifference(box5,cyl2);
     auto domain_temp4 = EB2::makeDifference(domain_temp3,chamfer);
-    auto domain_temp = EB2::makeDifference(domain_temp4,cyl5);        
+    auto domain_temp = EB2::makeDifference(domain_temp4,cyl5); // adjust ith bttom chamber if desired
     
     
     auto domain_temp2 = EB2::makeDifference(box6,cyl1);    
@@ -435,10 +432,10 @@ initialize_EB2 (const Geometry& geom, const int required_coarsening_level,
     Vector<Real> center_top(3);
     Vector<Real> center_mid(3);
     Vector<Real> cp_top(3);    
-    Real r_top = 0.5;
-    Real r_mid = 0.4;    
-    Real r_bot = 0.2;
-    Real thickness = 0.2;
+    Real r_top = 0.25;
+    Real r_mid = 0.2;    
+    Real r_bot = 0.1;
+    Real thickness = 0.1;
     Real delta = 0.4;
     EB2::SplineIF Nozzle;
     std::vector<amrex::RealVect> lnpts;
@@ -457,57 +454,68 @@ initialize_EB2 (const Geometry& geom, const int required_coarsening_level,
     center_mid[1] = temp0;
     center_mid[2] = 2.0;        
 
-
-    cp_top[0] = 0.0;    
-    cp_top[1] = 0.0;
-    cp_top[2] = 0.0;
-
-    temp0 = 0.5*(l_top+l_bot);
-    //    cp_mid[0] = temp0;    
-    //    cp_mid[1] = 0.0;
-    //    cp_mid[2] = 0.0;    
+    Real extra = 0.1;
     
-    // Nozzle shape:: lathe seems to default to revolve about x-axis
+    // Nozzle shape:: lathe operation must be about z-axis!
     
     //top out
     /*
-    p = amrex::RealVect(D_DECL(0.0, 0.0, 0.0));    
+    p = amrex::RealVect(D_DECL(0.0, 0.0, -extra));    
     lnpts.push_back(p);
-    p = amrex::RealVect(D_DECL(0.0, r_top, 0.0));
+    p = amrex::RealVect(D_DECL(0.0, r_top, -extra));
     lnpts.push_back(p);
     Nozzle.addLineElement(lnpts);
     lnpts.clear();
     */
+
+    /*
+    p = amrex::RealVect(D_DECL(0.0, r_top+thickness, -extra));    
+    lnpts.push_back(p);
+    p = amrex::RealVect(D_DECL(0.0, r_top, -extra));
+    lnpts.push_back(p);
+    Nozzle.addLineElement(lnpts);
+    lnpts.clear();    
+    */
     
     p = amrex::RealVect(D_DECL(0.0, r_top, 0.0));
     lnpts.push_back(p);
-    p = amrex::RealVect(D_DECL(l_top, r_mid, 0.0));
+    p = amrex::RealVect(D_DECL(0.0, r_mid, l_top));
     lnpts.push_back(p);
     Nozzle.addLineElement(lnpts);
     lnpts.clear();
 
-    p = amrex::RealVect(D_DECL(l_top, r_mid, 0.0));    
+    p = amrex::RealVect(D_DECL(0.0, r_mid, l_top));    
     lnpts.push_back(p);
-    p = amrex::RealVect(D_DECL(l_top+l_bot, r_bot, 0.0));
+    p = amrex::RealVect(D_DECL(0.0, r_bot, l_top+l_bot+extra));
     lnpts.push_back(p);
     Nozzle.addLineElement(lnpts);
     lnpts.clear();
 
     // bottom in
     /*
-    p = amrex::RealVect(D_DECL(l_top+l_bot,r_bot,0.0));
+    p = amrex::RealVect(D_DECL(0.0,r_bot,l_top+l_bot+extra));
     lnpts.push_back(p);
-    p = amrex::RealVect(D_DECL(l_top+l_bot,0.0,0.0));
+    p = amrex::RealVect(D_DECL(0.0,0.0,l_top+l_bot+extra));
     lnpts.push_back(p);
     Nozzle.addLineElement(lnpts);
     lnpts.clear();
     */
 
-
-    /* //center line
-    p = amrex::RealVect(D_DECL(0.0, center_top[1]-l_top-l_bot, center_top[2]));    
+    /*
+    p = amrex::RealVect(D_DECL(0.0,r_bot,l_top+l_bot+extra));
     lnpts.push_back(p);
-    p = amrex::RealVect(D_DECL(0.0, center_top[1], center_top[2]));
+    p = amrex::RealVect(D_DECL(0.0,r_top+thickness,l_top+l_bot+extra));
+    lnpts.push_back(p);
+    Nozzle.addLineElement(lnpts);
+    lnpts.clear();    
+    */
+
+
+    //center line
+    /*
+    p = amrex::RealVect(D_DECL(0.0,r_top+thickness,l_top+l_bot+extra));    
+    lnpts.push_back(p);
+    p = amrex::RealVect(D_DECL(0.0, r_top+thickness, -extra));
     lnpts.push_back(p);
     Nozzle.addLineElement(lnpts);
     lnpts.clear();
@@ -519,23 +527,29 @@ initialize_EB2 (const Geometry& geom, const int required_coarsening_level,
     Real temp1 = r_top + thickness; 
     Real temp2 = l_top + l_bot;
     EB2::CylinderIF cyl(temp1, temp2, 1, {center_mid[0],center_mid[1],center_mid[2]}, false);
-    EB2::CylinderIF cyl_inner(r_top, temp2+delta, 1, {center_mid[0],center_mid[1],center_mid[2]}, false);        
+    // EB2::CylinderIF cyl_inner(r_top, temp2+delta, 1, {center_mid[0],center_mid[1],center_mid[2]}, false);
 
-    // full nozzle shape
+    EB2::BoxIF box({0.0, 2.0, 0.0}, {4.0, 3.0, 4.0},false);
+    auto box2 = EB2::makeDifference(box,cyl);        
+
+    // full nozzle shape -> 3d shape with z-axis
     auto noz1 = EB2::lathe(Nozzle);
-    //    auto revolveNozzle = EB2::lathe(Nozzle);    
 
-    // rotate nozzle
+    // rotate nozzle about x-axis to make verticle, shift first to center at origin
+    auto snoz = EB2::translate(noz1, {0.0, 0.0, -0.5*(l_top+l_bot)});    
     const Real a_rot = -pi/2.0;
-    auto noz2 = EB2::rotate(noz1, a_rot, 2); // is center of rotation (0,0,0)?
+    auto noz2 = EB2::rotate(snoz, a_rot, 0);
 
-    // translate
-    auto revolveNozzle = EB2::translate(noz2, {center_top[0],center_top[1],center_top[2]});
-    
-    auto NozzleCylinder = EB2::makeDifference(cyl,revolveNozzle);
+    // translate to final position
+    auto revolveNozzle = EB2::translate(noz2, {center_mid[0],center_mid[1],center_mid[2]});
+
+    // full EB-nozzle shape
+    //    auto NozzleCylinder = EB2::makeDifference(cyl,revolveNozzle);
+    //    auto NozzleCylinder = EB2::makeDifference(box,revolveNozzle);
+    auto NozzleCylinder = EB2::makeUnion(box2,revolveNozzle);        
+    //    auto NozzleCylinder = EB2::makeUnion(cyl,revolveNozzle);    
     //    auto NozzleCylinder = EB2::makeDifference(cyl,cyl_inner);    
     
-    //EB2::BoxIF box({0.0, 0.0, 0.0}, {4.0, 0.1, 4.0}, false);
     auto gshop = EB2::makeShop(NozzleCylinder);
     //    auto gshop = EB2::makeShop(revolveNozzle);    
     EB2::Build(gshop, geom, required_coarsening_level, max_coarsening_level);
