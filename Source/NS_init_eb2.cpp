@@ -68,12 +68,8 @@ void
 initialize_EB2 (const Geometry& geom, const int required_coarsening_level,
 		const int max_coarsening_level)
 {
-
-  //    std::cout << " <NS_init_eb2> Initializing EB2...\n";
-  
     // read in EB parameters
     ParmParse ppeb2("eb2");
-    //ParmParse ppeb2("eb3");  
     std::string geom_type;
     ppeb2.get("geom_type", geom_type);
 
@@ -126,8 +122,6 @@ initialize_EB2 (const Geometry& geom, const int required_coarsening_level,
     auto gshop = EB2::makeShop(pr);
     EB2::Build(gshop, geom, required_coarsening_level, max_coarsening_level);
   }
-
-
   else if (geom_type == "Piston-Cylinder")
   {
     EB2::SplineIF Piston;
@@ -164,8 +158,6 @@ initialize_EB2 (const Geometry& geom, const int required_coarsening_level,
     auto gshop = EB2::makeShop(PistonCylinder);
     EB2::Build(gshop, geom, required_coarsening_level, max_coarsening_level);
   }
-
-  
   else if (geom_type == "Line-Piston-Cylinder")
   {
     EB2::SplineIF Piston;
@@ -216,8 +208,6 @@ initialize_EB2 (const Geometry& geom, const int required_coarsening_level,
     auto gshop = EB2::makeShop(PistonCylinder);
     EB2::Build(gshop, geom, required_coarsening_level, max_coarsening_level);
   }
-
-  
   else if (geom_type == "Inflow-Pipe")
   {
     
@@ -247,9 +237,8 @@ initialize_EB2 (const Geometry& geom, const int required_coarsening_level,
 
     // Compute distance between cylinder centres
     Real offset = 0.0;
-    for(int i = 0; i < 3; i++) {
+    for(int i = 0; i < 3; i++)
         offset += pow(center1[i] - center2[i], 2);
-    }
     offset = sqrt(offset);
 
     // Print info about cylinders
@@ -267,10 +256,9 @@ initialize_EB2 (const Geometry& geom, const int required_coarsening_level,
 
     amrex::Print() << "\n Offset:          " << offset << std::endl;
 
-    // Build the implicit function as a union of two cylinders
+        // Build the implicit function as a union of two cylinders
     EB2::CylinderIF cyl1(radius1, height1, direction1, center1, false);
     EB2::CylinderIF cyl2(radius2, height2, direction2, center2, false);
-//    auto twocylinders = EB2::makeUnion(cyl1, cyl2);
 
     auto twocylinders = EB2::makeDifference(cyl1, cyl2);
 
@@ -283,7 +271,48 @@ initialize_EB2 (const Geometry& geom, const int required_coarsening_level,
     EB2::Build(gshop, geom, required_coarsening_level, max_coarsening_level);
 
   }
-    
+  else if (geom_type == "Mixing-Pipe")
+  {
+
+    // Initialise parameters
+    int direction = 1;
+    Real radius = 0.018;
+    Real height = 0.01;
+    bool internal_flow = true; 
+    Vector<Real> centervec(3);
+
+    // Get information from inputs file.
+    ParmParse pp("pipe");
+
+    pp.query("direction", direction);
+    pp.query("radius", radius);
+    pp.query("height", height);
+    pp.getarr("center", centervec, 0, 3);
+    pp.query("internal_flow", internal_flow);
+    Array<Real, 3> center = {centervec[0], centervec[1], centervec[2]};
+
+    // Print info about cylinders
+    amrex::Print() << " CYLINDER " << std::endl;
+    amrex::Print() << " Direction:       " << direction << std::endl;
+    amrex::Print() << " Radius:    " << radius << std::endl;
+    amrex::Print() << " Center:    "
+                   << center[0] << ", " << center[1] << ", " << center[2] << std::endl;
+
+
+
+        // Build the implicit function as a union of two cylinders
+    EB2::CylinderIF cyl(radius, height, direction, center, internal_flow);
+
+    // Generate GeometryShop
+    auto gshop = EB2::makeShop(cyl);
+    // Build index space
+    int max_level_here = 0;
+    int max_coarsening_level = 100;
+    EB2::Build(gshop, geom, required_coarsening_level, max_coarsening_level);
+
+  }
+
+
   else if (geom_type == "Impingement-Effusion")
   {
     
@@ -582,7 +611,7 @@ initialize_EB2 (const Geometry& geom, const int required_coarsening_level,
     EB2::Build(gshop, geom, required_coarsening_level, max_coarsening_level);
     
   }  
-  
+
   else
 #endif
   {
@@ -683,7 +712,6 @@ NavierStokesBase::initialize_eb2_structs() {
     }   
   }
 }
-
 
 void
 NavierStokesBase::define_body_state()

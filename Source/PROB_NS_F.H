@@ -76,23 +76,20 @@
                                    const BL_FORT_FAB_ARG_ANYD(umacz),
 #endif
                                    const int* getForceVerbose);
-
     /*
-    FORT_MAKEFORCE (&time,
-		    BL_TO_FORTRAN_ANYD(force),
-		    BL_TO_FORTRAN_ANYD(Vel),
-		    //                   BL_TO_FORTRAN_N_ANYD(Scal),                                                                                   
-		    BL_TO_FORTRAN_ANYD(Scal),
-		    BL_TO_FORTRAN_ANYD(rhs),
-		    dx,
-		    gridloc.lo(),
-		    gridloc.hi(),
-		    &grav,
-		    &Fx,&Fy,&Fz,
-		    &scomp,&ncomp,&nscal,&getForceVerbose);
+     void FORT_MAKEFORCE (const amrex::Real* time,
+                                BL_FORT_FAB_ARG_ANYD(force),
+                          const BL_FORT_FAB_ARG_ANYD(vel),
+                          const BL_FORT_FAB_ARG_ANYD(scal),
+                          const amrex::Real* dx,
+                          const amrex::Real* xlo, const amrex::Real* xhi,
+                          const amrex::Real* gravity,
+                          const int* scomp, const int* ncomp, const int* nscal,
+                          const int* getForceVerbose);
     */
 
-     void FORT_MAKEFORCE (const amrex::Real* time,
+
+         void FORT_MAKEFORCE (const amrex::Real* time,
                                 BL_FORT_FAB_ARG_ANYD(force),
                           const BL_FORT_FAB_ARG_ANYD(vel),
                           const BL_FORT_FAB_ARG_ANYD(scal),

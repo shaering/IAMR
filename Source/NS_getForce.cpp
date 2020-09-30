@@ -24,8 +24,6 @@ using namespace amrex;
 // and velocity_advection routines.
 //
 
-// called for each FArrayBox in MultiFab within each level (this printed in basic advance) 
-
 void
 NavierStokesBase::getForce (FArrayBox&       force,
                             const Box&       bx,
@@ -35,41 +33,15 @@ NavierStokesBase::getForce (FArrayBox&       force,
                             const Real       time,
                             const FArrayBox& Vel,
                             const FArrayBox& Scal,
-                                  FArrayBox& rhs,
-			    //                            const FArrayBox& Drag,
-                            int              scalScomp) //,
-//                            int              level) //,
-			    //                            int              scalDensity)
+                                  FArrayBox& rhs,			    
+                            int              scalScomp)
 {
-   if (ParallelDescriptor::IOProcessor() && getForceVerbose) {
-      amrex::Print() << "NavierStokesBase::getForce(): Entered..." << std::endl 
-                     << "time      = " << time << std::endl
-                     << "scomp     = " << scomp << std::endl
-                     << "ncomp     = " << ncomp << std::endl
-                     << "ngrow     = " << ngrow << std::endl
-                     << "scalScomp = " << scalScomp << std::endl;
 
-   if (scomp==0) //                                                                      ncomp / scomp / forcing
-     if  (ncomp==3) amrex::Print() << "Doing all velocity components" << std::endl;//      3       0       Vel
-     else           amrex::Print() << "Doing incomplete vel components" << std::endl;//       X       0        ?
-   else if (scomp==3) 
-     if  (ncomp==1) amrex::Print() << "Doing density only" << std::endl;//         1       3       rho (not getting caught)
-     else           amrex::Print() << "Doing all scalars" << std::endl;//          X       3    scalars(all)
-   else if (scomp==4) amrex::Print() << "Doing tracer only" << std::endl;//        X       4      tracers
-   else               amrex::Print() << "Doing individual scalar: "<< scomp << " " << std::endl;//  X       X    particular scalars
-   
-   }
-
-
-   force.resize(grow(bx,ngrow),ncomp); // this needs to be adjusted for scalars (Temp)?
-
-   int num_levels = Scal.size();
-   const Real* VelDataPtr  = Vel.dataPtr(); 
-   const Real* ScalDataPtr = Scal.dataPtr();
-   const Real* rhoDataPtr  = Scal.dataPtr(scalScomp); // should be density, only 0 or Density gets passed
+   const Real* VelDataPtr  = Vel.dataPtr();
+   const Real* ScalDataPtr = Scal.dataPtr(scalScomp);
    const Real* uDataPtr    = Vel.dataPtr(0);
    const Real* vDataPtr    = Vel.dataPtr(1);
-   const Real* wDataPtr    = Vel.dataPtr(2);
+   const Real* wDataPtr    = Vel.dataPtr(2);   
 
    const Real* dx       = geom.CellSize();
    const Real  grav     = gravity;
@@ -82,38 +54,49 @@ NavierStokesBase::getForce (FArrayBox&       force,
    const int*  r_lo     = rhs.loVect();
    const int*  r_hi     = rhs.hiVect();
    const int   nscal    = NUM_SCALARS;
+   
 
    if (ParallelDescriptor::IOProcessor() && getForceVerbose) {
+      amrex::Print() << "NavierStokesBase::getForce(): Entered..." << std::endl 
+                     << "time      = " << time << std::endl
+                     << "scomp     = " << scomp << std::endl
+                     << "ncomp     = " << ncomp << std::endl
+                     << "ngrow     = " << ngrow << std::endl
+                     << "scalScomp = " << scalScomp << std::endl;
+
+      if (scomp==0)
+	if  (ncomp==3) amrex::Print() << "Doing velocities only" << std::endl;
+	else           amrex::Print() << "Doing all components" << std::endl;
+      else if (scomp==3)
+	if  (ncomp==1) amrex::Print() << "Doing density only" << std::endl;
+	else           amrex::Print() << "Doing all scalars" << std::endl;
+      else if (scomp==4) amrex::Print() << "Doing tracer only" << std::endl;
+      else               amrex::Print() << "Doing individual scalar" << std::endl;
+
 #if (AMREX_SPACEDIM == 3)
-      amrex::Print() << "NavierStokesBase::getForce()" << std::endl;
-      amrex::Print() << "Force Domain:" << std::endl;
+      amrex::Print() << "NavierStokesBase::getForce(): Force Domain:" << std::endl;
       amrex::Print() << "(" << f_lo[0] << "," << f_lo[1] << "," << f_lo[2] << ") - "
                      << "(" << f_hi[0] << "," << f_hi[1] << "," << f_hi[2] << ")" << std::endl;
-      amrex::Print() << "Vel Domain:" << std::endl;
+      amrex::Print() << "NavierStokesBase::getForce(): Vel Domain:" << std::endl;
       amrex::Print() << "(" << v_lo[0] << "," << v_lo[1] << "," << v_lo[2] << ") - "
                      << "(" << v_hi[0] << "," << v_hi[1] << "," << v_hi[2] << ")" << std::endl;
-      amrex::Print() << "Scal Domain:" << std::endl;
+      amrex::Print() << "NavierStokesBase::getForce(): Scal Domain:" << std::endl;
       amrex::Print() << "(" << s_lo[0] << "," << s_lo[1] << "," << s_lo[2] << ") - "
                      << "(" << s_hi[0] << "," << s_hi[1] << "," << s_hi[2] << ")" << std::endl;
-      amrex::Print() << "rhs Domain:" << std::endl;
-      amrex::Print() << "(" << r_lo[0] << "," << r_lo[1] << "," << r_lo[2] << ") - "
-                     << "(" << r_hi[0] << "," << r_hi[1] << "," << r_hi[2] << ")" << std::endl;
 #else
-      amrex::Print() << "NavierStokesBase::getForce():" << std::endl;
-      amrex::Print() << "Force Domain:" << std::endl;
+      amrex::Print() << "NavierStokesBase::getForce(): Force Domain:" << std::endl;
       amrex::Print() << "(" << f_lo[0] << "," << f_lo[1] << ") - "
                      << "(" << f_hi[0] << "," << f_hi[1] << ")" << std::endl;
-      amrex::Print() << "Vel Domain:" << std::endl;
+      amrex::Print() << "NavierStokesBase::getForce(): Vel Domain:" << std::endl;
       amrex::Print() << "(" << v_lo[0] << "," << v_lo[1] << ") - "
                      << "(" << v_hi[0] << "," << v_hi[1] << ")" << std::endl;
-      amrex::Print() << "Scal Domain:" << std::endl;
+      amrex::Print() << "NavierStokesBase::getForce(): Scal Domain:" << std::endl;
       amrex::Print() << "(" << s_lo[0] << "," << s_lo[1] << ") - "
                      << "(" << s_hi[0] << "," << s_hi[1] << ")" << std::endl;
 #endif
 
       Vector<Real> velmin(AMREX_SPACEDIM), velmax(AMREX_SPACEDIM);
       Vector<Real> scalmin(NUM_SCALARS), scalmax(NUM_SCALARS);
-
       for (int n=0; n<AMREX_SPACEDIM; n++) {
           velmin[n]= 1.e234;
           velmax[n]=-1.e234;
@@ -179,36 +162,77 @@ NavierStokesBase::getForce (FArrayBox&       force,
 
    RealBox gridloc = RealBox(bx,geom.CellSize(),geom.ProbLo());
 
-
-
-   //#ifdef AMREX_PARTICLES
-
    /*
-   if (scomp==0) {
-     std::cout << "Updating drag force (Sc,Nc,sSc)" << scomp << " " << ncomp << " " << scalScomp << "\n" ;
-     theNSPC()->getDrag(rhs,Vel,Scal,visc_coef[0],ngrow,level);
-     //     rhs.SumBoundary(0, ncomp, IntVect(1), Geom().periodicity());
-     //     rhs.SumBoundary(Geom().periodicity());
-   }
-   else if (scomp==3) {
-     //     std::cout << "Updating tempurature forcing (Sc,Nc,sSc)" << scomp << " " << ncomp << " " << scalScomp << "\n" ;
-     //     theNSPC()->getTemp(rhs,Vel,Scal,visc_coef[0],ngrow,level);
-   }
-   else {
-     std::cout << "Unknown forcing terms...\n";
+   
+   // Here's the meat
+   //
+   // Velocity forcing
+   //
+   if ( scomp<AMREX_SPACEDIM ){
+     AMREX_ALWAYS_ASSERT(scomp==Xvel);
+     AMREX_ALWAYS_ASSERT(ncomp>=AMREX_SPACEDIM);
    }
 
-   std::cout << " *** get forcing okay\n";
+   if ( scomp==Xvel ){
+     //
+     // TODO: add some switch for user-supplied/problem-dependent forcing
+     //
+     auto const& frc  = force.array(scomp);
+     auto const& scal = Scal.array(scalScomp);
+
+     if ( std::abs(grav) > 0.0001) {
+       amrex::ParallelFor(bx, [frc, scal, grav]
+       AMREX_GPU_DEVICE(int i, int j, int k) noexcept
+       {
+	 frc(i,j,k,0) = 0.0_rt;
+#if ( AMREX_SPACEDIM == 2 )
+         frc(i,j,k,1) = grav*scal(i,j,k,0);
+#elif ( AMREX_SPACEDIM == 3 )
+         frc(i,j,k,1) = 0.0_rt;
+         frc(i,j,k,2) = grav*scal(i,j,k,0);
+#endif
+       });
+     }
+     else {
+       force.setVal<RunOn::Gpu>(0.0, bx, Xvel, AMREX_SPACEDIM);
+       // amrex::ParallelFor(bx, AMREX_SPACEDIM, [frc]
+       // AMREX_GPU_DEVICE(int i, int j, int k, int n) noexcept
+       // {
+       // 	 frc(i,j,k,n) = 0.0_rt;
+       // });
+     }
+   }
+   //
+   // Scalar forcing
+   //
+   if ( scomp >= AMREX_SPACEDIM ) {
+     // Doing only scalars
+     force.setVal<RunOn::Gpu>(0.0, bx, 0, ncomp);
+     // auto const& frc  = force.array();
+     // amrex::ParallelFor(bx, ncomp, [frc]
+     // AMREX_GPU_DEVICE(int i, int j, int k, int n) noexcept
+     // {
+     // 	 frc(i,j,k,n) = 0.0_rt;
+     // });
+   }
+   else if ( scomp+ncomp > AMREX_SPACEDIM) {
+     // Doing scalars with vel
+     force.setVal<RunOn::Gpu>(0.0, bx, Density, ncomp-Density);
+     // auto const& frc  = force.array(Density);
+     // amrex::ParallelFor(bx, ncomp-Density, [frc]
+     // AMREX_GPU_DEVICE(int i, int j, int k, int n) noexcept
+     // {
+     // 	 frc(i,j,k,n) = 0.0_rt;
+     // });
+   }
+
    */
-
-   //#endif
 
 
    // Here's the meat
    FORT_MAKEFORCE (&time,
                    BL_TO_FORTRAN_ANYD(force),
                    BL_TO_FORTRAN_ANYD(Vel),
-		   //                   BL_TO_FORTRAN_N_ANYD(Scal),
                    BL_TO_FORTRAN_ANYD(Scal),
                    BL_TO_FORTRAN_ANYD(rhs),
                    dx,
@@ -217,7 +241,8 @@ NavierStokesBase::getForce (FArrayBox&       force,
                    &grav,
                    &Fx,&Fy,&Fz,
                    &scomp,&ncomp,&nscal,&getForceVerbose);
-
+   
+   
    if (ParallelDescriptor::IOProcessor() && getForceVerbose) {
       Vector<Real> forcemin(ncomp);
       Vector<Real> forcemax(ncomp);
@@ -254,6 +279,6 @@ NavierStokesBase::getForce (FArrayBox&       force,
                         << " / " << forcemax[n] << std::endl;
 
       amrex::Print() << "NavierStokesBase::getForce(): Leaving..." 
-                     << std::endl << "---\n" << std::endl;
+                     << std::endl << "---" << std::endl;
    }
 }

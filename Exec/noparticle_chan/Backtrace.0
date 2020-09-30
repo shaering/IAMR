@@ -1,0 +1,57 @@
+=== If no file names and line numbers are shown below, one can run
+            addr2line -Cpfie my_exefile my_line_address
+    to convert `my_line_address` (e.g., 0x4a6b) into file name and line number.
+    Or one can use amrex/Tools/Backtrace/parse_bt.py.
+
+=== Please note that the line number reported by addr2line may not be accurate.
+    One can use
+            readelf -wl my_exefile | grep my_line_address'
+    to find out the offset for that line.
+
+ 0: amr3d.gnu.DEBUG.MPI.ex(+0x4322fc) [0x7f1b7ec322fc]
+    amrex::BLBackTrace::print_backtrace_info(_IO_FILE*) at /home/shaering/Applications//amrex//Src/Base/AMReX_BLBackTrace.cpp:170
+
+ 1: amr3d.gnu.DEBUG.MPI.ex(+0x431dfc) [0x7f1b7ec31dfc]
+    amrex::BLBackTrace::handler(int) at /home/shaering/Applications//amrex//Src/Base/AMReX_BLBackTrace.cpp:80
+
+ 2: amr3d.gnu.DEBUG.MPI.ex(+0x2d88b1) [0x7f1b7ead88b1]
+    amrex::ParallelDescriptor::Abort(int, bool) at /home/shaering/Applications//amrex//Src/Base/AMReX_ParallelDescriptor.cpp:230
+
+ 3: amr3d.gnu.DEBUG.MPI.ex(+0x2893a4) [0x7f1b7ea893a4]
+    amrex::Error(char const*) at /home/shaering/Applications//amrex//Src/Base/AMReX.cpp:211
+
+ 4: amr3d.gnu.DEBUG.MPI.ex(+0xfa75f) [0x7f1b7e8fa75f]
+    MacProj::test_umac_periodic(int, amrex::MultiFab*) at /home/shaering/Applications/iamr_sh/IAMR/Exec/noparticle_chan/../../Source/MacProj.cpp:1300 (discriminator 2)
+
+ 5: amr3d.gnu.DEBUG.MPI.ex(+0xf1d56) [0x7f1b7e8f1d56]
+    MacProj::mac_project(int, amrex::MultiFab*, amrex::MultiFab&, double, double, amrex::MultiFab const&, int, amrex::BCRec const&, bool) at /home/shaering/Applications/iamr_sh/IAMR/Exec/noparticle_chan/../../Source/MacProj.cpp:375
+
+ 6: amr3d.gnu.DEBUG.MPI.ex(+0x8ba1f) [0x7f1b7e88ba1f]
+    NavierStokesBase::mac_project(double, double, amrex::MultiFab&, amrex::MultiFab*, int, bool) at /home/shaering/Applications/iamr_sh/IAMR/Exec/noparticle_chan/../../Source/NavierStokesBase.cpp:2338
+
+ 7: amr3d.gnu.DEBUG.MPI.ex(+0x35dce) [0x7f1b7e835dce]
+    NavierStokes::advance(double, double, int, int) at /home/shaering/Applications/iamr_sh/IAMR/Exec/noparticle_chan/../../Source/NavierStokes.cpp:329
+
+ 8: amr3d.gnu.DEBUG.MPI.ex(+0x3eea0) [0x7f1b7e83eea0]
+    NavierStokes::post_init_press(double&, amrex::Vector<int, std::allocator<int> >&, amrex::Vector<double, std::allocator<double> >&) at /home/shaering/Applications/iamr_sh/IAMR/Exec/noparticle_chan/../../Source/NavierStokes.cpp:1695 (discriminator 2)
+
+ 9: amr3d.gnu.DEBUG.MPI.ex(+0x3ea74) [0x7f1b7e83ea74]
+    NavierStokes::post_init(double) at /home/shaering/Applications/iamr_sh/IAMR/Exec/noparticle_chan/../../Source/NavierStokes.cpp:1625
+
+10: amr3d.gnu.DEBUG.MPI.ex(+0x4e9b4a) [0x7f1b7ece9b4a]
+    amrex::Amr::FinalizeInit(double, double) at /home/shaering/Applications//amrex//Src/Amr/AMReX_Amr.cpp:1327 (discriminator 2)
+
+11: amr3d.gnu.DEBUG.MPI.ex(+0x4e959d) [0x7f1b7ece959d]
+    amrex::Amr::initialInit(double, double, amrex::BoxArray const*, amrex::Vector<int, std::allocator<int> > const*) at /home/shaering/Applications//amrex//Src/Amr/AMReX_Amr.cpp:1249
+
+12: amr3d.gnu.DEBUG.MPI.ex(+0x4e8e9b) [0x7f1b7ece8e9b]
+    amrex::Amr::init(double, double) at /home/shaering/Applications//amrex//Src/Amr/AMReX_Amr.cpp:1121
+
+13: amr3d.gnu.DEBUG.MPI.ex(+0x159d4) [0x7f1b7e8159d4]
+    main at /home/shaering/Applications/iamr_sh/IAMR/Exec/noparticle_chan/../../Source/main.cpp:88
+
+14: /lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0xe7) [0x7f1b7cd91b97]
+
+15: amr3d.gnu.DEBUG.MPI.ex(+0x156ca) [0x7f1b7e8156ca]
+    ?? ??:0
+
