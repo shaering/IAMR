@@ -33,7 +33,7 @@ NavierStokesBase::getForce (FArrayBox&       force,
                             const Real       time,
                             const FArrayBox& Vel,
                             const FArrayBox& Scal,
-                                  FArrayBox& rhs,			    
+			    //                                  FArrayBox& rhs,			    
                             int              scalScomp)
 {
 
@@ -51,8 +51,8 @@ NavierStokesBase::getForce (FArrayBox&       force,
    const int*  v_hi     = Vel.hiVect();
    const int*  s_lo     = Scal.loVect();
    const int*  s_hi     = Scal.hiVect();
-   const int*  r_lo     = rhs.loVect();
-   const int*  r_hi     = rhs.hiVect();
+   //   const int*  r_lo     = rhs.loVect();
+   //   const int*  r_hi     = rhs.hiVect();
    const int   nscal    = NUM_SCALARS;
    
 
@@ -162,7 +162,7 @@ NavierStokesBase::getForce (FArrayBox&       force,
 
    RealBox gridloc = RealBox(bx,geom.CellSize(),geom.ProbLo());
 
-   /*
+   /**/
    
    // Here's the meat
    //
@@ -177,6 +177,9 @@ NavierStokesBase::getForce (FArrayBox&       force,
      //
      // TODO: add some switch for user-supplied/problem-dependent forcing
      //
+
+     std::cout << " ... IN XVEL LOOP ...\n";     
+     
      auto const& frc  = force.array(scomp);
      auto const& scal = Scal.array(scalScomp);
 
@@ -194,12 +197,17 @@ NavierStokesBase::getForce (FArrayBox&       force,
        });
      }
      else {
-       force.setVal<RunOn::Gpu>(0.0, bx, Xvel, AMREX_SPACEDIM);
-       // amrex::ParallelFor(bx, AMREX_SPACEDIM, [frc]
-       // AMREX_GPU_DEVICE(int i, int j, int k, int n) noexcept
-       // {
-       // 	 frc(i,j,k,n) = 0.0_rt;
-       // });
+       std::cout << " ... IN NOT XVEL LOOP ...\n";
+       //       force.setVal<RunOn::Gpu>(0.0, bx, Xvel, AMREX_SPACEDIM);
+        amrex::ParallelFor(bx, AMREX_SPACEDIM, [frc]
+        AMREX_GPU_DEVICE(int i, int j, int k, int n) noexcept
+        {
+          frc(i,j,k,n) = 0.0_rt;
+        });
+
+
+
+       
      }
    }
    //
@@ -207,6 +215,7 @@ NavierStokesBase::getForce (FArrayBox&       force,
    //
    if ( scomp >= AMREX_SPACEDIM ) {
      // Doing only scalars
+     std::cout << " ... IN SCALAR LOOP ...\n";
      force.setVal<RunOn::Gpu>(0.0, bx, 0, ncomp);
      // auto const& frc  = force.array();
      // amrex::ParallelFor(bx, ncomp, [frc]
@@ -226,10 +235,11 @@ NavierStokesBase::getForce (FArrayBox&       force,
      // });
    }
 
-   */
+   /**/
 
 
    // Here's the meat
+   /*
    FORT_MAKEFORCE (&time,
                    BL_TO_FORTRAN_ANYD(force),
                    BL_TO_FORTRAN_ANYD(Vel),
@@ -241,6 +251,7 @@ NavierStokesBase::getForce (FArrayBox&       force,
                    &grav,
                    &Fx,&Fy,&Fz,
                    &scomp,&ncomp,&nscal,&getForceVerbose);
+   */
    
    
    if (ParallelDescriptor::IOProcessor() && getForceVerbose) {
