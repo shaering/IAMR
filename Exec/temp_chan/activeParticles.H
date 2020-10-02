@@ -76,7 +76,7 @@ public:
     ~ActiveParticleContainer () {}
 
   void basicAdvectWithUmac (MultiFab* umac, int level, Real dt);
-  void myAdvectWithUmac (MultiFab* umac, int level, Real dt, MultiFab& rho, MultiFab& temp, Real nu_m);
+  void myAdvectWithUmac (MultiFab* umac, int level, Real dt, MultiFab& rho, MultiFab& temp, Real nu_m, Real time);
   void myAdvectWithUcc (const MultiFab& ucc, int level, Real dt);
   void Timestamp (const std::string& file, const MultiFab& mf, int lev, Real time, const std::vector<int>& idx);
   void getDrag (FArrayBox& rhs, const FArrayBox& vel, const FArrayBox& rho, Real nu_m, int nGrow, int level);

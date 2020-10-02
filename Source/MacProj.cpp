@@ -760,8 +760,10 @@ MacProj::mac_sync_compute (int                   level,
       //FArrayBox tforces;
         for (MFIter Smfi(Smf,TilingIfNotGPU()); Smfi.isValid(); ++Smfi)
         {
+	    const Box&  bx = Smfi.tilebox();
             const auto gbx = Smfi.growntilebox(ngrow);
-	    ns_level.getForce(forcing_term[Smfi],gbx,ngrow,0,NUM_STATE,prev_time,Smf[Smfi],Smf[Smfi],rhs2[Smfi],Density);
+	    ns_level.getForce(forcing_term[Smfi],bx,ngrow,0,NUM_STATE,prev_time,Smf[Smfi],Smf[Smfi],rhs2[Smfi],Density);
+	    //ns_level.getForce(forcing_term[Smfi],gbx,ngrow,0,NUM_STATE,prev_time,Smf[Smfi],Smf[Smfi],Density);	    
         }
     }
 

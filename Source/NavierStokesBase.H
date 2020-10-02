@@ -243,7 +243,7 @@ public:
                            const amrex::Real       time,
                            const amrex::FArrayBox& Vel,
                            const amrex::FArrayBox& Scal,
-			   //                                 amrex::FArrayBox& rhs,			   
+                           const amrex::FArrayBox& rhs,			   
                            int                     scalScomp);
     //
     amrex::FluxRegister& getAdvFluxReg () {

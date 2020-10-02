@@ -48,7 +48,7 @@ contains
     integer i, j, k, n, oo
     real(amrex_real) wx_lo, wy_lo, wz_lo, wx_hi, wy_hi, wz_hi
     real(amrex_real) lx, ly, lz
-    real(amrex_real) qp, inv_vol, Re_p, tau_p, dia_p, rho_p
+    real(amrex_real) qp, inv_vol, Re_p, tau_p, dia_p, rho_p, T_p
     real(amrex_real) inv_dx(3)
     real(amrex_real) vdiff, CT, vp(3)
     real(amrex_real) v_ap(3), Fp(3), rho_f
@@ -65,16 +65,17 @@ contains
 
        !qp = weights(n) * charge * inv_vol
 
-       ! particle properties (10 is temp)
-       vp(1) = particles(7,n)
-       vp(2) = particles(8,n)
-       vp(3) = particles(9,n)
-       !T_p = particles(10,n)
-       dia_p = particles(11,n)
-       rho_p = particles(12,n)
-       Fp(1) = particles(13,n)
-       Fp(2) = particles(14,n)
-       Fp(3) = particles(15,n)
+       !2D HARDCODE
+       ! particle properties (7 is temp)
+       vp(1) = particles(4,n)
+       vp(2) = particles(5,n)
+       vp(3) = particles(6,n)
+       T_p = particles(7,n)
+       dia_p = particles(8,n)
+       rho_p = particles(9,n)
+       Fp(1) = particles(10,n)
+       Fp(2) = particles(11,n)
+       Fp(3) = particles(12,n)
 
 
        if(isnan(vp(1))) print*, " up NAN at:", n
