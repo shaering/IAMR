@@ -17,7 +17,8 @@ struct PIdx
 {
   enum { // Particle Attributes stored in amrex::ParticleContainer's struct-of-arrays                                                               
     w = 0,
-    vx, vy,
+    vx,
+    vy,
 #if BL_SPACEDIM == 3
     vz,
 #endif
@@ -59,24 +60,24 @@ using ScalarMeshData = Vector<std::unique_ptr<MultiFab> >;
 
 
 class ActiveParticleContainer
-  : public ParticleContainer<AMREX_SPACEDIM*2+3+4,1> //<AMREX_SPACEDIM*2+3,1>
+  : public ParticleContainer<AMREX_SPACEDIM*2+3+AMREX_SPACEDIM+1,1> //<AMREX_SPACEDIM*2+3,1>
 {
 public:
 
     ActiveParticleContainer (ParGDBBase* gdb)
-      : ParticleContainer<AMREX_SPACEDIM*2+3+4,1>(gdb)
+      : ParticleContainer<AMREX_SPACEDIM*2+3+AMREX_SPACEDIM+1,1>(gdb)
 	{}
 
     ActiveParticleContainer (const Geometry            & geom, 
    			     const DistributionMapping & dmap,
 			     const BoxArray            & ba)
-      : ParticleContainer<AMREX_SPACEDIM*2+3+4,1>(geom,dmap,ba)
+      : ParticleContainer<AMREX_SPACEDIM*2+3+AMREX_SPACEDIM+1,1>(geom,dmap,ba)
 	{}
 
     ~ActiveParticleContainer () {}
 
   void basicAdvectWithUmac (MultiFab* umac, int level, Real dt);
-  void myAdvectWithUmac (MultiFab* umac, int level, Real dt, MultiFab& rho, MultiFab& temp, Real nu_m);
+  void myAdvectWithUmac (MultiFab* umac, int level, Real dt, MultiFab& rho, MultiFab& temp, Real nu_m, Real time);
   void myAdvectWithUcc (const MultiFab& ucc, int level, Real dt);
   void Timestamp (const std::string& file, const MultiFab& mf, int lev, Real time, const std::vector<int>& idx);
   void getDrag (FArrayBox& rhs, const FArrayBox& vel, const FArrayBox& rho, Real nu_m, int nGrow, int level);

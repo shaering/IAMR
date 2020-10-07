@@ -1,4 +1,5 @@
 
+
 #include <NavierStokes.H>
 #include <NS_BC.H>
 #include <RegType.H>
@@ -154,26 +155,13 @@ NavierStokes::variableSetUp ()
     //
     // Set number of state variables.
     //
-    NUM_STATE = Density + 1; //4
-    std::cout << " NUM_STATE1 = " << NUM_STATE << "\n"; //4
-    int Trac = NUM_STATE++; // why is this incrementing?
-    std::cout << " NUM_STATE2 = " << NUM_STATE << "\n"; //5   
+    NUM_STATE = Density + 1;
+    int Trac = NUM_STATE++;
     int Trac2;
-    int Pvel;
-    if (do_trac2) Trac2 = NUM_STATE++;
-    std::cout << " NUM_STATE3 = " << NUM_STATE << "\n"; //5  
-    if (do_temp) NUM_STATE++; //5
-    std::cout << " NUM_STATE4 = " << NUM_STATE << "\n"; //6
-    //    if (do_particle_vel) NUM_STATE++;
-    //    if (do_particle_vel) Pvel = NUM_STATE;
+    if (do_trac2)
+	Trac2 = NUM_STATE++;
+    if (do_temp) NUM_STATE++;
     NUM_SCALARS = NUM_STATE - Density;
-
-    std::cout << " NUM_STATE = " << NUM_STATE << "\n"; //6
-    std::cout << " NUM_SCALARS = " << NUM_SCALARS << "\n"; //3
-    std::cout << " DENSITY = " << Density << "\n"; //3
-    std::cout << " TEMP = " << Temp << "\n"; // 5
-    std::cout << " DO_TRAC2 = " << do_trac2 << "\n";  //0          
-    std::cout << " DO_TEMP = " << do_temp << "\n"; //1 
 
     if (do_scalar_update_in_order) {
 	// Need to check numbers and values of scalar update
@@ -222,7 +210,6 @@ NavierStokes::variableSetUp ()
 
     set_scalar_bc(bc,phys_bc);
     desc_lst.setComponent(State_Type,Trac,"tracer",bc,BndryFunc(FORT_ADVFILL));
-    std::cout << "Trac: " << Trac << "\n";
 
     if (do_trac2)
     {
@@ -230,19 +217,12 @@ NavierStokes::variableSetUp ()
        desc_lst.setComponent(State_Type,Trac2,"tracer2",bc,BndryFunc(FORT_ADV2FILL));
     }
     //
-    //    if (do_particle_vel)
-    //    {
-    //       set_scalar_bc(bc,phys_bc);
-    //       desc_lst.setComponent(State_Type,Pvel,"particle_vel",bc,BndryFunc(FORT_ADV2FILL));
-    //    }
-    //
     // **************  DEFINE TEMPERATURE  ********************
     //
     if (do_temp)
     {
         set_temp_bc(bc,phys_bc);
         desc_lst.setComponent(State_Type,Temp,"temp",bc,BndryFunc(FORT_TEMPFILL));
-    std::cout << "Temp: " << Temp << "\n";	
     }
 
     is_diffusive.resize(NUM_STATE);
@@ -362,11 +342,6 @@ NavierStokes::variableSetUp ()
     //
     derive_lst.add("mag_vort",IndexType::TheCellType(),1,DeriveFunc3D(dermgvort),grow_box_by_one);
     derive_lst.addComponent("mag_vort",desc_lst,State_Type,Xvel,BL_SPACEDIM);
-    //
-    // gradient-based Reynolds number
-    //
-    derive_lst.add("re_grad",IndexType::TheCellType(),1,DeriveFunc3D(derregrad_old),grow_box_by_one);
-    derive_lst.addComponent("re_grad",desc_lst,State_Type,Xvel,BL_SPACEDIM);
 #if (BL_SPACEDIM == 3)
     //
     //  vorticity vector field

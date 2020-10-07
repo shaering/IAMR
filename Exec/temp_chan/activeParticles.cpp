@@ -12,10 +12,10 @@ namespace amrex {
 // Uses midpoint method to advance particles using umac.
 //
 void
-ActiveParticleContainer::myAdvectWithUmac (MultiFab* umac, int lev, Real dt, MultiFab& rho, MultiFab& temp, Real nu_m)
+ActiveParticleContainer::myAdvectWithUmac (MultiFab* umac, int lev, Real dt, MultiFab& rho, MultiFab& temp, Real nu_m, Real time)
 {
     BL_PROFILE("AmrActiveParticleContainer::myAdvectWithUmac()");
-    std::cout << " *** myAdvectWithUmac: lev " << lev << "\n";
+    //    std::cout << " *** myAdvectWithUmac: lev " << lev << "\n";
 
     AMREX_ASSERT(OK(lev, lev, umac[0].nGrow()-1)); // segfault
     AMREX_ASSERT(lev >= 0 && lev < GetParticles().size());
@@ -163,34 +163,42 @@ ActiveParticleContainer::myAdvectWithUmac (MultiFab* umac, int lev, Real dt, Mul
 
                 ParticleType& p = p_pbox[i];
                 if (p.id() <= 0) return;
+		std::cout << " IPASS " << ipass << "\n";
+		std::cout << i  << ": particle pos: " << p.pos(0) << " " << p.pos(1) << " " << p.pos(2) << "\n";
                 Real v[AMREX_SPACEDIM];
                 mac_interpolate(p, plo, dxi, umacarr, v);
-                //std::cout << "     Mac_inerp vel okay"; //<< i << ":" << v[0] << " " << v[1] << " " << v[2] << " \n";
+                std::cout << i << ":     Mac_inerp vel okay\n"; //<< i << ":" << v[0] << " " << v[1] << " " << v[2] << " \n";
 
-		
                 // same thing for density
                 //ParticleType& p = p_pbox[i];
-                Real rho_f[AMREX_SPACEDIM];
-		//std::cout << "particle pos: " << p.pos(0) << " " << p.pos(1) << " " << p.pos(2);
-		//		std::cout << "box: " << p_pbox->loVect() << " " << p_pbox->hiVect();
+                Real rho_f[1];
+		//std::cout << "box: " << p_pbox->loVect() << " " << p_pbox->hiVect();
                 mac_interpolate(p, plo, dxi, rhoarr, rho_f); //segfault is apparently due to rhoarr being too large for p
-                //std::cout << "     Mac_inerp rho okay"; //<< i << ":" << rho_f[0] << " " << " \n";
+                std::cout << i << ":     Mac_inerp rho okay\n"; //<< i << ":" << rho_f[0] << " " << " \n";
 		/**/
 
 		
                 // same thing for temp
-                Real temp_f[AMREX_SPACEDIM];
+                Real temp_f[1];
                 mac_interpolate(p, plo, dxi, temparr, temp_f);
 		/**/
+                std::cout << i << ":     Mac_inerp temp okay\n";		
 
 
                 // soldati 2009
-  	        Real dia_p = p.m_rdata.arr[AMREX_SPACEDIM+7]; // make these indices general
-  	        Real rho_p = p.m_rdata.arr[AMREX_SPACEDIM+8];
+		//  	        Real dia_p = p.m_rdata.arr[AMREX_SPACEDIM+7];
+		//  	        Real rho_p = p.m_rdata.arr[AMREX_SPACEDIM+8];
+		// Temp is in 2*AMREX_SPACEDIM-1+1
+  	        Real dia_p = p.rdata(2*AMREX_SPACEDIM-1+2); //10 old
+  	        Real rho_p = p.rdata(2*AMREX_SPACEDIM-1+3); //11 old
+		
                 Real vdiff;
-                vdiff = (v[0]-p.m_rdata.arr[2*AMREX_SPACEDIM+0])*(v[0]-p.m_rdata.arr[2*AMREX_SPACEDIM+0])
-                      + (v[1]-p.m_rdata.arr[2*AMREX_SPACEDIM+1])*(v[1]-p.m_rdata.arr[2*AMREX_SPACEDIM+1])
-                      + (v[2]-p.m_rdata.arr[2*AMREX_SPACEDIM+2])*(v[2]-p.m_rdata.arr[2*AMREX_SPACEDIM+2]);
+		//                vdiff = (v[0]-p.m_rdata.arr[2*AMREX_SPACEDIM+0])*(v[0]-p.m_rdata.arr[2*AMREX_SPACEDIM+0])
+		//                      + (v[1]-p.m_rdata.arr[2*AMREX_SPACEDIM+1])*(v[1]-p.m_rdata.arr[2*AMREX_SPACEDIM+1])
+		//                      + (v[2]-p.m_rdata.arr[2*AMREX_SPACEDIM+2])*(v[2]-p.m_rdata.arr[2*AMREX_SPACEDIM+2]);
+                vdiff = (v[0]-p.rdata(AMREX_SPACEDIM+0))*(v[0]-p.rdata(AMREX_SPACEDIM+0))
+		      + (v[1]-p.rdata(AMREX_SPACEDIM+1))*(v[1]-p.rdata(AMREX_SPACEDIM+1))
+		      + (v[2]-p.rdata(AMREX_SPACEDIM+2))*(v[2]-p.rdata(AMREX_SPACEDIM+2));		
                 Real Re_p = sqrt(vdiff) * dia_p / nu_m;
                 Real tau_p = (rho_p/rho_f[0])*dia_p*dia_p/(18.0*nu_m); // need to pass nu and rho for fluid (simple with static first)
                 //Real tau_p = (rho_p/1.0)*dia_p*dia_p/(18.0*nu_m);
@@ -198,12 +206,18 @@ ActiveParticleContainer::myAdvectWithUmac (MultiFab* umac, int lev, Real dt, Mul
 		Real wt0 = (CT/tau_p)*dt;
                 wt0 = std::min(wt0,1.0);
 
+		// initialize forcing
+                p.rdata(2*AMREX_SPACEDIM-1+4) = 0.0; // Fx
+                p.rdata(2*AMREX_SPACEDIM-1+5) = 0.0; // Fy
+                p.rdata(2*AMREX_SPACEDIM-1+3+AMREX_SPACEDIM) = 0.0; // Fz  NEED AN IF 3D HERE
+                p.rdata(2*AMREX_SPACEDIM-1+4+AMREX_SPACEDIM) = 0.0; // FT	
+
 
 		// add more slots in particle array and store momentum src terms for future interp? (simplifies drag_cic)
 
 
 
-		/*		
+		
                 std::cout << " *** myAdvectWithUmac: CP5 \n";
                 std::cout << "     Data (nu_m, d, rho_p, rho_f, T_f, vdiff, Re_p, tau_p, CT, wto) " 
                           << nu_m << " " 
@@ -216,29 +230,33 @@ ActiveParticleContainer::myAdvectWithUmac (MultiFab* umac, int lev, Real dt, Mul
                           << tau_p << " " 
                           << CT << " " 
                           << wt0 << "\n";
+		
 
 		std::cout << " p.m_Xdata.arr dump (PRIOR) \n";
 		std::cout << " ================== \n";
-		std::cout << "(xp)" << p.m_rdata.pos[0] << "\n";
-		std::cout << "(yp)" << p.m_rdata.pos[1] << "\n";
-		std::cout << "(zp)" << p.m_rdata.pos[2] << "\n";
-		std::cout << "(xp?)" << p.m_rdata.arr[0] << "\n";
-		std::cout << "(yp?)" << p.m_rdata.arr[1] << "\n";
-		std::cout << "(zp?)" << p.m_rdata.arr[2] << "\n";
-		std::cout << "(*)" << p.m_rdata.arr[3] << "\n";
-		std::cout << "(*)" << p.m_rdata.arr[4] << "\n";
-		std::cout << "(*)" << p.m_rdata.arr[5] << "\n";
-		std::cout << "(up)" << p.m_rdata.arr[6] << "\n";
-		std::cout << "(vp)" << p.m_rdata.arr[7] << "\n";
-		std::cout << "(wp)" << p.m_rdata.arr[8] << "\n";
-		std::cout << "(Tp)" << p.m_rdata.arr[9] << "\n";
-		std::cout << "(dp)" << p.m_rdata.arr[10] << "\n";
-		std::cout << "(rhop)" << p.m_rdata.arr[11] << "\n";
-		std::cout << "(Fxp)" << p.m_rdata.arr[12] << "\n";
-		std::cout << "(Fyp)" << p.m_rdata.arr[13] << "\n";
-		std::cout << "(Fzp)" <<  p.m_rdata.arr[14] << "\n";
-		std::cout << "(FTp)" <<  p.m_rdata.arr[15] << "\n";
-		*/
+		std::cout << "(vxp)" << v[0] << "\n";
+		std::cout << "(vyp)" << v[1] << "\n";
+		std::cout << "(vzp)" << v[2] << "\n";		
+		std::cout << "(xp)" << p.pos(0) << "\n";
+		std::cout << "(yp)" << p.pos(1) << "\n";
+		std::cout << "(zp)" << p.pos(2) << "\n";
+		std::cout << "(up*)" << p.rdata(0) << "\n";
+		std::cout << "(vp*)" << p.rdata(1) << "\n";
+		std::cout << "(wp*)" << p.rdata(2) << "\n";
+		std::cout << "(up)" << p.rdata(3) << "\n";
+		std::cout << "(vp)" << p.rdata(4) << "\n";
+		std::cout << "(wp)" << p.rdata(5) << "\n";
+		std::cout << "(Tp)" << p.rdata(6) << "\n";
+		std::cout << "(diap)" << p.rdata(7) << "\n";
+		std::cout << "(rhop)" << p.rdata(8) << "\n";
+		std::cout << "(Fxp)" << p.rdata(9) << "\n";
+		std::cout << "(Fyp)" << p.rdata(10) << "\n";
+		std::cout << "(Fzp)" << p.rdata(11) << "\n";
+		std::cout << "(FTp)" << p.rdata(12) << "\n";
+		//std::cout << "(?)" << p.rdata(13) << "\n";
+		//std::cout << "(?)" <<  p.rdata(14) << "\n";
+		//std::cout << "(?)" <<  p.rdata(15) << "\n";
+		/**/
 
 		
 /*
@@ -276,6 +294,60 @@ p.m_rdata_arr[SPACEDIM+6] = particle density
 */
 
 
+
+                // imp-eff specific
+		int hole_top_n0, hole_top_n1;
+		int hole_bot_n0, hole_bot_n1;		
+		const Real ground = 0.0;
+	        const Real ceiling = 2.0;
+	        const Real bottom = 0.0;		
+        	Real r_top, r_bot, rp_top, rp_bot;
+	        Real x_top, z_top, x_bot, z_bot;
+		Real xp, yp, zp, norm_x,norm_z;
+		Real ur_prime, ut_prime, theta_p;
+		Real pi = 3.14159265359;
+
+		x_top = 2.5;
+		z_top = 1.0;		
+		r_top = 0.5;
+
+		//		x_bot = 1.5;
+		//		z_bot = 1.0;		
+		//		r_bot = 0.5;
+
+		x_bot = 2.7 + 1.0*tan(pi/3.0);
+		z_bot = 3.0;		
+		r_bot = 0.5;
+
+		/*
+                const Real a_rot = -1.0*pi/3.0;
+		center_bot[0] = 2.7;
+		center_bot[1] = -0.5;
+		center_bot[2] = 3.0;
+		clip_offset[0] = center_bot[0] + 1.0*tan(-a_rot) - offset;
+		clip_offset[1] = 0.5;
+		clip_offset[2] = center_bot[2];
+		*/
+		
+                // index i is particle number, gradually release particles into jet inlet
+		int gradual_release_flag, p_cutoff, p_freq;
+		Real t_freq;
+                Real rnd_wgt;		
+
+		t_freq = 0.1;
+		gradual_release_flag = 0; // set this to zero except from gradual release in imp-eff
+		p_cutoff = std::round(time/t_freq);
+		//		std::cout << "*** particle: " << i << "\n";
+		//		std::cout << "*** time: " << time << "\n";
+		//		std::cout << "*** p_cutoff: " << p_cutoff << "\n";
+
+		//                int p_active = p.m_idata[0];
+
+		// is i local to the proc?  would explain freezing...
+		if ( i<p_cutoff || gradual_release_flag==0 ) {
+		  
+		  //		  std::cout << "*** particle: " << i << " lives! (" << time << ")\n";
+		
                 // particles advanced here <warp>
                 if (ipass == 0)
                 {
@@ -286,13 +358,39 @@ p.m_rdata_arr[SPACEDIM+6] = particle density
 		      //p.m_rdata.arr[AMREX_SPACEDIM+dim] = p.m_rdata.pos[dim]; // copy old pos
 		      //p.m_rdata.pos[dim] += 0.5*dt*v[dim];                    // update pos to dt/2
 
-                      p.m_rdata.arr[AMREX_SPACEDIM+dim] = p.m_rdata.pos[dim];                                   // copy old pos
-		      p.m_rdata.pos[dim] += 0.5*dt*((1.0-wt0)*p.m_rdata.arr[2*AMREX_SPACEDIM+dim]+wt0*v[dim]);  // update pos to dt/2
+		      //                      p.m_rdata.arr[AMREX_SPACEDIM+dim] = p.m_rdata.pos[dim];                                   // copy old pos
+		      //		      p.m_rdata.pos[dim] += 0.5*dt*((1.0-wt0)*p.m_rdata.arr[2*AMREX_SPACEDIM+dim]+wt0*v[dim]);  // update pos to dt/2
+
+
+		      /**/
+                      p.rdata(dim) = p.pos(dim);                                   // copy old pos
+		      p.pos(dim) += 0.5*dt*((1.0-wt0)*p.rdata(AMREX_SPACEDIM+dim)+wt0*v[dim]);  // update pos to dt/2
+		      // difference? p.pos(dim) += static_cast<ParticleReal>(ParticleReal(0.5)*dt*((1.0-wt0)*p.rdata(AMREX_SPACEDIM+dim)+wt0*v[dim]));
+		      /**/
 
                     }
                 }
                 else
                 {
+
+		  /**/
+
+		    // old position
+		  //		    xp = p.m_rdata.arr[AMREX_SPACEDIM+0]; //p.m_rdata.pos[0];
+		  //		    yp = p.m_rdata.arr[AMREX_SPACEDIM+1]; //p.m_rdata.pos[1];
+		  //		    zp = p.m_rdata.arr[AMREX_SPACEDIM+2]; //p.m_rdata.pos[2];
+		    xp = p.rdata(0); //p.m_rdata.pos[0];
+		    yp = p.rdata(1); //p.m_rdata.pos[1];
+		    zp = p.rdata(2); //p.m_rdata.pos[2];		    
+      	            rp_top = sqrt( (xp-x_top)*(xp-x_top) + (zp-z_top)*(zp-z_top) );
+	            rp_bot = sqrt( (xp-x_bot)*(xp-x_bot) + (zp-z_bot)*(zp-z_bot) );
+
+		    hole_top_n0 = 0;
+		    hole_bot_n0 = 0;		
+		    if ( rp_top<=r_top && yp>=ceiling ) hole_top_n0 = 1;
+		    if ( rp_bot<=r_bot && yp<=ground )  hole_bot_n0 = 1;
+		
+				  
                     for (int dim=0; dim < AMREX_SPACEDIM; dim++)
                     {
 
@@ -300,46 +398,93 @@ p.m_rdata_arr[SPACEDIM+6] = particle density
 		      // p.m_rdata.pos[dim] = p.m_rdata.arr[AMREX_SPACEDIM+dim] + dt*v[dim]; // update pos to full dt
 		      // p.m_rdata.arr[AMREX_SPACEDIM+dim] = v[dim];                         // copy vel to arr, why?
 
-                      p.m_rdata.arr[2*AMREX_SPACEDIM+dim] = (1.0-wt0)*p.m_rdata.arr[2*AMREX_SPACEDIM+dim] + wt0*v[dim]; // update vel_p
-		      p.m_rdata.pos[dim] = p.m_rdata.arr[AMREX_SPACEDIM+dim] + dt*p.m_rdata.arr[2*AMREX_SPACEDIM+dim]; // update pos to fill dt
-		      p.m_rdata.arr[AMREX_SPACEDIM+dim] = p.m_rdata.arr[2*AMREX_SPACEDIM+dim];                          // copy vel to arr, why?
+		      //                      p.m_rdata.arr[2*AMREX_SPACEDIM+dim] = (1.0-wt0)*p.m_rdata.arr[2*AMREX_SPACEDIM+dim] + wt0*v[dim]; // update vel_p
+		      //		      p.m_rdata.pos[dim] = p.m_rdata.arr[AMREX_SPACEDIM+dim] + dt*p.m_rdata.arr[2*AMREX_SPACEDIM+dim];  // update pos to full dt
+		      //		      p.m_rdata.arr[AMREX_SPACEDIM+dim] = p.m_rdata.arr[2*AMREX_SPACEDIM+dim];                          // copy vel to arr, why?
+
+                      p.rdata(AMREX_SPACEDIM+dim) = (1.0-wt0)*p.rdata(AMREX_SPACEDIM+dim) + wt0*v[dim]; // update vel_p
+		      p.pos(dim) = p.rdata(dim) + dt*p.rdata(AMREX_SPACEDIM+dim);  // update pos to full dt
+		      p.rdata(dim) = p.rdata(AMREX_SPACEDIM+dim);                          // copy vel to arr, why?		      
 
                       // update force to reuse
-    		      p.m_rdata.arr[2*AMREX_SPACEDIM+dim+6] = CT/tau_p * (v[dim]-p.m_rdata.arr[2*AMREX_SPACEDIM+dim]);
+		      //    		      p.m_rdata.arr[2*AMREX_SPACEDIM+dim+6] = CT/tau_p * (v[dim]-p.m_rdata.arr[2*AMREX_SPACEDIM+dim]);
+    		      p.rdata(2*AMREX_SPACEDIM+dim+3) = CT/tau_p * (v[dim]-p.rdata(AMREX_SPACEDIM+dim));		      
 
                     }
 
 		    
-                    // update particle temp, make alpha readable
-    		    p.m_rdata.arr[9] += 0.01 * dt * (temp_f[0]-p.m_rdata.arr[9]);
-    		    p.m_rdata.arr[2*AMREX_SPACEDIM+3+6] = 0.01 * (temp_f[0]-p.m_rdata.arr[9]);
-		    /**/
+                    // update particle temp, make alpha readable HARDCODE HARDCODE HARDCODE
+		    //    		    p.m_rdata.arr[9] += 0.01 * dt * (temp_f[0]-p.m_rdata.arr[9]);
+		    //    		    p.m_rdata.arr[2*AMREX_SPACEDIM+3+6] = 0.01 * (temp_f[0]-p.m_rdata.arr[9]);
+    		    p.rdata(2*AMREX_SPACEDIM-1+1) += 0.01 * dt * (temp_f[0]-p.rdata(2*AMREX_SPACEDIM-1+1));
+    		    p.rdata(2*AMREX_SPACEDIM+6) = 0.01 * (temp_f[0]-p.rdata(2*AMREX_SPACEDIM-1+1));		    
 
-		    // hack for reflection or sticking
-                    Real rnd_wgt;
-                    if (p.m_rdata.pos[1] < 0.0) {
-		       srand( (unsigned)time( NULL ) );
-		       rnd_wgt = round(rand()/RAND_MAX);
-		       std::cout << " ***RND TRAP: " << rnd_wgt << "\n";
- 		       //rnd_wgt = 1.0;
-                       p.m_rdata.pos[1] = -1.0 * rnd_wgt * p.m_rdata.pos[1];
-                       p.m_rdata.arr[2*AMREX_SPACEDIM+0] =  1.0 * rnd_wgt * p.m_rdata.arr[2*AMREX_SPACEDIM+0];
-                       p.m_rdata.arr[2*AMREX_SPACEDIM+1] = -1.0 * rnd_wgt * p.m_rdata.arr[2*AMREX_SPACEDIM+1];
-                       p.m_rdata.arr[2*AMREX_SPACEDIM+2] =  1.0 * rnd_wgt * p.m_rdata.arr[2*AMREX_SPACEDIM+2];
+
+		    // hack for reflection or sticking ==> this should be changed to some global wall distance, manual changes now 
+		    //srand( (unsigned)time( NULL ) );
+		    //rnd_wgt = round(rand()/RAND_MAX);
+ 	            rnd_wgt = 1.0;		    
+
+		    // updated position
+		    //                    xp = p.m_rdata.pos[0];
+		    //                    yp = p.m_rdata.pos[1];
+		    //                    zp = p.m_rdata.pos[2];
+
+                    xp = p.pos(0);
+                    yp = p.pos(1);
+                    zp = p.pos(2);
+		    
+  		    rp_top = sqrt( (xp-x_top)*(xp-x_top) + (zp-z_top)*(zp-z_top) );
+		    rp_bot = sqrt( (xp-x_bot)*(xp-x_bot) + (zp-z_bot)*(zp-z_bot) );
+
+		    hole_top_n1 = 0;
+ 		    hole_bot_n1 = 0;		
+		    if ( rp_top<=r_top && yp>=ceiling ) hole_top_n1 = 1;
+		    if ( rp_bot<=r_bot && yp<=ground )  hole_bot_n1 = 1;		    
+
+		    // floor bounce
+                    if (yp < ground ) {
+		      //		       p.m_rdata.pos[1] = ground;
+		      //                       p.m_rdata.arr[2*AMREX_SPACEDIM+0] =  1.0 * rnd_wgt * p.m_rdata.arr[2*AMREX_SPACEDIM+0];
+		      //                       p.m_rdata.arr[2*AMREX_SPACEDIM+1] = -1.0 * rnd_wgt * p.m_rdata.arr[2*AMREX_SPACEDIM+1];
+		      //                       p.m_rdata.arr[2*AMREX_SPACEDIM+2] =  1.0 * rnd_wgt * p.m_rdata.arr[2*AMREX_SPACEDIM+2];
+		      p.pos(1) = ground;
+		      p.rdata(AMREX_SPACEDIM+0) =  1.0 * rnd_wgt * p.rdata(AMREX_SPACEDIM+0);
+		      p.rdata(AMREX_SPACEDIM+1) = -1.0 * rnd_wgt * p.rdata(AMREX_SPACEDIM+1);
+		      p.rdata(AMREX_SPACEDIM+2) =  1.0 * rnd_wgt * p.rdata(AMREX_SPACEDIM+2);
+		       
 	            }
 
-                    if (p.m_rdata.pos[1] > 2.0) {
-		       srand( (unsigned)time( NULL ) );
-		       rnd_wgt = round(rand()/RAND_MAX);
-		       std::cout << " ***RND TRAP: " << rnd_wgt << "\n";
- 		       //rnd_wgt = 1.0;
-		       p.m_rdata.pos[1] = 2.0 - 1.0 * rnd_wgt * (p.m_rdata.pos[1]-2.0);
-                       p.m_rdata.arr[2*AMREX_SPACEDIM+0] =  1.0 * rnd_wgt * p.m_rdata.arr[2*AMREX_SPACEDIM+0];
-                       p.m_rdata.arr[2*AMREX_SPACEDIM+1] = -1.0 * rnd_wgt * p.m_rdata.arr[2*AMREX_SPACEDIM+1];
-                       p.m_rdata.arr[2*AMREX_SPACEDIM+2] =  1.0 * rnd_wgt * p.m_rdata.arr[2*AMREX_SPACEDIM+2];
+		    // ceiling bounce
+                    if (yp > ceiling ) {
+		      //		       p.m_rdata.pos[1] = ceiling;
+		      //                       p.m_rdata.arr[2*AMREX_SPACEDIM+0] =  1.0 * rnd_wgt * p.m_rdata.arr[2*AMREX_SPACEDIM+0];
+		      //                       p.m_rdata.arr[2*AMREX_SPACEDIM+1] = -1.0 * rnd_wgt * p.m_rdata.arr[2*AMREX_SPACEDIM+1];
+		      //                       p.m_rdata.arr[2*AMREX_SPACEDIM+2] =  1.0 * rnd_wgt * p.m_rdata.arr[2*AMREX_SPACEDIM+2];
+		      p.pos(1) = ceiling;
+                       p.rdata(AMREX_SPACEDIM+0) =  1.0 * rnd_wgt * p.rdata(AMREX_SPACEDIM+0);
+                       p.rdata(AMREX_SPACEDIM+1) = -1.0 * rnd_wgt * p.rdata(AMREX_SPACEDIM+1);
+                       p.rdata(AMREX_SPACEDIM+2) =  1.0 * rnd_wgt * p.rdata(AMREX_SPACEDIM+2);
+		       
 		    }
 
+/**/		    
+
+		    
                 }
+
+		}
+		else { // just set forces to zero and dont update position, vel, or temp
+
+		  //    		      p.m_rdata.arr[2*AMREX_SPACEDIM+0+6] = 0.0;
+		  //    		      p.m_rdata.arr[2*AMREX_SPACEDIM+1+6] = 0.0;
+		  //    		      p.m_rdata.arr[2*AMREX_SPACEDIM+2+6] = 0.0;		      
+		  p.rdata(AMREX_SPACEDIM+0+6) = 0.0;
+		  p.rdata(AMREX_SPACEDIM+1+6) = 0.0;
+		  p.rdata(AMREX_SPACEDIM+2+6) = 0.0;		      
+
+		      
+		}; // gradual release if
 
 		/*
 		std::cout << " p.m_Xdata.arr dump (AFTER) \n";
@@ -371,7 +516,7 @@ p.m_rdata_arr[SPACEDIM+6] = particle density
 	//            std::cout << " *** myAdvectWithUmac: CP8 \n";
     }
 
-    //            std::cout << " *** myAdvectWithUmac: CP9 \n";
+    std::cout << " *** myAdvectWithUmac: CP9 \n";
 
     if (m_verbose > 1)
     {
@@ -489,23 +634,8 @@ ActiveParticleContainer::basicAdvectWithUmac (MultiFab* umac, int lev, Real dt)
                     {
 
                       // original
-		      p.m_rdata.arr[AMREX_SPACEDIM+dim] = p.m_rdata.pos[dim]; // copy pos at n-1/2 to arr
-		      p.m_rdata.pos[dim] += 0.5*dt*v[dim];                    // update pos for n
-
-		      //                      pos_lcl[dim] = p.m_rdata.pos[dim];
-		      //		      p.m_rdata.arr[AMREX_SPACEDIM+dim] = (1.0-wt0)*p.m_rdata.arr[AMREX_SPACEDIM+dim] + wt0*v[dim];
-		      //                      p.m_rdata.pos[dim] += 0.5*dt*(1.0-0.5*wt0)*p.m_rdata.arr[AMREX_SPACEDIM+dim] + 0.5*wt0*v[dim]; 
-
-                      // w/o adding fields
-		      //vp[dim] = p.m_rdata.arr[AMREX_SPACEDIM+dim];  // copy vel_p
-                      //vp[dim] = dt*(1.0-wt0)*vp[dim] + wt0*v[dim]; // update vel_p
-		      //p.m_rdata.arr[AMREX_SPACEDIM+dim] = p.m_rdata.pos[dim];  // copy pos at n-1/2 to arr
-		      //p.m_rdata.pos[dim] += 0.5*dt*vp[dim];                    // update pos for n
-
-		      //                      p.m_rdata.arr[2*AMREX_SPACEDIM+dim] = (1.0-wt0)*p.m_rdata.arr[2*AMREX_SPACEDIM+dim] + wt0*v[dim]; // update vel_p
-		      //		      p.m_rdata.pos[dim] += 0.5*dt*p.m_rdata.arr[2*AMREX_SPACEDIM+dim];                    // update pos for n
-
-		      //		      std::cout << "ipass 0: " << dim << " " << p.m_rdata.arr[AMREX_SPACEDIM+dim] << " " << p.m_rdata.pos[dim] << " " << v[dim] <<"\n";
+		      p.rdata(AMREX_SPACEDIM+dim) = p.pos(dim); // copy pos at n-1/2 to arr
+		      p.pos(dim) += 0.5*dt*v[dim];                    // update pos for n
 
                     }
                 }
@@ -516,20 +646,8 @@ ActiveParticleContainer::basicAdvectWithUmac (MultiFab* umac, int lev, Real dt)
 
 
                       // original
-		      p.m_rdata.pos[dim]  = p.m_rdata.arr[AMREX_SPACEDIM+dim] + dt*v[dim]; // update pos to n+1/2
-		      p.m_rdata.arr[AMREX_SPACEDIM+dim] = v[dim];                          // copy vel to arr, why?
-
-		      //                      p.m_rdata.pos[dim] = pos_lcl[dim] + dt*p.m_rdata.arr[AMREX_SPACEDIM+dim];
-		      //p.m_rdata.arr[AMREX_SPACEDIM+dim] = (1.0-wt0)*p.m_rdata.arr[AMREX_SPACEDIM+dim] + wt0*v[dim]; //already updated
-
-                      // w/o adding fields
-		      //p.m_rdata.pos[dim]  = p.m_rdata.arr[AMREX_SPACEDIM+dim] + dt*vp[dim]; // update pos to n+1/2
-		      //p.m_rdata.arr[AMREX_SPACEDIM+dim] = vp[dim];                          // copy vel to arr
-
-		      //		      p.m_rdata.pos[dim]  = p.m_rdata.arr[AMREX_SPACEDIM+dim] + dt*p.m_rdata.arr[2*AMREX_SPACEDIM+dim]; // update pos to n+1/2
-		      //		      p.m_rdata.arr[AMREX_SPACEDIM+dim] = p.m_rdata.arr[2*AMREX_SPACEDIM+dim];                          // copy vel to arr, why?
-
-		      //		      std::cout << "ipass 1: " << dim << " " << p.m_rdata.arr[AMREX_SPACEDIM+dim] << " " << p.m_rdata.pos[dim] << " " << v[dim] <<"\n";
+		      p.pos(dim) = p.rdata(AMREX_SPACEDIM+dim) + dt*v[dim]; // update pos to n+1/2
+		      p.rdata(AMREX_SPACEDIM+dim) = v[dim];                          // copy vel to arr, why?
 
                     }
                 }
@@ -849,7 +967,7 @@ ActiveParticleContainer::getDrag(FArrayBox& rhs, const FArrayBox& vel, const FAr
             const int nstride = particles.dataShape().first;
             const int np  = pti.numParticles();
 
-	    //            std::cout<< " ...checkpoint 4, level:" << level << "\n";
+            //std::cout<< " ...checkpoint 4, level:" << level << "\n";
 
 	    
 	    drag_cic( &ng, &nstride, &np, 
@@ -934,6 +1052,7 @@ ActiveParticleContainer::getTemp(FArrayBox& rhs, const FArrayBox& vel, const FAr
        const int nstride = particles.dataShape().first;
        const int np  = pti.numParticles();
 
+       std::cout<< " ...checkpoint 5, level:" << level << "\n";       
        temp_cic( &ng, &nstride, &np, 
                  box.loVect(), box.hiVect(), 
                  &nu_m, dx, plo,

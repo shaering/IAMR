@@ -41,6 +41,11 @@ public:
 
     virtual ~NavierStokes ();
 
+    //
+    // Floor small values of states to be extrapolated
+    //
+    void floor(amrex::MultiFab& mf);
+
     ////////////////////////////////////////////////////////////////////////////
     //    AmrLevel virtual functions                                          //
     ////////////////////////////////////////////////////////////////////////////
@@ -85,6 +90,24 @@ public:
                           int  iteration,
                           int  ncycle) override;
 
+    ////////////////////////////////////////////////////////////////////////////
+    //    NavierStokesBase public virtual functions                           //
+    ////////////////////////////////////////////////////////////////////////////
+
+    //
+    // Compute the mac sync correction.
+    //
+    virtual void mac_sync () override;
+    //
+    // Reflux function.
+    //
+    virtual void reflux () override;
+    //
+    // Calculate divU, which sets them to zero by default.
+    //
+    virtual void calc_divu (amrex::Real      time,
+			    amrex::Real      dt,
+			    amrex::MultiFab& fab) override;
 
     ////////////////////////////////////////////////////////////////////////////
     //    NavierStokes public static functions                                //
@@ -99,19 +122,22 @@ public:
     //
     static void variableCleanUp ();
 
+    ////////////////////////////////////////////////////////////////////////////
+    //    NavierStokes public functions                                       //
+    ////////////////////////////////////////////////////////////////////////////
+  
     //
     // Predict face velocities (before projection), estimate current cfl
     // from t^n cell-centered velocities (plus cfl and change_max)
     //
     amrex::Real predict_velocity (amrex::Real dt);
-  //OG    amrex::Real predict_velocity (amrex::Real dt, int level);
     //
     // Advect scalars.
     //
     void scalar_advection (amrex::Real dt,
                            int  first_scalar,
                            int  last_scalar);
-  
+
 protected:
 
     ////////////////////////////////////////////////////////////////////////////
@@ -119,18 +145,6 @@ protected:
     ////////////////////////////////////////////////////////////////////////////
 
     virtual void avgDown () override; // Average down for all the state types.
-    //
-    // Calculate divU, which sets them to zero by default.
-    //
-    virtual void calc_divu (amrex::Real      time,
-			    amrex::Real      dt,
-			    amrex::MultiFab& fab) override;
-    //
-    // Calculate dSdT, which sets them to zero by default.
-    //
-    virtual void calc_dsdt (amrex::Real      time,
-			    amrex::Real      dt,
-			    amrex::MultiFab& fab) override;
     //
     // Calculate nonuniform viscosity and diffusivity
     //
@@ -151,14 +165,6 @@ protected:
 			       int       num_comp,
 			       amrex::Real      time) override;
     //
-    // Compute the mac sync correction.
-    //
-    virtual void mac_sync () override;
-    //
-    // Reflux function.
-    //
-    virtual void reflux () override;
-    //
     virtual void sum_integrated_quantities () override;
     //
     virtual void velocity_diffusion_update (amrex::Real dt) override;
@@ -171,13 +177,6 @@ protected:
     static void Finalize ();
 
 private:
-
-    void center_to_edge_plain (const amrex::FArrayBox& ccfab,
-                               amrex::FArrayBox&       ecfab,
-			       const amrex::Box&       bx,
-			       int              sComp,
-                               int              dComp,
-                               int              nComp);
    
     void diffuse_velocity_setup (amrex::Real       dt,
 				 amrex::MultiFab*& delta_rhs,
