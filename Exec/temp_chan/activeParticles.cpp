@@ -123,10 +123,11 @@ ActiveParticleContainer::myAdvectWithUmac (MultiFab* umac, int lev, Real dt, Mul
             auto& aos  = ptile.GetArrayOfStructs();
             const int n = aos.numParticles();
             auto p_pbox = aos().data();
+
+	    
             const FArrayBox* fab[AMREX_SPACEDIM] = { AMREX_D_DECL(&((*umac_pointer[0])[grid]),
                                                                   &((*umac_pointer[1])[grid]),
                                                                   &((*umac_pointer[2])[grid])) };
-
             //array of these pointers to pass to the GPU
             amrex::GpuArray<amrex::Array4<const Real>, AMREX_SPACEDIM>
             const umacarr {AMREX_D_DECL((*fab[0]).array(),
@@ -136,6 +137,7 @@ ActiveParticleContainer::myAdvectWithUmac (MultiFab* umac, int lev, Real dt, Mul
 
 	    
             // same thing for density
+            /*
             const FArrayBox* rfab[AMREX_SPACEDIM] = { AMREX_D_DECL(&((*rho_pointer[0])[grid]),
                                                                    &((*rho_pointer[0])[grid]),
                                                                    &((*rho_pointer[0])[grid])) };
@@ -143,10 +145,12 @@ ActiveParticleContainer::myAdvectWithUmac (MultiFab* umac, int lev, Real dt, Mul
 	    const rhoarr {AMREX_D_DECL((*rfab[0]).array(),
                                        (*rfab[0]).array(),
                                        (*rfab[0]).array() )};
-	    /**/
+	    */
 
 	    
-            // same thing for temp
+
+	    // same thing for temp => this part is fine
+	    /*
             const FArrayBox* tfab[AMREX_SPACEDIM] = { AMREX_D_DECL(&((*temp_pointer[0])[grid]),
                                                                    &((*temp_pointer[0])[grid]),
                                                                    &((*temp_pointer[0])[grid])) };
@@ -154,7 +158,7 @@ ActiveParticleContainer::myAdvectWithUmac (MultiFab* umac, int lev, Real dt, Mul
 	    const temparr {AMREX_D_DECL((*tfab[0]).array(),
                                         (*tfab[0]).array(),
                                         (*tfab[0]).array() )};
-	    /**/
+	    */
 
 
             amrex::ParallelFor(n,
@@ -163,27 +167,33 @@ ActiveParticleContainer::myAdvectWithUmac (MultiFab* umac, int lev, Real dt, Mul
 
                 ParticleType& p = p_pbox[i];
                 if (p.id() <= 0) return;
-		std::cout << " IPASS " << ipass << "\n";
-		std::cout << i  << ": particle pos: " << p.pos(0) << " " << p.pos(1) << " " << p.pos(2) << "\n";
+		//std::cout << " IPASS " << ipass << "\n";
+		//std::cout << i  << ": particle pos: " << p.pos(0) << " " << p.pos(1) << " " << p.pos(2) << "\n";
                 Real v[AMREX_SPACEDIM];
                 mac_interpolate(p, plo, dxi, umacarr, v);
-                std::cout << i << ":     Mac_inerp vel okay\n"; //<< i << ":" << v[0] << " " << v[1] << " " << v[2] << " \n";
-
-                // same thing for density
-                //ParticleType& p = p_pbox[i];
-                Real rho_f[1];
-		//std::cout << "box: " << p_pbox->loVect() << " " << p_pbox->hiVect();
-                mac_interpolate(p, plo, dxi, rhoarr, rho_f); //segfault is apparently due to rhoarr being too large for p
-                std::cout << i << ":     Mac_inerp rho okay\n"; //<< i << ":" << rho_f[0] << " " << " \n";
-		/**/
+                //std::cout << i << ":     Mac_inerp vel okay\n"; //<< i << ":" << v[0] << " " << v[1] << " " << v[2] << " \n";
+		//std::cout << "dump" << (*fab[0]).array() << "\n";
 
 		
-                // same thing for temp
-                Real temp_f[1];
-                mac_interpolate(p, plo, dxi, temparr, temp_f);
-		/**/
-                std::cout << i << ":     Mac_inerp temp okay\n";		
+                // same thing for temp => this part screws everything up, must be a problem with mac_interp
+		
+                Real temp_f[AMREX_SPACEDIM];
+		
+		//                mac_interpolate(p, plo, dxi, temparr, temp_f);
 
+                //std::cout << i << ":     Mac_inerp temp okay\n";
+
+                // same thing for density
+		
+                //ParticleType& p = p_pbox[i];
+                Real rho_f[AMREX_SPACEDIM];
+		//std::cout << "box: " << p_pbox->loVect() << " " << p_pbox->hiVect();
+		//                mac_interpolate(p, plo, dxi, rhoarr, rho_f); //segfault is apparently due to rhoarr being too large for p
+                //std::cout << i << ":     Mac_inerp rho okay\n"; //<< i << ":" << rho_f[0] << " " << " \n";
+		
+
+		rho_f[0] = {1.0};
+	        temp_f[0] = {373.0};
 
                 // soldati 2009
 		//  	        Real dia_p = p.m_rdata.arr[AMREX_SPACEDIM+7];
@@ -217,7 +227,7 @@ ActiveParticleContainer::myAdvectWithUmac (MultiFab* umac, int lev, Real dt, Mul
 
 
 
-		
+		/*
                 std::cout << " *** myAdvectWithUmac: CP5 \n";
                 std::cout << "     Data (nu_m, d, rho_p, rho_f, T_f, vdiff, Re_p, tau_p, CT, wto) " 
                           << nu_m << " " 
@@ -230,8 +240,9 @@ ActiveParticleContainer::myAdvectWithUmac (MultiFab* umac, int lev, Real dt, Mul
                           << tau_p << " " 
                           << CT << " " 
                           << wt0 << "\n";
-		
+		*/
 
+		/*
 		std::cout << " p.m_Xdata.arr dump (PRIOR) \n";
 		std::cout << " ================== \n";
 		std::cout << "(vxp)" << v[0] << "\n";
@@ -256,7 +267,7 @@ ActiveParticleContainer::myAdvectWithUmac (MultiFab* umac, int lev, Real dt, Mul
 		//std::cout << "(?)" << p.rdata(13) << "\n";
 		//std::cout << "(?)" <<  p.rdata(14) << "\n";
 		//std::cout << "(?)" <<  p.rdata(15) << "\n";
-		/**/
+		*/
 
 		
 /*
@@ -516,7 +527,7 @@ p.m_rdata_arr[SPACEDIM+6] = particle density
 	//            std::cout << " *** myAdvectWithUmac: CP8 \n";
     }
 
-    std::cout << " *** myAdvectWithUmac: CP9 \n";
+    //std::cout << " *** myAdvectWithUmac: CP9 \n";
 
     if (m_verbose > 1)
     {
