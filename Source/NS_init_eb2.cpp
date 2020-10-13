@@ -311,6 +311,307 @@ initialize_EB2 (const Geometry& geom, const int required_coarsening_level,
     EB2::Build(gshop, geom, required_coarsening_level, max_coarsening_level);
 
   }
+
+  else if (geom_type == "Impingement-Effusion")
+  {
+    
+    // Initialise parameters
+    //    int some_int = 1;
+    Real r_top = 0.5;
+    Real r_bot = 0.3; //0.397747565; //0.5;
+    Real l_chan = 1.0;
+    Real l_top = 0.5;
+    Real l_bot = 0.5;        
+    Real theta_bot = 0.0;
+    const Real pi = 3.14159265359;
+    Vector<Real> center_top(3);
+    Vector<Real> center_bot(3);
+    Vector<Real> clip_offset(3);    
+    //    Vector<Real> plt1pt(3);
+    //    Vector<Real> plt2pt(3);
+    //    Vector<Real> plnm(3);
+
+    std::cout << " >>> EB: Impingement-Effusion selected <<<\n";
+
+    // center of both cylinder and length
+    center_top[0] = 2.5;    
+    center_top[1] = 2.75;
+    center_top[2] = 1.0;
+
+    /* pi/8
+    center_bot[0] = 1.5;
+    center_bot[1] = -0.5;    
+    center_bot[2] = 1.0;
+    */
+
+    // ok with pi/4
+    //    center_bot[0] = 2.6;
+    //    center_bot[1] = -0.5;    
+    //    center_bot[2] = 3.0;
+
+
+    center_bot[0] = 2.7;
+    center_bot[1] = -0.5;    
+    center_bot[2] = 3.0;
+     
+
+    /*
+    center_bot[0] = 2.65;
+    center_bot[1] = -0.5;    
+    center_bot[2] = 3.0;        
+    */
+
+    // Get information from inputs file.
+    //    ParmParse pp("IE");
+    //    pp.query("some_int",       some_int);
+    //    pp.query("radius_top",     r_top);
+    //    pp.query("radius_bottom",  r_bot);
+    //    pp.query("channel_height", l_chan);
+    //    pp.query("impTube_length", l_top);
+    //    pp.query("effTube_length", l_bot);    
+    //    pp.getarr("center_top",    center_top, 0, 3); // fix these vector inputs...
+    //    pp.getarr("center_bottom", center_bot, 0, 3);
+    
+    Array<Real,3> center1 = {center_top[0], center_top[1], center_top[2]};
+    Array<Real,3> center2 = {center_bot[0], center_bot[1], center_bot[2]};
+    Array<Real,3> center3 = {center_bot[0], 1.0, center_bot[2]};
+
+    Array<Real,3> center4 = {2.5, 0.0, 1.0};
+    Array<Real,3> center5 = {2.25, 0.0, 1.0};            
+
+    // Build the implicit function as a union of two cylinders and
+    // a center channel with one cylinder at an angle
+    // EB2::CylinderIF cf(radius, length (l/2 from center in each direction), direction, center, has_fluid_inside);
+
+    // top 
+    EB2::CylinderIF cyl1(r_top, 1.0, 1, center1, false);
+
+    // bottom
+    const Real a_rot = -1.0*pi/3.0;
+    EB2::CylinderIF cyl2t(r_bot, 6.0, 1, {0.0,0.0,0.0}, false);
+    auto cyl2r = EB2::rotate(cyl2t, a_rot, 2);
+    auto cyl2 = EB2::translate(cyl2r, center2);
+
+
+    // chamfer shape
+    Real offset = r_bot*tan(-a_rot) + 0.05;
+    Real clip_h = 0.2;
+    clip_offset[0] = center_bot[0] + 1.0*tan(-a_rot) - offset;
+    clip_offset[1] = 0.5;
+    clip_offset[2] = center_bot[2];
+    EB2::CylinderIF cyl4t(1.0*r_bot, 2.0*clip_h, 1, {0.0,0.0,0.0}, false); // clip edge    
+    auto cyl4 = EB2::translate(cyl4t, {clip_offset[0],clip_offset[1],clip_offset[2]});
+
+    EB2::BoxIF cboxt({-offset/2.0, -clip_h, -r_bot}, {offset/2.0, clip_h, r_bot}, false);
+    auto cboxr = EB2::rotate(cboxt, pi/2.0 + a_rot, 2);    
+    clip_offset[0] = center_bot[0] + 1.0*tan(-a_rot) - 0.5*offset;
+    clip_offset[1] = 0.5; // - 0.5*offset*tan(pi/2.0 + a_rot);
+    clip_offset[2] = center_bot[2];    
+    auto cbox = EB2::translate(cboxt, {clip_offset[0],clip_offset[1],clip_offset[2]});
+
+    auto chamfer = EB2::makeUnion(cbox,cyl4);
+
+
+    // ouflow chamfer 
+    offset = r_bot*tan(-a_rot) + 0.05;
+    clip_h = 0.2;
+    clip_offset[0] = center_bot[0] - 1.5*tan(-a_rot) + offset;
+    clip_offset[1] = -2.0;
+    clip_offset[2] = center_bot[2];
+    EB2::CylinderIF cyl5t(1.0*r_bot, 2.0*clip_h, 1, {0.0,0.0,0.0}, false); // clip edge    
+    auto cyl5 = EB2::translate(cyl5t, {clip_offset[0],clip_offset[1],clip_offset[2]});
+    
+    
+    // top and bottom solid spaces
+    EB2::BoxIF box5({-1.0, -1.5, -1.0}, {7.0, 0.5, 5.0}, false);
+    EB2::BoxIF box6({-1.0, 2.5, -1.0}, {7.0, 3.0, 5.0}, false);
+
+
+    //    auto domain_temp = EB2::makeDifference(box5,cyl2);    
+
+    //    auto domain_temp3 = EB2::makeDifference(box5,cyl2);
+    //    auto domain_temp = EB2::makeDifference(domain_temp3,chamfer);
+
+    auto domain_temp3 = EB2::makeDifference(box5,cyl2);
+    auto domain_temp4 = EB2::makeDifference(domain_temp3,chamfer);
+    auto domain_temp = EB2::makeDifference(domain_temp4,cyl5); // adjust ith bttom chamber if desired
+    
+    
+    auto domain_temp2 = EB2::makeDifference(box6,cyl1);    
+    auto domain = EB2::makeUnion(domain_temp,domain_temp2);        
+    
+    auto gshop = EB2::makeShop(domain);        
+    EB2::Build(gshop, geom, required_coarsening_level, max_coarsening_level);
+
+    
+  }
+
+
+    else if (geom_type == "Impinging-Jet")
+  {
+    
+    // Initialise parameters
+    //    int some_int = 1;
+    Real l_chan = 1.0;
+    Real l_top = 0.6;
+    Real l_bot = 0.4;
+    Real theta_bot = 0.0;
+    const Real pi = 3.14159265359;
+    Vector<Real> center_top(3);
+    Vector<Real> center_mid(3);
+    Vector<Real> cp_top(3);    
+    Real r_top = 0.25;
+    Real r_mid = 0.2;    
+    Real r_bot = 0.1;
+    Real thickness = 0.1;
+    Real delta = 0.4;
+    EB2::SplineIF Nozzle;
+    std::vector<amrex::RealVect> lnpts;
+    amrex::RealVect p;    
+
+
+    std::cout << " >>> EB: Impinging Jet selected <<<\n";
+
+    // center of both cylinder and length
+    center_top[0] = 2.0;    
+    center_top[1] = 3.0;
+    center_top[2] = 2.0;
+
+    Real temp0 = 3.0 - 0.5*(l_top+l_bot);
+    center_mid[0] = 2.0;    
+    center_mid[1] = temp0;
+    center_mid[2] = 2.0;        
+
+    Real extra = 0.1;
+    
+    // Nozzle shape:: lathe operation must be about z-axis!
+    
+    //top out
+    /*
+    p = amrex::RealVect(D_DECL(0.0, 0.0, -extra));    
+    lnpts.push_back(p);
+    p = amrex::RealVect(D_DECL(0.0, r_top, -extra));
+    lnpts.push_back(p);
+    Nozzle.addLineElement(lnpts);
+    lnpts.clear();
+    */
+
+    /*
+    p = amrex::RealVect(D_DECL(0.0, r_top+thickness, -extra));    
+    lnpts.push_back(p);
+    p = amrex::RealVect(D_DECL(0.0, r_top, -extra));
+    lnpts.push_back(p);
+    Nozzle.addLineElement(lnpts);
+    lnpts.clear();    
+    */
+    
+    p = amrex::RealVect(D_DECL(0.0, r_top, 0.0));
+    lnpts.push_back(p);
+    p = amrex::RealVect(D_DECL(0.0, r_mid, l_top));
+    lnpts.push_back(p);
+    Nozzle.addLineElement(lnpts);
+    lnpts.clear();
+
+    p = amrex::RealVect(D_DECL(0.0, r_mid, l_top));    
+    lnpts.push_back(p);
+    p = amrex::RealVect(D_DECL(0.0, r_bot, l_top+l_bot+extra));
+    lnpts.push_back(p);
+    Nozzle.addLineElement(lnpts);
+    lnpts.clear();
+
+    // bottom in
+    /*
+    p = amrex::RealVect(D_DECL(0.0,r_bot,l_top+l_bot+extra));
+    lnpts.push_back(p);
+    p = amrex::RealVect(D_DECL(0.0,0.0,l_top+l_bot+extra));
+    lnpts.push_back(p);
+    Nozzle.addLineElement(lnpts);
+    lnpts.clear();
+    */
+
+    /*
+    p = amrex::RealVect(D_DECL(0.0,r_bot,l_top+l_bot+extra));
+    lnpts.push_back(p);
+    p = amrex::RealVect(D_DECL(0.0,r_top+thickness,l_top+l_bot+extra));
+    lnpts.push_back(p);
+    Nozzle.addLineElement(lnpts);
+    lnpts.clear();    
+    */
+
+
+    //center line
+    /*
+    p = amrex::RealVect(D_DECL(0.0,r_top+thickness,l_top+l_bot+extra));    
+    lnpts.push_back(p);
+    p = amrex::RealVect(D_DECL(0.0, r_top+thickness, -extra));
+    lnpts.push_back(p);
+    Nozzle.addLineElement(lnpts);
+    lnpts.clear();
+    */
+
+
+    
+    // outer cylinder
+    Real temp1 = r_top + thickness; 
+    Real temp2 = l_top + l_bot;
+    EB2::CylinderIF cyl(temp1, temp2, 1, {center_mid[0],center_mid[1],center_mid[2]}, false);
+    // EB2::CylinderIF cyl_inner(r_top, temp2+delta, 1, {center_mid[0],center_mid[1],center_mid[2]}, false);
+
+    EB2::BoxIF box({0.0, 2.0, 0.0}, {4.0, 3.0, 4.0},false);
+    auto box2 = EB2::makeDifference(box,cyl);        
+
+    // full nozzle shape -> 3d shape with z-axis
+    auto noz1 = EB2::lathe(Nozzle);
+
+    // rotate nozzle about x-axis to make verticle, shift first to center at origin
+    auto snoz = EB2::translate(noz1, {0.0, 0.0, -0.5*(l_top+l_bot)});    
+    const Real a_rot = -pi/2.0;
+    auto noz2 = EB2::rotate(snoz, a_rot, 0);
+
+    // translate to final position
+    auto revolveNozzle = EB2::translate(noz2, {center_mid[0],center_mid[1],center_mid[2]});
+
+    // full EB-nozzle shape
+    //    auto NozzleCylinder = EB2::makeDifference(cyl,revolveNozzle);
+    //    auto NozzleCylinder = EB2::makeDifference(box,revolveNozzle);
+    auto NozzleCylinder = EB2::makeUnion(box2,revolveNozzle);        
+    //    auto NozzleCylinder = EB2::makeUnion(cyl,revolveNozzle);    
+    //    auto NozzleCylinder = EB2::makeDifference(cyl,cyl_inner);    
+    
+    auto gshop = EB2::makeShop(NozzleCylinder);
+    //    auto gshop = EB2::makeShop(revolveNozzle);    
+    EB2::Build(gshop, geom, required_coarsening_level, max_coarsening_level);
+    
+  }
+
+  
+    else if (geom_type == "Flat-Plate")
+  {
+    
+    // Initialise parameters
+    //    int some_int = 1;
+    Real r_top = 0.5;
+    Real r_bot = 0.5;
+    Real l_chan = 1.0;
+    Real l_top = 0.5;
+    Real l_bot = 0.5;        
+    Real theta_bot = 0.0;
+    const Real pi = 3.14159265359;
+    Vector<Real> center_top(3);
+    Vector<Real> center_bot(3);
+    //    Vector<Real> plt1pt(3);
+    //    Vector<Real> plt2pt(3);
+    //    Vector<Real> plnm(3);
+
+    std::cout << " >>> EB: Flat Plate selected <<<\n";
+    
+    EB2::BoxIF box({0.0, 0.0, 0.0}, {8.0, 0.1, 1.0}, false);
+    auto gshop = EB2::makeShop(box);    
+    EB2::Build(gshop, geom, required_coarsening_level, max_coarsening_level);
+    
+  }  
+
+  
   else
 #endif
   {

@@ -692,6 +692,9 @@ public:
     static int        radius_grow;
     static int        verbose;
     static amrex::Real       gravity;
+    static amrex::Real       Fx;
+    static amrex::Real       Fy;
+    static amrex::Real       Fz;    
     static int        NUM_SCALARS;      // number of non-velocity components
     static int        NUM_STATE;        // total number of state variables
 #ifdef AMREX_USE_EB
@@ -737,6 +740,7 @@ public:
     static int  do_tracer_ref;
     static int  do_tracer2_ref;
     static int  do_vorticity_ref;
+    static int  do_reg_ref;  
     static int  do_temp_ref;
     static int  do_scalar_update_in_order;  // Flags to allow evaluation of source terms
     static amrex::Vector<int> scalarUpdateOrder;

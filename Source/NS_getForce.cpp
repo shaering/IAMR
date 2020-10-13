@@ -172,34 +172,42 @@ NavierStokesBase::getForce (FArrayBox&       force,
      AMREX_ALWAYS_ASSERT(ncomp>=AMREX_SPACEDIM);
    }
 
+   // make these readable
+   Real alpha = 0.01;
+   Real Tref = 300.0;
+   
    if ( scomp==Xvel ){
      //
      // TODO: add some switch for user-supplied/problem-dependent forcing
      //
      auto const& frc  = force.array(scomp);
      auto const& scal = Scal.array(scalScomp);
+     auto const& Fp = rhs.array(scomp);
 
-     if ( std::abs(grav) > 0.0001) {
-       amrex::ParallelFor(bx, [frc, scal, grav]
+     //     if ( std::abs(grav) > 0.0001) {
+       amrex::ParallelFor(bx, [frc, scal, grav, Fp]
        AMREX_GPU_DEVICE(int i, int j, int k) noexcept
        {
-	 frc(i,j,k,0) = 0.0_rt;
+	 frc(i,j,k,0) = Fp(i,j,k,0); // + scal(i,j,k,0)*Fx; //0.0_rt;
 #if ( AMREX_SPACEDIM == 2 )
-         frc(i,j,k,1) = grav*scal(i,j,k,0);
+         frc(i,j,k,1) = Fp(i,j,k,1); // + scal(i,j,k,0)*Fy; // + grav*scal(i,j,k,0)*alpha*(scal(i,j,k,0)-Tref);  //grav*scal(i,j,k,0);
 #elif ( AMREX_SPACEDIM == 3 )
-         frc(i,j,k,1) = 0.0_rt;
-         frc(i,j,k,2) = grav*scal(i,j,k,0);
+	 frc(i,j,k,1) = Fp(i,j,k,1); // + scal(i,j,k,0)*Fy; //0.0_rt;
+	 frc(i,j,k,2) = Fp(i,j,k,2); // + scal(i,j,k,0)*Fz; //grav*scal(i,j,k,0);
 #endif
        });
-     }
-     else {
-       force.setVal<RunOn::Gpu>(0.0, bx, Xvel, AMREX_SPACEDIM);
+       //     }
+     
+       //     else {
+       //       force.setVal<RunOn::Gpu>(0.0, bx, Xvel, AMREX_SPACEDIM);
+       
        // amrex::ParallelFor(bx, AMREX_SPACEDIM, [frc]
        // AMREX_GPU_DEVICE(int i, int j, int k, int n) noexcept
        // {
        // 	 frc(i,j,k,n) = 0.0_rt;
        // });
-     }
+       
+       //     }
    }
    //
    // Scalar forcing

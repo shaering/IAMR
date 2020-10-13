@@ -2,14 +2,14 @@
 #            SIMULATION STOP            #
 #.......................................#
 #stop_time               =   100.0         # Max (simulated) time to evolve
-max_step                =  5000           # Max number of time steps
+max_step                =  1000           # Max number of time steps
 #max_step                =  2
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #           SOLVER SETTINGS             #
 #.......................................#
 ns.init_shrink     = 0.1
-ns.init_dt         = 1.0e-1
+ns.init_dt         = 1.0e-2
 ns.change_max      = 1.1
 ns.init_iter       = 3
 ns.init_vel_iter   = 5
@@ -63,7 +63,7 @@ particles.timestamp_indices = 1
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #        ADAPTIVE MESH REFINEMENT       #
 #.......................................#
-amr.n_cell              =   48 32 32    # Grid cells at coarsest AMRlevel
+amr.n_cell              =   48 36 32    # Grid cells at coarsest AMRlevel
 #amr.n_cell              =   96 64 64    # Grid cells at coarsest AMRlevel
 #amr.n_cell              =   192 128 128   # Grid cells at coarsest AMRlevel
 amr.max_level           =   0           # Max AMR level in hierarchy
@@ -72,7 +72,7 @@ amr.n_error_buf         =   1
 amr.max_grid_size_x     =   1024
 amr.max_grid_size_y     =   512
 amr.max_grid_size_z     =   512
-amr.blocking_factor     =   8
+amr.blocking_factor     =   4
 amr.ref_ratio		=   2
 amr.regrid_int          =   100
 #amr.refine_grid_layout  =   1
@@ -81,7 +81,7 @@ amr.regrid_int          =   100
 #              GEOMETRY                 #
 #.......................................#
 geometry.coord_sys      =   0
-geometry.prob_lo        =   0.  -1.0  0.   # Lo corner coordinates
+geometry.prob_lo        =   0.  -1.5  0.   # Lo corner coordinates
 geometry.prob_hi        =   6.  3.0  4.    # Hi corner coordinates
 geometry.is_periodic    =   1   0   1   # Periodicity x y z (0/1)
 #geometry.is_periodic    =   0   0   0
@@ -115,9 +115,9 @@ eb2.geom_type                 = Impingement-Effusion
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #              VERBOSITY                #
 #.......................................#
-ns.v                    = 0 # NS solver
-proj.v                  = 0 # Nodal projection
-mac_proj.verbose        = 0 # MacProjector
-nodal_proj.verbose      = 0 # Nodal projection
-ns.getForceVerbose      = 0
-verbose                 = 0
+ns.v                    = 1 # NS solver
+proj.v                  = 1 # Nodal projection
+mac_proj.verbose        = 1 # MacProjector
+nodal_proj.verbose      = 1 # Nodal projection
+ns.getForceVerbose      = 1
+verbose                 = 1

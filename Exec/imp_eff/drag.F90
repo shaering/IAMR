@@ -92,26 +92,25 @@ contains
 
 !       print*, "... in drag_cic (lo_x, hi_x, ng): ", lo(1),hi(1),ng
 
-!       print*, " "
-!       print*, " (DRAG) PARTICLE No. ", n, "(stride: )", ns, 2*3+3+4
-!       print*, "==================="
-!       print*, "    particle dump: 1 (xp)", particles(1,n)
-!       print*, "    particle dump: 2 (yp)", particles(2,n)
-!       print*, "    particle dump: 3 (zp)", particles(3,n)
-!       print*, "    particle dump: 4 (*)", particles(4,n)
-!       print*, "    particle dump: 5 (*)", particles(5,n)
-!       print*, "    particle dump: 6 (*)", particles(6,n)
-!       print*, "    particle dump: 7 (up)", particles(7,n)
-!       print*, "    particle dump: 8 (vp)", particles(8,n)
-!       print*, "    particle dump: 9 (wp)", particles(9,n)
-!       print*, "    particle dump: 10 (Tp)", particles(10,n)
-!       print*, "    particle dump: 11 (dp)", particles(11,n)
-!       print*, "    particle dump: 12 (rhop)", particles(12,n)
-!       print*, "    particle dump: 13 (Fxp)", particles(13,n)
-!       print*, "    particle dump: 14 (Fyp)", particles(14,n)
-!       print*, "    particle dump: 15 (Fzp)", particles(15,n)
-!       print*, "    particle dump: 16 (FTp)", particles(16,n)
-!!       print*, "    particle dump: 17 (?)", particles(17,n)
+       print*, " "
+       print*, " (DRAG) PARTICLE No. ", n, "(stride: )", ns, 2*3+3+4
+       print*, "==================="
+       print*, "    particle dump: 1 (xp)", particles(1,n)
+       print*, "    particle dump: 2 (yp)", particles(2,n)
+       print*, "    particle dump: 3 (zp)", particles(3,n)
+       print*, "    particle dump: 4 (*)", particles(4,n)
+       print*, "    particle dump: 5 (*)", particles(5,n)
+       print*, "    particle dump: 6 (*)", particles(6,n)
+       print*, "    particle dump: 7 (up)", particles(7,n)
+       print*, "    particle dump: 8 (vp)", particles(8,n)
+       print*, "    particle dump: 9 (wp)", particles(9,n)
+       print*, "    particle dump: 10 (Tp)", particles(10,n)
+       print*, "    particle dump: 11 (dp)", particles(11,n)
+       print*, "    particle dump: 12 (rhop)", particles(12,n)
+       print*, "    particle dump: 13 (Fxp)", particles(13,n)
+       print*, "    particle dump: 14 (Fyp)", particles(14,n)
+       print*, "    particle dump: 15 (Fzp)", particles(15,n)
+       print*, "    particle dump: 16 (FTp)", particles(16,n)
 
 
        ! scaled location of particle: (pos - lower corner of tile)*1/dx = x_p/dx (relative to tile)

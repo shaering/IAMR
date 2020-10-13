@@ -76,6 +76,9 @@ int  NavierStokesBase::jet_interval_split = 2;
 int  NavierStokesBase::radius_grow = 1;
 int  NavierStokesBase::verbose     = 0;
 Real NavierStokesBase::gravity     = 0.0;
+Real NavierStokesBase::Fx          = 0.0;
+Real NavierStokesBase::Fy          = 0.0;
+Real NavierStokesBase::Fz          = 0.0;
 int  NavierStokesBase::NUM_SCALARS = 0;
 int  NavierStokesBase::NUM_STATE   = 0;
 
@@ -108,6 +111,7 @@ int         NavierStokesBase::do_density_ref            = 0;
 int         NavierStokesBase::do_tracer_ref             = 0;
 int         NavierStokesBase::do_tracer2_ref            = 0;
 int         NavierStokesBase::do_vorticity_ref          = 0;
+int         NavierStokesBase::do_reg_ref                = 0;
 int         NavierStokesBase::do_temp_ref               = 0;
 int         NavierStokesBase::do_scalar_update_in_order = 0;
 Vector<int>  NavierStokesBase::scalarUpdateOrder;
@@ -414,6 +418,9 @@ NavierStokesBase::Initialize ()
     pp.query("jet_interval",jet_interval);
     pp.query("jet_interval_split",jet_interval_split);
     pp.query("gravity",gravity);
+    pp.query("Fx",Fx);
+    pp.query("Fy",Fy);
+    pp.query("Fz",Fz);
     //
     // Get run options.
     //
@@ -433,6 +440,7 @@ NavierStokesBase::Initialize ()
     pp.query("do_tracer_ref",            do_tracer_ref    );
     pp.query("do_tracer2_ref",           do_tracer2_ref   );
     pp.query("do_vorticity_ref",         do_vorticity_ref );
+    pp.query("do_reg_ref",               do_reg_ref       );    
     pp.query("do_temp_ref",              do_temp_ref      );
 
     pp.query("visc_tol",visc_tol);
@@ -1432,13 +1440,14 @@ NavierStokesBase::estTimeStep ()
     // so no need to account for explicit part of viscous term
     //
     MultiFab tforces(grids,dmap,AMREX_SPACEDIM,0,MFInfo(),Factory());
+    tforces.setVal(0.0);    
 
-      const BoxArray& ba = S_new.boxArray();
-      const DistributionMapping& dm = S_new.DistributionMap();
-      int ncomp = S_new.nComp();
-      int ngrow = S_new.nGrow();
-      MultiFab rhs(ba,dm,ncomp,ngrow);
-      rhs.setVal(0.0);
+    const BoxArray& ba = S_new.boxArray();
+    const DistributionMapping& dm = S_new.DistributionMap();
+    int ncomp = S_new.nComp();
+    int ngrow = S_new.nGrow();
+    MultiFab rhs(ba,dm,ncomp,ngrow);
+    rhs.setVal(0.0);
     
 
 #ifdef _OPENMP
@@ -1457,6 +1466,7 @@ NavierStokesBase::estTimeStep ()
                                << "------------------" << '\n';
 	    }       
        getForce(tforces_fab,bx,0,0,AMREX_SPACEDIM,cur_time,S_new[mfi],S_new[mfi],rhs[mfi],Density);
+	    //getForce(tforces_fab,bx,0,0,AMREX_SPACEDIM,cur_time,U_new[mfi],S_new[mfi],rhs[mfi],Density);	    
 
        const auto& rho   = rho_ctime.array(mfi);  
        const auto& gradp = Gp.array(mfi); 
@@ -3069,7 +3079,8 @@ NavierStokesBase::scalar_advection_update (Real dt,
             Scal.plus<RunOn::Host>(S_new[Rho_mfi],bx,Density,0,NUM_SCALARS);
             Scal.mult<RunOn::Host>(0.5,bx);
 
-            if (NavierStokes::initial_iter != true) {	    
+	    //            if (NavierStokes::initial_iter != true) {
+            if (NavierStokes::initial_step != true) {	    	    
 	    theNSPC()->getTemp(rhs[Rho_mfi],Vel,Scal,visc_coef[0],ngrow,level);
 	    }
 	}
@@ -3078,9 +3089,7 @@ NavierStokesBase::scalar_advection_update (Real dt,
 
 
 
-  
-  
-        FArrayBox  tforces;
+        FArrayBox tforces;
 
         for (MFIter Rho_mfi(rho_halftime,TilingIfNotGPU()); Rho_mfi.isValid(); ++Rho_mfi)
         {
@@ -3726,7 +3735,8 @@ NavierStokesBase::velocity_advection (Real dt)
 #ifdef AMREX_PARTICLES	   
            for (MFIter U_mfi(Umf,true); U_mfi.isValid(); ++U_mfi)
            {
- 	      if (NavierStokes::initial_iter != true) {	     
+	     // 	      if (NavierStokes::initial_iter != true) {
+ 	      if (NavierStokes::initial_step != true) {	     	     
 	      theNSPC()->getDrag(rhs[U_mfi],Umf[U_mfi],Smf[U_mfi],visc_coef[0],1,level);
 	      }
 	   }
@@ -3984,7 +3994,8 @@ NavierStokesBase::velocity_advection_update (Real dt)
         if (getForceVerbose) amrex::Print() << "Calling getForce..." << '\n';
         const Real half_time = 0.5*(state[State_Type].prevTime()+state[State_Type].curTime());
 
-       if (NavierStokes::initial_iter != true) {
+	//       if (NavierStokes::initial_iter != true) {
+       if (NavierStokes::initial_step != true) {	 
        theNSPC()->getDrag(rhs[mfi],VelFAB,ScalFAB,visc_coef[0],1,level);
        }
     }
@@ -4147,7 +4158,8 @@ NavierStokesBase::initial_velocity_diffusion_update (Real dt)
 #ifdef AMREX_PARTICLES	  	   
         for (MFIter mfi(tforces,TilingIfNotGPU()); mfi.isValid(); ++mfi)
         {
-           if (NavierStokes::initial_iter != true) {	     
+	  //           if (NavierStokes::initial_iter != true) {
+           if (NavierStokes::initial_step != true) {	     	  
 	   theNSPC()->getDrag(rhs[mfi],U_old[mfi],U_old[mfi],visc_coef[0],1,level);
 	   }
         }

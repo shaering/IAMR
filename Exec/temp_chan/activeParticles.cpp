@@ -243,8 +243,9 @@ ActiveParticleContainer::myAdvectWithUmac (MultiFab* umac, int lev, Real dt, Mul
 		*/
 
 		/*
-		std::cout << " p.m_Xdata.arr dump (PRIOR) \n";
-		std::cout << " ================== \n";
+		std::cout << " Particle Dump (activeParticles.cpp): \n";
+		std::cout << " ==================================== \n";
+		std::cout << "n " << n << " i " << i << "\n";		
 		std::cout << "(vxp)" << v[0] << "\n";
 		std::cout << "(vyp)" << v[1] << "\n";
 		std::cout << "(vzp)" << v[2] << "\n";		
@@ -264,9 +265,6 @@ ActiveParticleContainer::myAdvectWithUmac (MultiFab* umac, int lev, Real dt, Mul
 		std::cout << "(Fyp)" << p.rdata(10) << "\n";
 		std::cout << "(Fzp)" << p.rdata(11) << "\n";
 		std::cout << "(FTp)" << p.rdata(12) << "\n";
-		//std::cout << "(?)" << p.rdata(13) << "\n";
-		//std::cout << "(?)" <<  p.rdata(14) << "\n";
-		//std::cout << "(?)" <<  p.rdata(15) << "\n";
 		*/
 
 		
@@ -1063,7 +1061,7 @@ ActiveParticleContainer::getTemp(FArrayBox& rhs, const FArrayBox& vel, const FAr
        const int nstride = particles.dataShape().first;
        const int np  = pti.numParticles();
 
-       std::cout<< " ...checkpoint 5, level:" << level << "\n";       
+       //       std::cout<< " ...checkpoint 5, level:" << level << "\n";       
        temp_cic( &ng, &nstride, &np, 
                  box.loVect(), box.hiVect(), 
                  &nu_m, dx, plo,

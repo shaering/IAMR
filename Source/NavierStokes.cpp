@@ -562,7 +562,8 @@ NavierStokes::predict_velocity (Real  dt)
             FArrayBox& Sfab = Smf[U_mfi];
 	    FArrayBox& rfab = rhs[U_mfi];
 
-	    if (NavierStokes::initial_iter != true) {	    
+	    //	    if (NavierStokes::initial_iter != true) {
+	    if (NavierStokes::initial_step != true) {	    	    
 	    theNSPC()->getDrag(rfab,Ufab,Sfab,visc_coef[0],1,level);
 	    }
 
@@ -692,7 +693,8 @@ NavierStokes::scalar_advection (Real dt,
 #ifdef AMREX_PARTICLES   
    for (MFIter S_mfi(Smf,true); S_mfi.isValid(); ++S_mfi)
    {
-      if (NavierStokes::initial_iter != true) {	         
+     //      if (NavierStokes::initial_iter != true) {
+      if (NavierStokes::initial_step != true) {	    	    	
       theNSPC()->getTemp(rhs[S_mfi],Umf[S_mfi],Smf[S_mfi],visc_coef[0],ngrow,level);
       }
    }
@@ -892,6 +894,7 @@ NavierStokes::scalar_update (Real dt,
        {
 	 Print() << "New scalar " << sigma << " contains Nans" << '\n';
 	 exit(0);
+	 //S_new.setVal(1.0);
        }
     }
 }
@@ -1193,6 +1196,7 @@ NavierStokes::sum_integrated_quantities ()
     Real trac = 0.0;
     Real energy = 0.0;
     Real mgvort = 0.0;
+    Real regrad = 0.0;    
 #if defined(DO_IAMR_FORCE)
     Real forcing = 0.0;
 #endif
@@ -1207,6 +1211,7 @@ NavierStokes::sum_integrated_quantities ()
 	trac += ns_level.volWgtSum("tracer",time);
         energy += ns_level.volWgtSum("energy",time);
         mgvort = std::max(mgvort,ns_level.MaxVal("mag_vort",time));
+        regrad = std::max(regrad,ns_level.MaxVal("re_grad",time));	
 #if defined(DO_IAMR_FORCE)
         forcing += ns_level.volWgtSum("forcing",time);
 #endif
@@ -1221,6 +1226,7 @@ NavierStokes::sum_integrated_quantities ()
     Print().SetPrecision(12) << "TIME= " << time << " KENG= " << energy << '\n';
     Print().SetPrecision(12) << "TIME= " << time << " MAGVORT= " << mgvort << '\n';
     Print().SetPrecision(12) << "TIME= " << time << " ENERGY= " << energy << '\n';
+    Print().SetPrecision(12) << "TIME= " << time << " RE_G= " << regrad << '\n';    
 #if defined(DO_IAMR_FORCE)
     //NOTE: FORCING_T gives only the energy being injected by the forcing
     //      term used for generating turbulence in probtype 14, 15.

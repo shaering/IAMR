@@ -344,6 +344,11 @@ NavierStokes::variableSetUp ()
     derive_lst.addComponent("mag_vort",desc_lst,State_Type,Xvel,BL_SPACEDIM);
 #if (BL_SPACEDIM == 3)
     //
+    // gradient-based Reynolds number
+    //
+    derive_lst.add("re_grad",IndexType::TheCellType(),1,DeriveFunc3D(derregrad_old),grow_box_by_one);
+    derive_lst.addComponent("re_grad",desc_lst,State_Type,Xvel,BL_SPACEDIM);
+    //
     //  vorticity vector field
     //
     derive_lst.add("vort_x",IndexType::TheCellType(),1,dervortx,grow_box_by_one);

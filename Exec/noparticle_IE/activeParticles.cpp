@@ -167,7 +167,7 @@ ActiveParticleContainer::myAdvectWithUmac (MultiFab* umac, int lev, Real dt, Mul
 
                 ParticleType& p = p_pbox[i];
                 if (p.id() <= 0) return;
-		std::cout << " IPASS " << ipass << "\n";
+		//std::cout << " IPASS " << ipass << "\n";
 		//std::cout << i  << ": particle pos: " << p.pos(0) << " " << p.pos(1) << " " << p.pos(2) << "\n";
                 Real v[AMREX_SPACEDIM];
                 mac_interpolate(p, plo, dxi, umacarr, v);
@@ -227,7 +227,7 @@ ActiveParticleContainer::myAdvectWithUmac (MultiFab* umac, int lev, Real dt, Mul
 
 
 
-		
+		/*
                 std::cout << " *** myAdvectWithUmac: CP5 \n";
                 std::cout << "     Data (nu_m, d, rho_p, rho_f, T_f, vdiff, Re_p, tau_p, CT, wto) " 
                           << nu_m << " " 
@@ -240,9 +240,9 @@ ActiveParticleContainer::myAdvectWithUmac (MultiFab* umac, int lev, Real dt, Mul
                           << tau_p << " " 
                           << CT << " " 
                           << wt0 << "\n";
-		
+		*/
 
-		/**/
+		/*
 		std::cout << " Particle Dump (activeParticles.cpp): \n";
 		std::cout << " ==================================== \n";
 		std::cout << "n " << n << " i " << i << "\n";		
@@ -265,7 +265,7 @@ ActiveParticleContainer::myAdvectWithUmac (MultiFab* umac, int lev, Real dt, Mul
 		std::cout << "(Fyp)" << p.rdata(10) << "\n";
 		std::cout << "(Fzp)" << p.rdata(11) << "\n";
 		std::cout << "(FTp)" << p.rdata(12) << "\n";
-		/**/
+		*/
 
 		
 /*
@@ -324,7 +324,7 @@ p.m_rdata_arr[SPACEDIM+6] = particle density
 		//		z_bot = 1.0;		
 		//		r_bot = 0.5;
 
-                const Real a_rot = -1.0*pi/6.0;		
+                const Real a_rot = -1.0*pi/3.0;
 		x_bot = 2.7 + 1.0*tan(a_rot);
 		z_bot = 3.0;		
 		r_bot = 0.3;
@@ -344,7 +344,7 @@ p.m_rdata_arr[SPACEDIM+6] = particle density
                 Real rnd_wgt;		
 
 		t_freq = 0.1;
-		gradual_release_flag = 0; // set this to zero except from gradual release in imp-eff
+		gradual_release_flag = 1; // set this to zero except from gradual release in imp-eff
 		p_cutoff = std::round(time/t_freq);
 		//		std::cout << "*** particle: " << i << "\n";
 		//		std::cout << "*** time: " << time << "\n";
@@ -390,8 +390,7 @@ p.m_rdata_arr[SPACEDIM+6] = particle density
 		  //		    zp = p.m_rdata.arr[AMREX_SPACEDIM+2]; //p.m_rdata.pos[2];
 		    xp = p.rdata(0); //p.m_rdata.pos[0];
 		    yp = p.rdata(1); //p.m_rdata.pos[1];
-		    zp = p.rdata(2); //p.m_rdata.pos[2];
-		    
+		    zp = p.rdata(2); //p.m_rdata.pos[2];		    
       	            rp_top = sqrt( (xp-x_top)*(xp-x_top) + (zp-z_top)*(zp-z_top) );
 	            rp_bot = sqrt( (xp-x_bot)*(xp-x_bot) + (zp-z_bot)*(zp-z_bot) );
 
@@ -404,7 +403,7 @@ p.m_rdata_arr[SPACEDIM+6] = particle density
                     for (int dim=0; dim < AMREX_SPACEDIM; dim++)
                     {
 
-                      //original
+                      // original
 		      // p.m_rdata.pos[dim] = p.m_rdata.arr[AMREX_SPACEDIM+dim] + dt*v[dim]; // update pos to full dt
 		      // p.m_rdata.arr[AMREX_SPACEDIM+dim] = v[dim];                         // copy vel to arr, why?
 
@@ -412,32 +411,23 @@ p.m_rdata_arr[SPACEDIM+6] = particle density
 		      //		      p.m_rdata.pos[dim] = p.m_rdata.arr[AMREX_SPACEDIM+dim] + dt*p.m_rdata.arr[2*AMREX_SPACEDIM+dim];  // update pos to full dt
 		      //		      p.m_rdata.arr[AMREX_SPACEDIM+dim] = p.m_rdata.arr[2*AMREX_SPACEDIM+dim];                          // copy vel to arr, why?
 
-
-
-
-		      
-		      
-		      
                       p.rdata(AMREX_SPACEDIM+dim) = (1.0-wt0)*p.rdata(AMREX_SPACEDIM+dim) + wt0*v[dim]; // update vel_p
 		      p.pos(dim) = p.rdata(dim) + dt*p.rdata(AMREX_SPACEDIM+dim);  // update pos to full dt
-		      p.rdata(dim) = p.rdata(AMREX_SPACEDIM+dim);                          // copy vel to arr, why?
-
-
-		      /**/
+		      p.rdata(dim) = p.rdata(AMREX_SPACEDIM+dim);                          // copy vel to arr, why?		      
 
                       // update force to reuse
-    		      p.rdata(2*AMREX_SPACEDIM+dim+3) = CT/tau_p * (v[dim]-p.rdata(AMREX_SPACEDIM+dim));
+		      //    		      p.m_rdata.arr[2*AMREX_SPACEDIM+dim+6] = CT/tau_p * (v[dim]-p.m_rdata.arr[2*AMREX_SPACEDIM+dim]);
+    		      p.rdata(2*AMREX_SPACEDIM+dim+3) = CT/tau_p * (v[dim]-p.rdata(AMREX_SPACEDIM+dim));		      
 
-		      /**/
                     }
 
 		    
                     // update particle temp, make alpha readable HARDCODE HARDCODE HARDCODE
-		    /**/
-		    
+		    //    		    p.m_rdata.arr[9] += 0.01 * dt * (temp_f[0]-p.m_rdata.arr[9]);
+		    //    		    p.m_rdata.arr[2*AMREX_SPACEDIM+3+6] = 0.01 * (temp_f[0]-p.m_rdata.arr[9]);
     		    p.rdata(2*AMREX_SPACEDIM-1+1) += 0.01 * dt * (temp_f[0]-p.rdata(2*AMREX_SPACEDIM-1+1));
     		    p.rdata(2*AMREX_SPACEDIM+6) = 0.01 * (temp_f[0]-p.rdata(2*AMREX_SPACEDIM-1+1));		    
-		    /**/
+
 
 		    // hack for reflection or sticking ==> this should be changed to some global wall distance, manual changes now 
 		    //srand( (unsigned)time( NULL ) );
@@ -516,7 +506,7 @@ p.m_rdata_arr[SPACEDIM+6] = particle density
 		       theta_p = atan(norm_z/norm_x);
 
 		       ur_prime = p.rdata(AMREX_SPACEDIM+0) * cos(theta_p) + p.rdata(AMREX_SPACEDIM+2) * sin(theta_p);
-		       ut_prime = -1.0 * p.rdata(AMREX_SPACEDIM+0) * sin(theta_p) + p.rdata(AMREX_SPACEDIM+2) * cos(theta_p);
+		    ut_prime = -1.0 * p.rdata(AMREX_SPACEDIM+0) * sin(theta_p) + p.rdata(AMREX_SPACEDIM+2) * cos(theta_p);
 
 		       // flip wall vel
 		       ur_prime = -ur_prime; 
