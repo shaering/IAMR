@@ -113,6 +113,7 @@ NavierStokes::initData ()
         const int* p_lo    = Pfab.loVect();
         const int* p_hi    = Pfab.hiVect();
 
+	std::cout << " SETTING INITIAL FIELD VIA FORT_INITDATA " << Xvel << "/" << BL_SPACEDIM << "\n";
         FORT_INITDATA (&level,&cur_time,lo,hi,&ns,
                        Sfab.dataPtr(Xvel),
                        Sfab.dataPtr(BL_SPACEDIM),
@@ -120,6 +121,7 @@ NavierStokes::initData ()
                        Pfab.dataPtr(),
                        ARLIM(p_lo), ARLIM(p_hi),
                        dx,gridloc.lo(),gridloc.hi() );
+	
     }
 
 #ifdef AMREX_USE_EB

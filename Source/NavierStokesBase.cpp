@@ -21,6 +21,8 @@
 
 #include <PROB_NS_F.H>
 
+#include <AMReX_EBMultiFabUtil.H>
+
 //fixme, for writesingle level plotfile
 #include<AMReX_PlotFileUtil.H>
 
@@ -1446,10 +1448,13 @@ NavierStokesBase::estTimeStep ()
     const DistributionMapping& dm = S_new.DistributionMap();
     int ncomp = S_new.nComp();
     int ngrow = S_new.nGrow();
-    MultiFab rhs(ba,dm,ncomp,ngrow);
+    //MultiFab rhs(ba,dm,ncomp,ngrow);
+    MultiFab rhs(grids,dmap,AMREX_SPACEDIM,0,MFInfo(),Factory());    
     rhs.setVal(0.0);
     
 
+    EB_set_covered(S_new,0.0);    
+    
 #ifdef _OPENMP
 #pragma omp parallel if (Gpu::notInLaunchRegion())
 #endif
@@ -1470,15 +1475,17 @@ NavierStokesBase::estTimeStep ()
 
        const auto& rho   = rho_ctime.array(mfi);  
        const auto& gradp = Gp.array(mfi); 
-       const auto& force = tforces.array(mfi);
-       amrex::ParallelFor(bx, [rho, gradp, force] 
+       const auto& force = tforces.array(mfi); 
+       const auto& scal = S_new.array(mfi);      
+       amrex::ParallelFor(bx, [rho, gradp, force, scal] 
        AMREX_GPU_DEVICE(int i, int j, int k) noexcept
        {
           Real rho_inv = 1.0/rho(i,j,k);
           for (int n = 0; n < AMREX_SPACEDIM; n++) {
              force(i,j,k,n) -= gradp(i,j,k,n);
              force(i,j,k,n) *= rho_inv;
-          } 
+	     //if (scal(i,j,k,n)>=2.0) std::cout << "BAD SCALAR " << n << " (" << scal(i,j,k,n) << ") at: " << i << " " << j << " " << k << "\n";	     
+          }
        });
     }
 
@@ -3080,7 +3087,7 @@ NavierStokesBase::scalar_advection_update (Real dt,
             Scal.mult<RunOn::Host>(0.5,bx);
 
 	    //            if (NavierStokes::initial_iter != true) {
-            if (NavierStokes::initial_step != true) {	    	    
+            if (NavierStokes::initial_step != true && NavierStokes::initial_iter != true) {	    	    
 	    theNSPC()->getTemp(rhs[Rho_mfi],Vel,Scal,visc_coef[0],ngrow,level);
 	    }
 	}
@@ -3736,7 +3743,7 @@ NavierStokesBase::velocity_advection (Real dt)
            for (MFIter U_mfi(Umf,true); U_mfi.isValid(); ++U_mfi)
            {
 	     // 	      if (NavierStokes::initial_iter != true) {
- 	      if (NavierStokes::initial_step != true) {	     	     
+ 	      if (NavierStokes::initial_step != true && NavierStokes::initial_iter != true) {	     	     
 	      theNSPC()->getDrag(rhs[U_mfi],Umf[U_mfi],Smf[U_mfi],visc_coef[0],1,level);
 	      }
 	   }
@@ -3954,11 +3961,12 @@ NavierStokesBase::velocity_advection_update (Real dt)
 
 
     // particle bit
-    const BoxArray& ba = U_old.boxArray();
-    const DistributionMapping& dm = U_old.DistributionMap();
-    int ncomp = U_old.nComp();
-    int ngrow = U_old.nGrow();
-    MultiFab rhs(ba,dm,ncomp,ngrow);
+    const BoxArray& ba = U_new.boxArray();
+    const DistributionMapping& dm = U_new.DistributionMap();
+    int ncomp = U_new.nComp();
+    int ngrow = U_new.nGrow();
+    //MultiFab rhs(ba,dm,ncomp,ngrow);
+    MultiFab rhs(ba,dm,ncomp,0);    
     rhs.setVal(0.0);
 
     

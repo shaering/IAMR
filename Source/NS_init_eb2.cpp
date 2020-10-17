@@ -394,6 +394,7 @@ initialize_EB2 (const Geometry& geom, const int required_coarsening_level,
 
 
     // chamfer shape
+    /**/
     Real offset = r_bot*tan(-a_rot) + 0.05;
     Real clip_h = 0.2;
     clip_offset[0] = center_bot[0] + 1.0*tan(-a_rot) - offset;
@@ -410,9 +411,10 @@ initialize_EB2 (const Geometry& geom, const int required_coarsening_level,
     auto cbox = EB2::translate(cboxt, {clip_offset[0],clip_offset[1],clip_offset[2]});
 
     auto chamfer = EB2::makeUnion(cbox,cyl4);
+    /**/
 
-
-    // ouflow chamfer 
+    // ouflow chamfer
+    /**/
     offset = r_bot*tan(-a_rot) + 0.05;
     clip_h = 0.2;
     clip_offset[0] = center_bot[0] - 1.5*tan(-a_rot) + offset;
@@ -420,27 +422,29 @@ initialize_EB2 (const Geometry& geom, const int required_coarsening_level,
     clip_offset[2] = center_bot[2];
     EB2::CylinderIF cyl5t(1.0*r_bot, 2.0*clip_h, 1, {0.0,0.0,0.0}, false); // clip edge    
     auto cyl5 = EB2::translate(cyl5t, {clip_offset[0],clip_offset[1],clip_offset[2]});
-    
+    /**/
     
     // top and bottom solid spaces
-    EB2::BoxIF box5({-1.0, -1.5, -1.0}, {7.0, 0.5, 5.0}, false);
-    EB2::BoxIF box6({-1.0, 2.5, -1.0}, {7.0, 3.0, 5.0}, false);
+    EB2::BoxIF box5({0.0, -1.5, 0.0}, {6.0, 0.5, 4.0}, false);
+    EB2::BoxIF box6({0.0, 2.5, 0.0}, {6.0, 3.0, 4.0}, false);
 
 
-    //    auto domain_temp = EB2::makeDifference(box5,cyl2);    
+    auto domain_temp = EB2::makeDifference(box5,cyl2);    
 
     //    auto domain_temp3 = EB2::makeDifference(box5,cyl2);
     //    auto domain_temp = EB2::makeDifference(domain_temp3,chamfer);
 
-    auto domain_temp3 = EB2::makeDifference(box5,cyl2);
-    auto domain_temp4 = EB2::makeDifference(domain_temp3,chamfer);
-    auto domain_temp = EB2::makeDifference(domain_temp4,cyl5); // adjust ith bttom chamber if desired
+    //    auto domain_temp3 = EB2::makeDifference(box5,cyl2);
+    //    auto domain_temp4 = EB2::makeDifference(domain_temp3,chamfer);
+    //    auto domain_temp = EB2::makeDifference(domain_temp4,cyl5); // adjust ith bttom chamber if desired
     
     
     auto domain_temp2 = EB2::makeDifference(box6,cyl1);    
     auto domain = EB2::makeUnion(domain_temp,domain_temp2);        
     
-    auto gshop = EB2::makeShop(domain);        
+    //    auto gshop = EB2::makeShop(domain);
+    auto gshop = EB2::makeShop(domain_temp2);        // ONLY TOP BIT
+    //auto gshop = EB2::makeShop(domain_temp);        // ONLY BOT BIT        
     EB2::Build(gshop, geom, required_coarsening_level, max_coarsening_level);
 
     

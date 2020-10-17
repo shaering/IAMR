@@ -38,7 +38,7 @@ NavierStokesBase::getForce (FArrayBox&       force,
 
    const Real* VelDataPtr  = Vel.dataPtr();
    const Real* ScalDataPtr = Scal.dataPtr(scalScomp);
-   const Real* rhoDataPtr  = Scal.dataPtr(scalScomp); // should be density, only 0 or Density gets passed
+   const Real* rhoDataPtr  = Scal.dataPtr(0); // should be density, only 0 or Density gets passed
    const Real* uDataPtr    = Vel.dataPtr(0);
    const Real* vDataPtr    = Vel.dataPtr(1);
    const Real* wDataPtr    = Vel.dataPtr(2);   
@@ -99,13 +99,19 @@ NavierStokesBase::getForce (FArrayBox&       force,
       Vector<Real> velmin(AMREX_SPACEDIM), velmax(AMREX_SPACEDIM);
       Vector<Real> scalmin(NUM_SCALARS), scalmax(NUM_SCALARS);
       for (int n=0; n<AMREX_SPACEDIM; n++) {
-          velmin[n]= 1.e234;
-          velmax[n]=-1.e234;
+          velmin[n]= 1.0e15;
+          velmax[n]=-1.0e15;
       }
+
       int ix = v_hi[0]-v_lo[0]+1;
       int jx = v_hi[1]-v_lo[1]+1;
 #if (AMREX_SPACEDIM == 3)
       int kx = v_hi[2]-v_lo[2]+1;
+
+      int imax[AMREX_SPACEDIM], jmax[AMREX_SPACEDIM], kmax[AMREX_SPACEDIM];
+      int imin[AMREX_SPACEDIM], jmin[AMREX_SPACEDIM], kmin[AMREX_SPACEDIM];
+      int bad_v=0;
+      
       for (int k=0; k<kx; k++) {
 #endif
          for (int j=0; j<jx; j++) {
@@ -117,8 +123,27 @@ NavierStokesBase::getForce (FArrayBox&       force,
                   int cell = (n*jx+j)*ix+i;
 #endif
                   Real v = VelDataPtr[cell];
-                  if (v<velmin[n]) velmin[n] = v;
-                  if (v>velmax[n]) velmax[n] = v;
+                  if (v<velmin[n])
+		    {
+		    velmin[n] = v;
+		    imin[n] = i;
+		    jmin[n] = j;
+		    kmin[n] = k;		    
+		    }
+                  if (v>velmax[n])
+		    {
+		    velmax[n] = v;
+		    imax[n] = i;
+		    jmax[n] = j;
+		    kmax[n] = k;		    
+		    }
+		  
+                  if (v>2.0)
+		    {
+		      bad_v = bad_v + 1;
+		      //std::cout << n << " BAD DATA (vel) : " << v << " at (" << i << ", " << j << ", " << k << ")\n";
+		    }		    		  
+		  
                }
             }
          }
@@ -126,12 +151,18 @@ NavierStokesBase::getForce (FArrayBox&       force,
       }
 #endif
       for (int n=0; n<AMREX_SPACEDIM; n++) 
-         amrex::Print() << "Vel  " << n << " min/max " 
-                        << velmin[n] << " / " << velmax[n] << std::endl;
+	amrex::Print() << "Vel  " << n << " min/max " << velmin[n] << " / " << velmax[n] << " at (" << imin[n] << ", " << jmin[n] << ", " << kmin[n] << ") / (" << imax[n] << ", " << jmax[n] << ", " << kmax[n] << ")" << std::endl;
+	amrex::Print() << "Number of potentially bad vel points: " << bad_v  << std::endl;      
 
+
+
+      int ismax[NUM_SCALARS], jsmax[NUM_SCALARS], ksmax[NUM_SCALARS];
+      int ismin[NUM_SCALARS], jsmin[NUM_SCALARS], ksmin[NUM_SCALARS];
+      int bad_s=0;
+      
       for (int n=0; n<NUM_SCALARS; n++) {
-         scalmin[n]= 1.e234;
-         scalmax[n]=-1.e234;
+         scalmin[n]= 1.0e15;
+         scalmax[n]=-1.e15;
       }
       ix = s_hi[0]-s_lo[0]+1;
       jx = s_hi[1]-s_lo[1]+1;
@@ -148,8 +179,28 @@ NavierStokesBase::getForce (FArrayBox&       force,
                   int cell = (n*jx+j)*ix+i;
 #endif
                   Real s = ScalDataPtr[cell];
-                  if (s<scalmin[n]) scalmin[n] = s;
-                  if (s>scalmax[n]) scalmax[n] = s;
+		  
+                  if (s<scalmin[n])
+		    {
+		    scalmin[n] = s;
+		    ismin[n] = i;
+		    jsmin[n] = j;
+		    ksmin[n] = k;		    
+		    }		  
+                  if (s>scalmax[n])
+		    {
+		    scalmax[n] = s;
+		    ismax[n] = i;
+		    jsmax[n] = j;
+		    ksmax[n] = k;		    
+		    }
+		  
+                  if (std::abs(s)>400.0)
+		    {
+		      bad_s = bad_s + 1;
+		      //std::cout << n << " BAD DATA (scal): " << s << " at (" << i << ", " << j << ", " << k << ")\n";
+		    }
+		 
                }
             }
          }
@@ -157,8 +208,10 @@ NavierStokesBase::getForce (FArrayBox&       force,
       }
 #endif
       for (int n=0; n<NUM_SCALARS; n++) 
-         amrex::Print() << "Scal " << n << " min/max " << scalmin[n] 
-                        << " / " << scalmax[n] << std::endl;
+         amrex::Print() << "Scal " << n << " min/max " << scalmin[n] << " / " << scalmax[n] << " at (" << ismin[n] << ", " << jsmin[n] << ", " << ksmin[n] << ") / (" << ismax[n] << ", " << jsmax[n] << ", " << ksmax[n] << ")" << std::endl;
+	amrex::Print() << "Number of potentially bad scalar points: " << bad_s  << std::endl;      
+
+      
    } //end if(getForceVerbose)
 
    RealBox gridloc = RealBox(bx,geom.CellSize(),geom.ProbLo());
