@@ -2,7 +2,7 @@
 #            SIMULATION STOP            #
 #.......................................#
 #stop_time               =   100.0         # Max (simulated) time to evolve
-max_step                =  5000           # Max number of time steps
+max_step                =  4000           # Max number of time steps
 #max_step                =  2
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
@@ -30,9 +30,9 @@ ns.cfl               = 0.5
 #.......................................#
 amr.plot_int            =   50          # Steps between plot files
 #amr.plot_per            =   5.0         # Time between plot files
-amr.check_int           =   100        # Steps between checkpoint files
-amr.restart             =   ""         # Checkpoint to restart from
-#amr.restart             =   "chk00100.temp"
+amr.check_int           =   10        # Steps between checkpoint files
+#amr.restart             =   ""         # Checkpoint to restart from
+amr.restart             =  "chk00500.temp"
 amr.derive_plot_vars    = re_grad particle_count mag_vort
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
@@ -47,8 +47,8 @@ ns.gravity          =   0.0
 ns.Fx               =   0.
 ns.Fy               =   0.
 ns.Fz               =   0.
-ns.vel_visc_coef    = 3.5e-4
-ns.temp_cond_coef   = 2.0e-4
+ns.vel_visc_coef    = 1.0e-3
+ns.temp_cond_coef   = 1.5e-3
 ns.scal_diff_coefs  = 0.0
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
@@ -63,16 +63,16 @@ particles.timestamp_indices = 1
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #        ADAPTIVE MESH REFINEMENT       #
 #.......................................#
-amr.n_cell              =   48 36 32    # Grid cells at coarsest AMRlevel
-#amr.n_cell              =   96 64 64    # Grid cells at coarsest AMRlevel
-#amr.n_cell              =   192 128 128   # Grid cells at coarsest AMRlevel
-amr.max_level           =   1           # Max AMR level in hierarchy
+#amr.n_cell              =   24 20 16     # Grid cells at coarsest AMRlevel
+amr.n_cell              =   48 40 32    # Grid cells at coarsest AMRlevel
+#amr.n_cell              =   128 128 128   # Grid cells at coarsest AMRlevel
+amr.max_level           =   0           # Max AMR level in hierarchy
 amr.grid_eff            =   0.7
 amr.n_error_buf         =   1
 amr.max_grid_size_x     =   1024
 amr.max_grid_size_y     =   512
 amr.max_grid_size_z     =   512
-amr.blocking_factor     =   4
+amr.blocking_factor     =   8
 amr.ref_ratio		=   2
 amr.regrid_int          =   10
 #amr.refine_grid_layout  =   1
@@ -81,43 +81,48 @@ amr.regrid_int          =   10
 #              GEOMETRY                 #
 #.......................................#
 geometry.coord_sys      =   0
-geometry.prob_lo        =   0.  -1.5  0.   # Lo corner coordinates
-geometry.prob_hi        =   6.  3.0  4.    # Hi corner coordinates
+geometry.prob_lo        =   0.  0.  0.   # Lo corner coordinates
+geometry.prob_hi        =   3.  2.5  2.    # Hi corner coordinates
 geometry.is_periodic    =   1   0   1   # Periodicity x y z (0/1)
 #geometry.is_periodic    =   0   0   0
 
 # 0 = Interior/Periodic  3 = Symmetry
 # 1 = Inflow             4 = SlipWall
 # 2 = Outflow            5 = NoSlipWall
-# Boundary conditions on the low end of the domain.
+
 ns.lo_bc 	     	= 0 2 0
-# Boundary conditions on the high end of the domain.
 ns.hi_bc   	      	= 0 1 0
 
-#ns.lo_bc 	     	= 3 2 3
-#ns.hi_bc   	      	= 3 1 3
+#ns.lo_bc 	     	= 2 2 2
+#ns.hi_bc   	      	= 2 1 2
 
 # EB stuff
-eb2.geom_type                 = Impingement-Effusion
-#eb2.geom_type                 = cylinder
-#eb2.cylinder_has_fluid_inside = 0
-#eb2.cylinder_radius           = 0.25
-#eb2.cylinder_direction        = 2
-#eb2.cylinder_center           = 2.5  1.0  0.0
+eb2.geom_type      = Impingement-Effusion
+eb2.radius_top     = 0.5
+eb2.radius_bottom  = 0.3
+eb2.chamber_height = 1.0
+eb2.impTube_height = 0.5
+eb2.effTube_height = 0.5
+#eb2.effTube_az     = -0.33333333333
+eb2.effTube_az     = 0.0
+eb2.effTube_ay     = 0.0
+eb2.center_top     = 0.75 2.25 1.25
+eb2.center_bottom  = 1.75 0.75 1.0
+
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #              DEBUG                    #
 #.......................................#
-amrex.fpe_trap_invalid = 1
-amrex.fpe_trap_zero = 1
-amrex.fpe_trap_overflow = 1
+#amrex.fpe_trap_invalid = 1
+#amrex.fpe_trap_zero = 1
+#amrex.fpe_trap_overflow = 1
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #              VERBOSITY                #
 #.......................................#
 ns.v                    = 1 # NS solver
-proj.v                  = 1 # Nodal projection
-mac_proj.verbose        = 1 # MacProjector
+proj.v                  = 3 # Nodal projection
+mac_proj.verbose        = 3 # MacProjector
 nodal_proj.verbose      = 3 # Nodal projection
 ns.getForceVerbose      = 1
 verbose                 = 1

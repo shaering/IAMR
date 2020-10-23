@@ -1471,7 +1471,6 @@ NavierStokesBase::estTimeStep ()
                                << "------------------" << '\n';
 	    }       
        getForce(tforces_fab,bx,0,0,AMREX_SPACEDIM,cur_time,S_new[mfi],S_new[mfi],rhs[mfi],Density);
-	    //getForce(tforces_fab,bx,0,0,AMREX_SPACEDIM,cur_time,U_new[mfi],S_new[mfi],rhs[mfi],Density);	    
 
        const auto& rho   = rho_ctime.array(mfi);  
        const auto& gradp = Gp.array(mfi); 
@@ -1482,6 +1481,7 @@ NavierStokesBase::estTimeStep ()
        {
           Real rho_inv = 1.0/rho(i,j,k);
           for (int n = 0; n < AMREX_SPACEDIM; n++) {
+	    //	     force(i,j,k,n) = 0.0; // HACK HACK HACK	    
              force(i,j,k,n) -= gradp(i,j,k,n);
              force(i,j,k,n) *= rho_inv;
 	     //if (scal(i,j,k,n)>=2.0) std::cout << "BAD SCALAR " << n << " (" << scal(i,j,k,n) << ") at: " << i << " " << j << " " << k << "\n";	     
@@ -4054,13 +4054,17 @@ NavierStokesBase::velocity_advection_update (Real dt)
         {
            edg2cen_average(i,j,k,D_DECL(umac,vmac,wmac),vel);
            for (int n = 0; n < numscal; n++) {
-              scal(i,j,k,n) = 0.5 * ( scal_o(i,j,k,n) + scal_n(i,j,k,n) );
+	     scal(i,j,k,n) = 0.5 * ( scal_o(i,j,k,n) + scal_n(i,j,k,n) );
            }
+           //  HACK HACK HACK
+	   //scal(i,j,k,0) = 1.0;
+	   //scal(i,j,k,1) = 0.0; 
         });
 
         if (getForceVerbose) amrex::Print() << "Calling getForce..." << '\n';
         const Real half_time = 0.5*(state[State_Type].prevTime()+state[State_Type].curTime());
         tforces.resize(bx,AMREX_SPACEDIM);
+	rhs[mfi].resize(bx,AMREX_SPACEDIM);
         Elixir tf_i = tforces.elixir();
         getForce(tforces,bx,0,Xvel,AMREX_SPACEDIM,half_time,VelFAB,ScalFAB,rhs[mfi],0);
 

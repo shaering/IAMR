@@ -214,6 +214,14 @@ subroutine amrex_probinit (init,name,namlen,problo,probhi) bind(c)
             end do
          end do
       end do
+      
+
+      vel(:,:,:,1) = 0.0d0
+      vel(:,:,:,2) = 0.0d0
+      vel(:,:,:,3) = 0.0d0      
+      scal(:,:,:,1) = 1.0d0
+      scal(:,:,:,2) = 0.0d0      
+      scal(:,:,:,3) = 293.0d0      
 
    end subroutine FORT_INITDATA
 
@@ -904,7 +912,8 @@ subroutine amrex_probinit (init,name,namlen,problo,probhi) bind(c)
          do i = ARG_L1(u), domlo(1)-1
             do k = ARG_L3(u), ARG_H3(u)
                do j = ARG_L2(u), ARG_H2(u)
-                  u(i,j,k) = 0.0d0
+                  !                  u(i,j,k) = 0.0d0
+                  u(i,j,k) = u(i+1,j,k)                  
                end do
 	    end do
 	 end do
@@ -915,7 +924,8 @@ subroutine amrex_probinit (init,name,namlen,problo,probhi) bind(c)
          do i = domhi(1)+1, ARG_H1(u)
             do k = ARG_L3(u), ARG_H3(u)
                do j = ARG_L2(u), ARG_H2(u)
-                  u(i,j,k) = 0.0d0
+                  !                  u(i,j,k) = 0.0d0
+                  u(i,j,k) = u(i-1,j,k)                  
                end do
 	    end do
 	 end do
@@ -973,7 +983,8 @@ subroutine amrex_probinit (init,name,namlen,problo,probhi) bind(c)
          do k = ARG_L3(u), domlo(3)-1
             do j = ARG_L2(u), ARG_H2(u)
                do i = ARG_L1(u), ARG_H1(u)
-                  u(i,j,k) = 0.0d0
+                  !                  u(i,j,k) = 0.0d0
+                  u(i,j,k) = u(i,j,k+1)                  
                end do
             end do
          end do
@@ -984,7 +995,8 @@ subroutine amrex_probinit (init,name,namlen,problo,probhi) bind(c)
          do k = domhi(3)+1, ARG_H3(u)
             do j = ARG_L2(u), ARG_H2(u)
                do i = ARG_L1(u), ARG_H1(u)
-                  u(i,j,k) = 0.0d0
+                  !                  u(i,j,k) = 0.0d0
+                  u(i,j,k) = u(i,j,k-1)           
                end do
             end do
          end do
@@ -1082,21 +1094,23 @@ subroutine amrex_probinit (init,name,namlen,problo,probhi) bind(c)
 !      yc = 0.5*(domnhi(2) - domnlo(2))
 !      zc = 0.5*(domnhi(3) - domnlo(3))      
 
+! GET THIS FROM INPUT
+      
       ! geom descriptions, should make this connected to EB2 file
-      x_top = 2.5d0 ! center of top cylinder
-      z_top = 1.0d0
+      x_top = 0.75d0 ! center of top cylinder 
+      z_top = 1.25d0
       r_top = 0.5d0
       
-      x_bot = 1.5d0 ! center of bottom cylinder
-      z_bot = 1.0d0
+      x_bot = 2.0d0 ! center of bottom cylinder
+      z_bot = 2.0d0
       r_bot = 0.5d0
 
       gvar = r_top/10.0d0
 
       pi = 3.14159265359D0
       Lf = pi/r_top      
-      twidth = 1.0d0
-      toffset = 2.5d0
+      twidth = 2.0d0 !1.0d0
+      toffset = 5.0d0 !2.5d0
       factor = 0.5d0 * (tanh(time/twidth-toffset)+1.0d0)
 
       unsteady = (sin((time/twidth)*pi) + 10.0d0)/10.0d0
@@ -1115,7 +1129,8 @@ subroutine amrex_probinit (init,name,namlen,problo,probhi) bind(c)
          do i = ARG_L1(v), domlo(1)-1
             do k = ARG_L3(v), ARG_H3(v)
                do j = ARG_L2(v), ARG_H2(v)
-                  v(i,j,k) = 0.0d0
+                  !                  v(i,j,k) = 0.0d0
+                  v(i,j,k) = v(i+1,j,k) ! fix this
                end do
 	    end do
 	 end do
@@ -1126,7 +1141,8 @@ subroutine amrex_probinit (init,name,namlen,problo,probhi) bind(c)
          do i = domhi(1)+1, ARG_H1(v)
             do k = ARG_L3(v), ARG_H3(v)
                do j = ARG_L2(v), ARG_H2(v)
-                  v(i,j,k) = 0.0d0
+                  !                  v(i,j,k) = 0.0d0
+                  v(i,j,k) = v(i-1,j,k)                  
                end do
 	    end do
 	 end do
@@ -1152,7 +1168,9 @@ subroutine amrex_probinit (init,name,namlen,problo,probhi) bind(c)
 !                     v(i,j,k) = v_face ! careful, this may not work => just simple zero gradient
 !                     !                     v(i,domlo(2),k) = 0.5d0 * ( v_face + v(i,domlo(2),k) )
 !                  endif
-                  v(i,j,k) = min(v_face,0.0d0)
+!                  v(i,j,k) = min(v_face,0.0d0)
+!                  v(i,j+1,k) = min(v(i,j+1,k), 0.0d0)
+                  v(i,j,k) = v_face                  
                end do
 	    end do
 	 end do
@@ -1189,7 +1207,8 @@ subroutine amrex_probinit (init,name,namlen,problo,probhi) bind(c)
          do k = ARG_L3(v), domlo(3)-1
             do j = ARG_L2(v), ARG_H2(v)
                do i = ARG_L1(v), ARG_H1(v)
-                  v(i,j,k) = 0.0d0
+                  !                  v(i,j,k) = 0.0d0
+                  v(i,j,k) = v(i,j,k+1)                  
                end do
             end do
          end do
@@ -1200,7 +1219,8 @@ subroutine amrex_probinit (init,name,namlen,problo,probhi) bind(c)
          do k = domhi(3)+1, ARG_H3(v)
             do j = ARG_L2(v), ARG_H2(v)
                do i = ARG_L1(v), ARG_H1(v)
-                  v(i,j,k) = 0.0d0
+                  !                  v(i,j,k) = 0.0d0
+                  v(i,j,k) = v(i,j,k-1)                  
                end do
             end do
          end do
@@ -1329,7 +1349,8 @@ subroutine amrex_probinit (init,name,namlen,problo,probhi) bind(c)
          do i = ARG_L1(w), domlo(1)-1
             do k = ARG_L3(w), ARG_H3(w)
                do j = ARG_L2(w), ARG_H2(w)
-                  w(i,j,k) = 0.0d0
+                  !                  w(i,j,k) = 0.0d0
+                  w(i,j,k) = w(i+1,j,k)                  
                end do
 	    end do
 	 end do
@@ -1340,7 +1361,8 @@ subroutine amrex_probinit (init,name,namlen,problo,probhi) bind(c)
          do i = domhi(1)+1, ARG_H1(w)
             do k = ARG_L3(w), ARG_H3(w)
                do j = ARG_L2(w), ARG_H2(w)
-                  w(i,j,k) = 0.0d0
+                  !                  w(i,j,k) = 0.0d0
+                  w(i,j,k) = w(i-1,j,k)                  
                end do
 	    end do
 	 end do
@@ -1395,7 +1417,8 @@ subroutine amrex_probinit (init,name,namlen,problo,probhi) bind(c)
          do k = ARG_L3(w), domlo(3)-1
             do j = ARG_L2(w), ARG_H2(w)
                do i = ARG_L1(w), ARG_H1(w)
-                  w(i,j,k) = 0.0d0
+                  !                  w(i,j,k) = 0.0d0
+                  w(i,j,k) = w(i,j,k+1)                  
                end do
             end do
          end do
@@ -1406,7 +1429,8 @@ subroutine amrex_probinit (init,name,namlen,problo,probhi) bind(c)
          do k = domhi(3)+1, ARG_H3(w)
             do j = ARG_L2(w), ARG_H2(w)
                do i = ARG_L1(w), ARG_H1(w)
-                  w(i,j,k) = 0.0d0
+                  !                  w(i,j,k) = 0.0d0
+                  w(i,j,k) = w(i,j,k-1)                  
                end do
             end do
          end do

@@ -98,19 +98,25 @@ NavierStokesBase::getForce (FArrayBox&       force,
 
       Vector<Real> velmin(AMREX_SPACEDIM), velmax(AMREX_SPACEDIM);
       Vector<Real> scalmin(NUM_SCALARS), scalmax(NUM_SCALARS);
+      int imax[AMREX_SPACEDIM], jmax[AMREX_SPACEDIM], kmax[AMREX_SPACEDIM];
+      int imin[AMREX_SPACEDIM], jmin[AMREX_SPACEDIM], kmin[AMREX_SPACEDIM];
+      int bad_v=0;
+      
       for (int n=0; n<AMREX_SPACEDIM; n++) {
           velmin[n]= 1.0e15;
           velmax[n]=-1.0e15;
+	  imin[n] = -1;
+	  jmin[n] = -1;
+	  kmin[n] = -1;
+	  imax[n] = -1;
+	  jmax[n] = -1;
+	  kmax[n] = -1;	 	  
       }
-
+      
       int ix = v_hi[0]-v_lo[0]+1;
       int jx = v_hi[1]-v_lo[1]+1;
 #if (AMREX_SPACEDIM == 3)
       int kx = v_hi[2]-v_lo[2]+1;
-
-      int imax[AMREX_SPACEDIM], jmax[AMREX_SPACEDIM], kmax[AMREX_SPACEDIM];
-      int imin[AMREX_SPACEDIM], jmin[AMREX_SPACEDIM], kmin[AMREX_SPACEDIM];
-      int bad_v=0;
       
       for (int k=0; k<kx; k++) {
 #endif
@@ -162,7 +168,13 @@ NavierStokesBase::getForce (FArrayBox&       force,
       
       for (int n=0; n<NUM_SCALARS; n++) {
          scalmin[n]= 1.0e15;
-         scalmax[n]=-1.e15;
+         scalmax[n]=-1.0e15;
+	 ismin[n] = -1;
+	 jsmin[n] = -1;
+	 ksmin[n] = -1;
+	 ismax[n] = -1;
+	 jsmax[n] = -1;
+	 ksmax[n] = -1;	 
       }
       ix = s_hi[0]-s_lo[0]+1;
       jx = s_hi[1]-s_lo[1]+1;
