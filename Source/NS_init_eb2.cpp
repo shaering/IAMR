@@ -424,7 +424,7 @@ initialize_EB2 (const Geometry& geom, const int required_coarsening_level,
     */
     
     // top and bottom solid spaces
-    EB2::BoxIF box5({prob_lo[0], l_plenum, prob_lo[2]}, {prob_hi[0], l_plenum+l_bot, prob_hi[2]}, false);    
+    EB2::BoxIF box5({prob_lo[0], prob_hi[1]-l_top-l_bot-h_cham, prob_lo[2]}, {prob_hi[0], prob_hi[1]-l_top-h_cham, prob_hi[2]}, false);    
     EB2::BoxIF box6({prob_lo[0], prob_hi[1]-l_top, prob_lo[2]}, {prob_hi[0], prob_hi[1], prob_hi[2]}, false);
 
 
